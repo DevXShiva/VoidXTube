@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VoidTube branding: override SmartTube's app_name for the mobile flavor only -->
+    <string name="app_name" translatable="false">VoidTube</string>
+    <string name="mobile_player_back">Back</string>
+    <string name="mobile_player_minimize">Minimize</string>
+    <string name="mobile_player_audio_only">Audio only</string>
+    <string name="mobile_player_audio_off">Video on</string>
+    <string name="mobile_player_play">Play</string>
+    <string name="mobile_player_pause">Pause</string>
+    <string name="mobile_player_replay">Replay</string>
+    <string name="mobile_player_fullscreen">Toggle fullscreen</string>
+    <string name="mobile_player_time_default" translatable="false">0:00</string>
+    <string name="mobile_player_live" translatable="false">LIVE</string>
+    <string name="mobile_player_quality">Quality</string>
+    <!-- Gear-sheet row and sheet title for choosing the audio language (dubbed videos only). -->
+    <string name="mobile_player_audio_track">Audio track</string>
+    <string name="mobile_player_subtitles">Subtitles</string>
+    <string name="mobile_player_speed">Playback speed</string>
+    <!-- VOIDXDEV(sleep-timer): gear-sheet row + sheet title, and its states. -->
+    <string name="mobile_player_sleep_timer">Sleep timer</string>
+    <!-- VOIDXDEV(feed-strip): the first chip on Home and the first avatar on Subscriptions. -->
+    <string name="mobile_feed_all">All</string>
+    <string name="mobile_feed_show_filters">Show filters</string>
+    <!-- VOIDXDEV(autoplay): gear-sheet switch over Settings > When a video ends (on = next, off = pause). -->
+    <string name="mobile_player_autoplay">Autoplay</string>
+    <string name="mobile_sleep_end_of_video">End of video</string>
+    <string name="mobile_sleep_left">%1$d min left</string>
+    <string name="mobile_sleep_toast_minutes">Video will pause in %1$s</string>
+    <string name="mobile_sleep_toast_end">Video will pause at the end</string>
+    <string name="mobile_sleep_toast_off">Sleep timer off</string>
+    <!-- Spoken for the current-chapter button above the seek bar (it opens the Chapters list). -->
+    <string name="mobile_player_chapter_button">Chapter: %1$s. Show all chapters</string>
+    <!-- NEWTUBE(seek bar): the duration after the position ("1:10 / 4:26:52"), and the current
+         chapter's title after them ("· Introduction"). -->
+    <string name="mobile_player_duration" translatable="false">\u0020/ %1$s</string>
+    <string name="mobile_player_chapter_title" translatable="false">·\u0020%1$s</string>
+    <!-- Over the video while a seek-bar drag rests on where playback was: letting go cancels. -->
+    <string name="mobile_player_release_to_cancel">Release to cancel</string>
+    <!-- Pill over the video while press-and-hold plays it at double speed. -->
+    <string name="mobile_player_hold_speed" translatable="false">2x</string>
+    <string name="mobile_player_pip">Picture-in-picture</string>
+    <string name="mobile_player_previous">Previous</string>
+    <string name="mobile_player_next">Next</string>
+    <string name="mobile_playlist_play_all">Play all</string>
+    <string name="mobile_playlist_shuffle">Shuffle</string>
+    <!-- Shown after Shuffle, because it also turns the player's repeat mode to shuffle -->
+    <!-- Pinch-zoom hint chip, same copy as the YouTube app -->
+    <string name="mobile_player_zoom_fill">Zoomed to fill</string>
+    <string name="mobile_player_zoom_original">Original</string>
+
+    <!-- Player gear bottom-sheet menu -->
+    <string name="mobile_player_more">More options</string>
+    <string name="mobile_menu_more">More</string>
+    <!-- Trailing value on the Quality row while adaptive: "Auto (720p)". -->
+    <string name="mobile_quality_auto_current">Auto (%1$s)</string>
+    <string name="mobile_quality_auto_short">Auto</string>
+    <string name="mobile_menu_repeat">Repeat mode</string>
+    <string name="mobile_menu_shuffle">Shuffle</string>
+    <string name="mobile_menu_zoom">Zoom</string>
+    <string name="mobile_menu_background">Play in background</string>
+    <string name="mobile_menu_stats">Stats for nerds</string>
+    <string name="mobile_menu_playlist_add">Save to playlist</string>
+    <string name="mobile_menu_queue">Playback queue</string>
+    <string name="mobile_menu_on">On</string>
+    <string name="mobile_menu_off">Off</string>
+
+    <!-- Background playback media notification -->
+    <string name="mobile_playback_channel_name">Playback</string>
+    <string name="mobile_playback_channel_desc">Media controls for background playback</string>
+
+    <!-- Watch page (portrait content area under the video) -->
+    <string name="mobile_watch_like">Like</string>
+    <string name="mobile_watch_dislike">Dislike</string>
+    <string name="mobile_watch_share">Share</string>
+    <string name="mobile_lyrics">Lyrics</string>
+    <string name="mobile_lyrics_none">Lyrics aren\'t available for this song</string>
+    <string name="mobile_lyrics_source">Source: %1$s</string>
+    <!-- VOIDXDEV(lyrics): the lyrics provider chooser (LyricsSheet), in BitChord's words -->
+    <string name="mobile_lyrics_provider_description">Lyrics provider: %1$s</string>
+    <string name="mobile_lyrics_provider_choose">Choose lyrics provider</string>
+    <string name="mobile_lyrics_provider_current">Current provider</string>
+    <string name="mobile_lyrics_provider_found">Lyrics found · Tap to use</string>
+    <string name="mobile_lyrics_provider_fetching">Fetching lyrics&#8230;</string>
+    <string name="mobile_lyrics_provider_not_fetched">Tap to fetch</string>
+    <string name="mobile_lyrics_provider_not_found">Lyrics not found</string>
+    <!-- Watch-page action pill: opens the add/remove-from-playlist sheet. "Saved" while the video
+         is in at least one playlist. -->
+    <string name="mobile_watch_save">Save</string>
+    <string name="mobile_watch_saved">Saved</string>
+    <string name="mobile_watch_subscribe">Subscribe</string>
+    <string name="mobile_watch_subscribed">Subscribed</string>
+    <string name="mobile_watch_related">Up next</string>
+    <!-- In place of "Up next" when nothing loaded because there is no network (e.g. a download). -->
+    <string name="mobile_watch_offline">You\'re offline</string>
+    <!-- Queue card. "%1$s" is the playlist/queue name; the position line is "3 / 48". -->
+    <string name="mobile_watch_queue_from">Playing from %1$s</string>
+    <string name="mobile_watch_queue_position" translatable="false">%1$d / %2$d</string>
+    <string name="mobile_watch_queue_fallback">queue</string>
+    <string name="mobile_watch_queue_now_playing">Now playing</string>
+    <string name="mobile_watch_description">Description</string>
+    <string name="mobile_description_likes">Likes</string>
+    <string name="mobile_description_views">Views</string>
+    <string name="mobile_watch_count_placeholder" translatable="false">&#8211;</string>
+    <string name="mobile_watch_share_subject">Watch this video</string>
+
+    <!-- Comments panel (under the video: CommentsPanel) -->
+    <string name="mobile_comments_entry">Comments</string>
+    <string name="mobile_comments_title">Comments</string>
+    <string name="mobile_comments_replies_title">Replies</string>
+    <string name="mobile_comments_none">No comments yet</string>
+    <string name="mobile_comments_load_error">Couldn\'t load comments.</string>
+    <string name="mobile_comments_replies_load_error">Couldn\'t load replies.</string>
+    <string name="mobile_comments_sort_top">Top</string>
+    <string name="mobile_comments_sort_top_hint">Most liked first</string>
+    <string name="mobile_comments_sort_newest">Newest</string>
+    <string name="mobile_comments_sort_newest_hint">Includes possible spam</string>
+    <string name="mobile_comments_sort_description">Sort comments: %1$s</string>
+    <string name="mobile_comments_close">Close comments</string>
+    <string name="mobile_comments_back">Back to comments</string>
+    <string name="mobile_comments_read_more">Read more</string>
+    <string name="mobile_comments_show_less">Show less</string>
+    <string name="mobile_comments_open_replies">Open replies</string>
+    <string name="mobile_comments_copy">Copy comment</string>
+    <string name="mobile_comments_copied">Comment copied</string>
+    <string name="mobile_comments_like">Like comment</string>
+    <string name="mobile_comments_unlike">Remove like</string>
+    <string name="mobile_comments_liked">Liked</string>
+    <string name="mobile_comments_sign_in_to_like">Sign in to like comments</string>
+    <!-- NEWTUBE(write-comments) -->
+    <string name="mobile_comments_add_hint">Add a comment&#8230;</string>
+    <string name="mobile_comments_reply_hint">Add a reply&#8230;</string>
+    <string name="mobile_comments_reply">Reply</string>
+    <string name="mobile_comments_post">Post</string>
+    <string name="mobile_comments_posted">Comment posted</string>
+    <string name="mobile_comments_reply_posted">Reply posted</string>
+    <string name="mobile_comments_view_reply">View</string>
+    <string name="mobile_comments_post_failed">Couldn\'t post your comment</string>
+    <string name="mobile_comments_post_failed_reason">Couldn\'t post: %1$s</string>
+    <string name="mobile_comments_try_again">Try again</string>
+    <string name="mobile_comments_sign_in_to_comment">Sign in to comment</string>
+    <string name="mobile_comments_more">More actions</string>
+    <string name="mobile_comments_delete">Delete</string>
+    <string name="mobile_comments_delete_title">Delete comment?</string>
+    <string name="mobile_comments_delete_reply_title">Delete reply?</string>
+    <string name="mobile_comments_delete_message">It will be removed for everyone.</string>
+    <string name="mobile_comments_delete_cancel">Cancel</string>
+    <string name="mobile_comments_deleted">Comment deleted</string>
+    <string name="mobile_comments_delete_failed">Couldn\'t delete the comment</string>
+    <plurals name="mobile_comments_replies">
+        <item quantity="one">%1$d reply</item>
+        <item quantity="other">%1$d replies</item>
+    </plurals>
+
+    <!-- Live chat panel (bottom sheet) -->
+    <string name="mobile_live_chat_entry">Live chat</string>
+    <string name="mobile_live_chat_title">Live chat</string>
+    <string name="mobile_live_chat_empty">Waiting for messages&#8230;</string>
+
+    <string name="mobile_sheet_close">Close</string>
+
+    <string name="mobile_dialog_back">Back</string>
+    <!-- Read-only fallback shown for dialog categories not yet rendered on mobile (chat / comments). -->
+    <string name="mobile_dialog_unavailable">Not available on mobile yet.</string>
+    <string name="mobile_back">Back</string>
+    <string name="mobile_search_hint">Search for videos</string>
+    <string name="mobile_search_button">Search</string>
+    <string name="mobile_search_voice">Voice search</string>
+    <!-- The NW arrow on a suggestion row: puts the text into the field without searching. -->
+    <string name="mobile_search_insert">Refine this search</string>
+    <string name="mobile_search_clear">Clear search</string>
+    <string name="mobile_search_filters">Search filters</string>
+    <!-- SearchFiltersDialog: YouTube's own filter names. -->
+    <string name="mobile_search_filter_type">Type</string>
+    <string name="mobile_search_filter_all">All</string>
+    <string name="mobile_search_filter_videos">Videos</string>
+    <string name="mobile_search_filter_shorts">Shorts</string>
+    <string name="mobile_search_filter_channels">Channels</string>
+    <string name="mobile_search_filter_playlists">Playlists</string>
+    <string name="mobile_search_filter_movies">Movies</string>
+    <string name="mobile_search_filter_duration">Duration</string>
+    <string name="mobile_search_filter_any">Any</string>
+    <string name="mobile_search_filter_under_3">Under 3 minutes</string>
+    <string name="mobile_search_filter_3_20">3 - 20 minutes</string>
+    <string name="mobile_search_filter_over_20">Over 20 minutes</string>
+    <string name="mobile_search_filter_upload_date">Upload date</string>
+    <string name="mobile_search_filter_anytime">Anytime</string>
+    <string name="mobile_search_filter_today">Today</string>
+    <string name="mobile_search_filter_this_week">This week</string>
+    <string name="mobile_search_filter_this_month">This month</string>
+    <string name="mobile_search_filter_this_year">This year</string>
+    <string name="mobile_search_filter_prioritize">Prioritize</string>
+    <string name="mobile_search_filter_relevance">Relevance</string>
+    <string name="mobile_search_filter_popularity">Popularity</string>
+    <string name="mobile_search_filter_features">Features</string>
+    <string name="mobile_search_filter_live">Live</string>
+    <string name="mobile_search_filter_4k" translatable="false">4K</string>
+    <string name="mobile_search_filter_hd" translatable="false">HD</string>
+    <string name="mobile_search_filter_subtitles">Subtitles/CC</string>
+    <string name="mobile_search_filter_creative_commons">Creative Commons</string>
+    <string name="mobile_search_filter_360" translatable="false">360°</string>
+    <string name="mobile_search_filter_vr180" translatable="false">VR180</string>
+    <string name="mobile_search_filter_3d" translatable="false">3D</string>
+    <string name="mobile_search_filter_hdr" translatable="false">HDR</string>
+    <string name="mobile_search_filter_location">Location</string>
+    <string name="mobile_search_filter_purchased">Purchased</string>
+    <string name="mobile_search_filter_apply">Apply</string>
+    <!-- Zero-result / failed search (the two are indistinguishable at this seam); tap = retry. -->
+    <!-- SearchLoadState: an honest empty answer (no retry), and a failed search. -->
+    <string name="mobile_search_no_results">No results for “%1$s”</string>
+    <string name="mobile_search_error">Couldn\'t load results.</string>
+    <!-- Fallback tab label for a channel section the API delivered without a title. -->
+    <string name="mobile_channel_tab_videos">Videos</string>
+    <!-- Tab label for the channel's untitled shortcut row (cards opening its own Videos / Live /
+         Releases / Playlists tabs), so it does not read "Videos" twice. -->
+    <string name="mobile_channel_tab_more">More</string>
+
+    <!-- Bottom-nav "You" tab (account + extra sections + settings) -->
+    <string name="mobile_nav_you">You</string>
+    <!-- You-tab group label over the discovery feeds (Music, Gaming, News, ...). -->
+    <string name="mobile_you_explore">Explore</string>
+
+    <!-- External-link handoff (MobileWebBrowserActivity) -->
+    <string name="mobile_no_browser">No app found to open this link</string>
+
+    <!-- Companion-device / remote-control pairing (MobileAddDeviceActivity) -->
+    <string name="mobile_add_device_title">Pair a device</string>
+    <string name="mobile_add_device_done">Done</string>
+
+    <!-- Device-code sign-in screen (com.newtube.mobile.ui.signin.MobileSignInActivity) -->
+    <string name="mobile_quality_title">Quality</string>
+    <string name="mobile_quality_auto">Auto (recommended)</string>
+    <string name="mobile_audio_default">Default</string>
+    <!-- Audio track roles after the language name (AudioTrackLabel): "English (original)". -->
+    <string name="mobile_audio_role_original">original</string>
+    <string name="mobile_audio_role_dubbed">dubbed</string>
+    <!-- YouTube's own AI dub (acont=dubbed-auto): "Spanish (auto-dubbed)". -->
+    <string name="mobile_audio_role_auto_dubbed">auto-dubbed</string>
+    <string name="mobile_audio_role_descriptive">audio description</string>
+    <!-- Snackbar after picking an audio track: "Audio track: Spanish (dubbed)". -->
+    <string name="mobile_audio_track_toast">Audio track: %1$s</string>
+
+    <!-- Captions sheet (sheet_mobile_captions / showCaptionsSheet) + CC toggle snackbar -->
+    <string name="mobile_captions_off">Turn off subtitles</string>
+    <string name="mobile_captions_empty">No subtitles available for this video</string>
+    <string name="mobile_captions_style">Caption style &amp; size</string>
+    <string name="mobile_captions_on_toast">Subtitles on (%1$s)</string>
+    <string name="mobile_captions_off_toast">Subtitles off</string>
+
+    <!-- Speed sheet (sheet_mobile_speed / showSpeedSheet) -->
+    <string name="mobile_speed_normal">Normal</string>
+    <string name="mobile_speed_more">More speeds</string>
+    <string name="mobile_speed_toast">Playback speed: %1$s</string>
+    <string name="mobile_signin_title">Sign in</string>
+    <string name="mobile_signin_lead">Connect your Google account to get your subscriptions, playlists and history.</string>
+    <string name="mobile_signin_step1_title">Tap \u201cContinue with Google\u201d</string>
+    <string name="mobile_signin_step1_caption">Google\'s sign-in page opens right here.</string>
+    <string name="mobile_signin_step2_title">Choose your account and allow access</string>
+    <string name="mobile_signin_step2_caption">The page may mention a TV or another device \u2014 that\'s normal: VoidTube signs in the same way a TV does, so your password never touches the app.</string>
+    <string name="mobile_signin_step3_title">Come back to VoidTube</string>
+    <string name="mobile_signin_step3_caption">Sign-in finishes by itself \u2014 nothing else to do.</string>
+    <string name="mobile_signin_code_label">Google will show this code \u2014 check it matches:</string>
+    <string name="mobile_signin_copy_hint">Tap the code to copy it</string>
+    <string name="mobile_signin_code_copied">Code copied to clipboard</string>
+    <string name="mobile_signin_open_button">Continue with Google</string>
+    <string name="mobile_signin_manual_hint">Button not working? Open this address in any browser and enter the code:</string>
+    <string name="mobile_signin_notification">Signing in with Google\u2026</string>
+    <string name="mobile_signin_waiting_title">Waiting for Google\u2026</string>
+    <string name="mobile_signin_waiting_caption">Finish on the Google page: choose your account and allow access. You\'ll be signed in here automatically.</string>
+    <string name="mobile_signin_reopen_button">Re-open sign-in page</string>
+    <string name="mobile_signin_success">You\'re signed in!</string>
+    <string name="mobile_signin_error">Couldn\'t complete sign-in. Check your connection and try again — you\'ll get a fresh code.</string>
+    <string name="mobile_signin_retry_button">Try again</string>
+
+    <!-- Accounts sheet (com.newtube.mobile.ui.browse.AccountsSheet) -->
+    <string name="mobile_accounts_title">Accounts</string>
+    <string name="mobile_accounts_signed_out">Use without account</string>
+    <string name="mobile_accounts_sign_out">Sign out</string>
+    <string name="mobile_accounts_sign_out_title">Sign out?</string>
+    <string name="mobile_accounts_sign_out_confirm">%1$s will be removed from this device. You can sign in again anytime.</string>
+
+    <!-- Empty / sign-in-gated / errored browse section placeholders (MobileBrowseActivity) -->
+    <string name="mobile_empty_signin_section">Sign in to see your %1$s</string>
+    <string name="mobile_empty_signin_generic">Sign in to see this content</string>
+    <!-- Per-section wording (SignInCopy) - "Sign in to see your %1$s" read "your My videos". -->
+    <string name="mobile_empty_signin_subscriptions">Sign in to see your subscriptions</string>
+    <string name="mobile_empty_signin_channels">Sign in to see the channels you follow</string>
+    <string name="mobile_empty_signin_playlists">Sign in to see your playlists</string>
+    <string name="mobile_empty_signin_my_videos">Sign in to see your videos</string>
+    <string name="mobile_empty_signin_history">Sign in to see your watch history</string>
+    <string name="mobile_empty_signin_notifications">Sign in to see your notifications</string>
+    <!-- Overrides common's all-caps TV label ("SIGN IN") on the sign-in-gated empty state. -->
+    <string name="action_signin">Sign in</string>
+    <string name="mobile_empty_generic">Nothing to show here yet</string>
+    <string name="mobile_empty_subscriptions">Videos from channels you subscribe to show up here</string>
+    <!-- Same empty state, but the device has no working network: say so instead of blaming the feed. -->
+    <string name="mobile_empty_no_connection">No connection. Check your network and try again.</string>
+    <!-- Channel / uploads / playlist pages (MobileChannel*Activity): the first page failed with a
+         real error (not the network, not an empty answer); a next page failed (grid footer); a
+         pull-to-refresh failed over rows that stay on screen (snackbar). All retry with
+         mobile_signin_retry_button. -->
+    <string name="mobile_page_load_error">Couldn\'t load this page.</string>
+    <string name="mobile_load_more_error">Couldn\'t load more.</string>
+    <string name="mobile_refresh_error">Couldn\'t refresh.</string>
+
+    <!-- In-app mini-player bar (MobileBrowseActivity + MiniPlayerBridge) -->
+    <string name="mobile_mini_play_pause">Play or pause</string>
+    <!-- NEWTUBE(a11y): what TalkBack says for the mini card, the player gear, a card's ⋮ and a
+         comment's like count (was: nothing, "More options", 43 identical "More options", "12K"). -->
+    <string name="mobile_mini_expand">Expand player</string>
+    <!-- NEWTUBE(menu): card-menu wording for the phone (overrides common's TV sidebar/channel
+         phrasing). Pinned items live in the You tab, not a sidebar. -->
+    <string name="pin_playlist">Pin playlist to You</string>
+    <string name="pin_channel">Pin channel to You</string>
+    <string name="pinned_to_sidebar">Pinned to You</string>
+    <string name="unpin_from_sidebar">Unpin from You</string>
+    <string name="unpinned_from_sidebar">Unpinned from You</string>
+    <string name="subscribe_to_channel">Subscribe</string>
+    <string name="unsubscribe_from_channel">Unsubscribe</string>
+    <string name="subscribe_unsubscribe_from_channel">Subscribe or unsubscribe</string>
+    <string name="share_link">Share</string>
+    <string name="mobile_you_pinned">Pinned</string>
+    <string name="pin_unpin_from_sidebar">Pin to You</string>
+    <string name="mobile_settings_experimental">Experimental</string>
+    <!-- NEWTUBE(gestures): Settings > Player, the switches for the optional player swipes (#12). -->
+    <string name="mobile_settings_gestures">Gestures</string>
+    <string name="mobile_settings_gesture_levels">Swipe for brightness and volume</string>
+    <string name="mobile_settings_gesture_levels_summary">Up and down on the left or right of the fullscreen video</string>
+    <string name="mobile_settings_gesture_seek">Swipe to seek</string>
+    <string name="mobile_settings_gesture_seek_summary">Sideways on the video</string>
+    <string name="mobile_settings_double_tap_seek">Double-tap to seek</string>
+    <!-- Default-locale twins of the values-es overrides below (lint ExtraTranslation). -->
+    <string name="subscribed_to_channel">Subscribed</string>
+    <string name="unsubscribed_from_channel">Unsubscribed</string>
+    <string name="mobile_player_settings">Settings</string>
+    <string name="mobile_more_options_for">More options for %1$s</string>
+    <string name="mobile_comment_likes">%1$s likes</string>
+    <string name="mobile_mini_close">Close player</string>
+
+    <!-- First-run session warmup (SessionWarmup): shown under the player spinner while the
+         one-time YouTube session setup is still running on a fresh install. -->
+    <string name="mobile_first_run_setup">One-time setup — getting YouTube ready…</string>
+
+    <!-- Casting (picker, TV-code pairing, session service, player overlay). Picker copy is plain
+         words - no protocol names; one row per physical device; the tradeoff explanations live in
+         the mode-chooser subtitles, shown exactly when the choice exists. -->
+    <string name="mobile_cast_button">Cast to TV</string>
+    <string name="mobile_cast_picker_title">Cast to</string>
+    <string name="mobile_cast_searching">Looking for devices…</string>
+    <string name="mobile_cast_empty">No devices found on this Wi-Fi network</string>
+    <!-- Cast-device row: the default mode's promise, nothing else. -->
+    <string name="mobile_cast_subtitle_no_ads">Quality controls on your phone</string>
+    <!-- Lounge-only row (saved screen / DIAL TV): plain statement of what will play. -->
+    <string name="mobile_cast_subtitle_youtube_app">YouTube or SmartTube on the TV</string>
+    <!-- Chooser header for a Cast device offering both modes; tapping it goes back to the list. -->
+    <string name="mobile_cast_chooser_title">Cast to %1$s</string>
+    <!-- Chooser option 1 (default, listed first): Route A. Subtitle carries the one real cost. -->
+    <string name="mobile_cast_option_direct_title">Direct cast</string>
+    <string name="mobile_cast_option_direct_subtitle">Quality controlled from your phone · no subtitles</string>
+    <!-- Chooser option 2: Lounge via saved screen or the mdx shim. -->
+    <string name="mobile_cast_option_app_title">Play through the TV app</string>
+    <string name="mobile_cast_option_app_subtitle">Required for live and subtitles · quality controlled with the TV remote</string>
+    <!-- mdx shim in flight: launching the TV's YouTube app and reading its Lounge screenId. -->
+    <string name="mobile_cast_connecting_youtube_app">Connecting to the YouTube app on the TV…</string>
+    <!-- Route A load refusals: the session stays up, only this video can't be direct-cast. -->
+    <string name="mobile_cast_direct_live_unsupported">Live streams need YouTube or SmartTube on the TV</string>
+    <string name="mobile_cast_direct_incompatible">This video can\'t be direct-cast (no format the TV can play)</string>
+    <string name="mobile_cast_direct_load_failed">Couldn\'t prepare this video for direct cast</string>
+    <string name="mobile_cast_direct_no_wifi">Direct cast needs the phone and TV on the same Wi-Fi</string>
+    <string name="mobile_cast_link_code">Link with TV code</string>
+    <string name="mobile_cast_link_code_subtitle">Works with YouTube and SmartTube</string>
+    <string name="mobile_cast_code_hint">12-digit code</string>
+    <string name="mobile_cast_code_title">Link TV</string>
+    <string name="mobile_cast_code_app_label">TV app</string>
+    <string name="mobile_cast_code_choose_app">Choose the app open on your TV.</string>
+    <string name="mobile_cast_code_open_smarttube">In SmartTube on your TV, open:</string>
+    <string name="mobile_cast_code_open_youtube">In YouTube on your TV, open:</string>
+    <string name="mobile_cast_code_find">Find the code in either TV app:</string>
+    <string name="mobile_cast_code_youtube" translatable="false">YouTube</string>
+    <string name="mobile_cast_code_youtube_path">Settings → Link with TV code</string>
+    <string name="mobile_cast_code_smarttube" translatable="false">SmartTube</string>
+    <string name="mobile_cast_code_smarttube_path">Settings → Remote control</string>
+    <string name="mobile_cast_code_helper">Dashes and spaces are okay</string>
+    <string name="mobile_cast_code_smarttube_benefit">Tip: with SmartTube you get quality and subtitle controls on the TV.</string>
+    <string name="mobile_cast_code_positive">Link</string>
+    <string name="mobile_cast_code_invalid">The code should have 12 digits</string>
+    <string name="mobile_cast_pairing">Linking with the TV…</string>
+    <string name="mobile_cast_pair_failed">Couldn\'t link with that code. Check it and try again.</string>
+    <string name="mobile_cast_connecting">Connecting to %1$s…</string>
+    <string name="mobile_cast_launch_failed">Couldn\'t reach the TV\'s YouTube app. Try “Link with TV code”.</string>
+    <!-- Shown until the Lounge sender lands in the MediaServiceCore fork. -->
+    <string name="mobile_cast_unavailable">Casting isn\'t available in this build yet</string>
+    <!-- Player overlay + cast notification title: "Playing on Living room TV". -->
+    <string name="mobile_cast_playing_on">Playing on %1$s</string>
+    <string name="mobile_cast_disconnect">Disconnect</string>
+    <string name="mobile_cast_channel_name">Casting</string>
+    <string name="mobile_cast_channel_desc">Controls for the TV casting session</string>
+    <!-- Volume-key routing while a session is connected: lightweight toast indicator. -->
+    <string name="mobile_cast_fallback_switching">Trying YouTube on the TV…</string>
+    <string name="mobile_cast_trying_smarttube">Trying SmartTube on the TV…</string>
+    <string name="mobile_cast_trying_direct">Trying direct cast…</string>
+    <string name="mobile_cast_trying_saved">Trying the saved TV app…</string>
+    <string name="mobile_cast_checking_ad_free">Checking the TV…</string>
+    <string name="mobile_cast_smarttube_title">SmartTube</string>
+    <string name="mobile_cast_smarttube_subtitle">SmartTube · your phone can leave</string>
+    <string name="mobile_cast_youtube_title">YouTube</string>
+    <string name="mobile_cast_youtube_subtitle">YouTube · fallback</string>
+    <string name="mobile_cast_unknown_title">Saved TV app</string>
+    <string name="mobile_cast_unknown_subtitle">TV app not identified · choose ⋮ to set it</string>
+    <string name="mobile_cast_identify_app">Which TV app is this code from?</string>
+    <string name="mobile_cast_onboarding_title">SmartTube on your TV?</string>
+    <string name="mobile_cast_onboarding_body">Pair it once and the videos you cast open in SmartTube.</string>
+    <string name="mobile_cast_pair_smarttube">Pair SmartTube</string>
+    <string name="mobile_cast_receiver_no_playback">The TV app did not start playback</string>
+    <string name="mobile_cast_switching_tv_app">Opening YouTube controls on the TV…</string>
+    <string name="mobile_cast_choose_method">Choose casting method</string>
+    <string name="mobile_cast_more_options">TV playback options</string>
+    <string name="mobile_cast_controls_title">TV playback options</string>
+    <string name="mobile_cast_direct_summary">Direct cast · quality from this phone · subtitles need the TV app</string>
+    <string name="mobile_cast_app_summary">TV app · subtitles from this phone · quality from the TV remote</string>
+    <string name="mobile_cast_quality_auto_1080">Auto (up to 1080p)</string>
+    <string name="mobile_cast_quality_cap">Up to %1$dp</string>
+    <string name="mobile_cast_quality_tv_remote">Use TV remote</string>
+    <string name="mobile_cast_subtitles_need_tv_app">Switch to TV app</string>
+    <string name="mobile_cast_quality_receiver_help">Choose quality from the player settings on your TV.</string>
+    <string name="mobile_cast_subtitles_sent">Subtitle selection sent to the TV</string>
+    <string name="mobile_cast_subtitles_failed">Couldn\'t change subtitles on this receiver</string>
+    <string name="mobile_cast_switch_subtitles_title">Use the TV app for subtitles?</string>
+    <string name="mobile_cast_switch_subtitles_message">The TV app supports subtitles and controls quality with the TV remote. We try paired SmartTube first, then YouTube.</string>
+    <string name="mobile_cast_switch_subtitles_positive">Switch</string>
+    <string name="mobile_cast_tv_volume_label">TV volume</string>
+
+    <!-- Downloads -->
+    <!-- Watch-page confirmations (WatchActionFeedback) -->
+    <string name="mobile_sign_in_to_rate">Sign in to like or dislike videos</string>
+    <string name="mobile_subscribed_to">Subscribed to %1$s</string>
+    <string name="mobile_unsubscribed_from">Unsubscribed from %1$s</string>
+    <string name="mobile_subscribed">Subscribed</string>
+    <string name="mobile_unsubscribed">Unsubscribed</string>
+    <string name="mobile_undo">Undo</string>
+    <string name="mobile_liked">Added to Liked videos</string>
+    <string name="mobile_like_removed">Removed from Liked videos</string>
+    <string name="mobile_disliked">You disliked this video</string>
+    <string name="mobile_dislike_removed">Dislike removed</string>
+    <string name="mobile_rate_not_ready">Still loading this video. Try again in a moment.</string>
+    <string name="mobile_rating_not_saved">Couldn\'t save your rating. Check your connection and try again.</string>
+    <string name="mobile_download_started">Download started</string>
+    <string name="mobile_download_started_size">Download started • %1$s</string>
+    <string name="mobile_download_done">Downloaded</string>
+    <string name="mobile_download_done_size">Downloaded • %1$s</string>
+    <string name="mobile_download_already_here">Already downloaded</string>
+    <string name="mobile_download_view">View</string>
+    <string name="mobile_download_preparing">Preparing download…</string>
+    <string name="mobile_download_unavailable">This video can\'t be downloaded</string>
+    <string name="mobile_download_unavailable_live">Live streams can\'t be downloaded</string>
+    <string name="mobile_download_audio_only">Audio only</string>
+    <string name="mobile_download_already">already downloaded</string>
+    <string name="mobile_download_state_queued">Waiting to download</string>
+    <string name="mobile_download_state_downloading">Downloading · %1$d%% · %2$s of %3$s</string>
+    <string name="mobile_download_state_downloading_bytes">Downloading · %1$s</string>
+    <string name="mobile_download_state_processing">Finishing…</string>
+    <string name="mobile_download_error_generic">Download failed. Tap to retry.</string>
+    <string name="mobile_download_error_link">Download link expired. Tap to retry.</string>
+    <string name="mobile_download_done_title">Download complete</string>
+    <string name="mobile_download_play">Play</string>
+    <string name="mobile_download_retry">Retry download</string>
+    <string name="mobile_download_cancel">Cancel download</string>
+    <string name="mobile_download_delete">Delete download</string>
+    <string name="mobile_download_file_missing">The downloaded file is no longer on this device</string>
+    <string name="mobile_download_pill_downloaded">Downloaded</string>
+    <string name="mobile_downloads_empty">Videos you download appear here.\nUse Download in a video\'s menu or on the watch page.</string>
+    <string name="mobile_download_badge_queued">Queued</string>
+    <string name="mobile_download_badge_downloading">Downloading</string>
+    <string name="mobile_download_badge_failed">Failed</string>
+    <string name="mobile_download_channel_name">Downloads</string>
+    <string name="mobile_download_channel_desc">Progress of video downloads</string>
+
+    <!-- NEWTUBE(update-flow): the update sheet (Settings > About > Check for updates, the You tab's
+         update row) and the notices around it. -->
+    <string name="mobile_update_checking">Checking for updates…</string>
+    <string name="mobile_update_up_to_date">VoidTube is up to date</string>
+    <string name="mobile_update_version">Version %1$s</string>
+    <string name="mobile_update_check_failed_title">Couldn\'t check for updates</string>
+    <string name="mobile_update_check_failed_body">Check your connection and try again.</string>
+    <string name="mobile_update_available_title">Update available</string>
+    <string name="mobile_update_app_version">VoidTube %1$s</string>
+    <string name="mobile_update_app_version_size">VoidTube %1$s · %2$s</string>
+    <string name="mobile_update_metered">You\'re on mobile data.</string>
+    <string name="mobile_update_whats_new_in">What\'s new in %1$s</string>
+    <string name="mobile_update_release_notes">Full release notes</string>
+    <string name="mobile_update_later">Later</string>
+    <string name="mobile_update_dont_ask">Don\'t ask again</string>
+    <string name="mobile_update_dont_ask_done">Got it. Update anytime from the You tab or Settings › About.</string>
+    <string name="mobile_settings_update_prompt">Update pop-up</string>
+    <string name="mobile_settings_update_prompt_summary">Ask to update when a new version is out</string>
+    <string name="mobile_update_update">Update</string>
+    <string name="mobile_update_downloading_title">Downloading update</string>
+    <string name="mobile_update_progress">%1$s of %2$s</string>
+    <string name="mobile_update_cancel">Cancel</string>
+    <string name="mobile_update_download_failed_title">The download didn\'t finish</string>
+    <string name="mobile_update_download_failed_body">Try again, or get VoidTube %1$s from GitHub.</string>
+    <string name="mobile_update_install_failed_title">Couldn\'t open the installer</string>
+    <string name="mobile_update_github">Open GitHub</string>
+    <string name="mobile_update_try_again">Try again</string>
+    <string name="mobile_update_ready_title">Ready to install</string>
+    <string name="mobile_update_install">Install</string>
+    <string name="mobile_update_permission_title">Allow VoidTube to install updates</string>
+    <string name="mobile_update_permission_body">Android asks this once. On the next screen, turn on “Allow from this source”, then come back: the update installs right away.</string>
+    <string name="mobile_update_open_settings">Open settings</string>
+    <string name="mobile_update_not_now">Not now</string>
+    <string name="mobile_update_done">Done</string>
+    <string name="mobile_update_whats_new">What\'s new</string>
+    <string name="mobile_update_updated">Updated to VoidTube %1$s</string>
+    <string name="mobile_update_downloaded">Update downloaded</string>
+    <string name="mobile_update_row_available">Update available</string>
+    <string name="mobile_update_row_downloading">Downloading update</string>
+    <string name="mobile_update_row_downloading_percent">VoidTube %1$s · %2$d%%</string>
+    <string name="mobile_update_row_ready">Update ready to install</string>
+    <string name="mobile_update_channel_name">App updates</string>
+    <string name="mobile_update_channel_desc">Downloading a VoidTube update</string>
+    <!-- NEWTUBE(theme): Settings > User interface > Theme. -->
+    <string name="mobile_theme">Theme</string>
+    <string name="mobile_theme_system">System default</string>
+    <string name="mobile_theme_light">Light</string>
+    <string name="mobile_theme_dark">Dark</string>
+
+    <!-- NEWTUBE(about-growth): the last two rows of Settings > About. Tap-only: no prompt, badge
+         or counter. Never "ad-free" wording. -->
+    <string name="mobile_about_star">Star VoidTube on GitHub</string>
+    <string name="mobile_about_star_desc">Free and open source. A star helps others find it</string>
+    <string name="mobile_about_share">Share VoidTube</string>
+    <string name="mobile_about_share_desc">Send the link to someone who\'d like it</string>
+    <string name="mobile_about_share_text">VoidTube — a YouTube client for phones, built on SmartTube: %1$s</string>
+    <string name="mobile_about_repo_url" translatable="false">https://github.com/DevXShiva/VoidXTube</string>
+    <string name="mobile_about_site_url" translatable="false">https://github.com/DevXShiva/VoidXTube</string>
+    <!-- VOIDXDEV(branding): the Telegram channel row in Settings > About. The link itself is the
+         voidx_telegram_url resource, injected from build.gradle (see the stmobile flavor). -->
+    <string name="mobile_about_telegram_title">Telegram channel</string>
+    <string name="mobile_about_telegram_summary">Updates, releases and support</string>
+    <!-- Experimental SABR playback (was strings_sabr.xml) -->
+    <string name="sabr_vod_option">Prefer SABR even when links work (experimental; next VOD)</string>
+    <string name="sabr_vod_stopped">Experimental SABR playback stopped. Tap play to retry, or disable SABR in Settings.</string>
+    <!-- VOIDXDEV(up-next): the countdown card over an ended video. %1$d = seconds left. -->
+    <string name="mobile_next_in">Up next in %1$d</string>
+    <string name="mobile_next_play">Play now</string>
+    <string name="mobile_next_cancel">Cancel</string>
+</resources>

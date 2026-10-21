@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(accent): a choice radio - the accent when picked, the secondary text colour when not. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/voidx_accent" android:state_checked="true" />
+    <item android:color="@color/mobile_color_on_surface_secondary" />
+</selector>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(comments-panel): a comment-shaped loading row (a shimmer sweeps it, ShimmerLinearLayout): the
+     avatar, then a handle line and two lines of text at 34%, 92% and 70% of the column. -->
+<com.newtube.mobile.ui.common.ShimmerLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:importantForAccessibility="noHideDescendants"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="10dp">
+
+    <View
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="@drawable/bg_comment_skeleton_avatar" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="2dp">
+
+        <LinearLayout style="@style/MobileSkeletonCommentLine">
+            <View style="@style/MobileSkeletonCommentBar" android:layout_weight="34" />
+            <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="66" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MobileSkeletonCommentLine" android:layout_marginTop="8dp">
+            <View style="@style/MobileSkeletonCommentBar" android:layout_weight="92" />
+            <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="8" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MobileSkeletonCommentLine" android:layout_marginTop="8dp">
+            <View style="@style/MobileSkeletonCommentBar" android:layout_weight="70" />
+            <Space android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="30" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.newtube.mobile.ui.common.ShimmerLinearLayout>

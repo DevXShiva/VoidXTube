@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Mobile (touch) flavor manifest overlay.
+
+  Overrides the TV manifest so the app installs and shows in the launcher on
+  ordinary touchscreen phones/tablets:
+    * android.software.leanback  -> NOT required (TV manifest + leanbackassistant
+      both declare it required=true; tools:replace forces the merged value false).
+    * android.hardware.touchscreen -> required (TV manifest declares it false).
+
+  SplashActivity already carries the normal LAUNCHER category in the main manifest,
+  so no launcher changes are needed here - it routes via SplashPresenter ->
+  ViewManager.startView(BrowseView.class)/startDefaultView(), both of which are
+  re-pointed at the touch Home screen below (see MobileMainApplication).
+
+  Wave 1 vertical slice: override the Application class to MobileMainApplication
+  (re-points just the BrowseView mapping + root activity at the touch shell; every
+  other TV View->Activity mapping from MainApplication.setupViewManager() is left
+  intact) and declare the touch Home Activity itself.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          tools:ignore="MissingLeanbackLauncher,UnsupportedTvHardware">
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false"
+        tools:replace="android:required" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="true"
+        tools:replace="android:required" />
+
+    <!-- Background audio: a media-playback foreground service (MobilePlaybackService) keeps the
+         reused ExoPlayer alive + posts the media notification when the app is backgrounded / screen
+         off. FOREGROUND_SERVICE (API 28+) and FOREGROUND_SERVICE_MEDIA_PLAYBACK (API 34+) are both
+         normal, auto-granted permissions. POST_NOTIFICATIONS is already declared in the main manifest. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Video downloads run as a dataSync foreground service (the type Android 14 accepts for
+         transfers); this is its API 34+ companion permission. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Drag haptics (ui/common/Haptics): the Pixel's own swipe feel is composed from vibration
+         primitives, which only the Vibrator plays - View.performHapticFeedback has no way to ask
+         for them. Normal, auto-granted permission. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- The in-app updater hands its APK straight to Android's installer (AppUpdates.systemInstaller):
+         from Android 11 these queries make the installers visible, so apps that also open APK files
+         do not turn the install into an "Open with" chooser. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.INSTALL_PACKAGE" />
+            <data android:mimeType="application/vnd.android.package-archive" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/vnd.android.package-archive" />
+        </intent>
+    </queries>
+
+    <!-- Casting (Route B): SSDP/DIAL discovery needs multicast (Android filters multicast in
+         hardware unless a MulticastLock is held - see DialDiscovery); the cast session service
+         holds a WifiLock + partial wakelock so the Lounge status stream survives screen-off.
+         All three are normal, auto-granted permissions. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- Android 16+ Local Network Protection: runtime permission gating LAN multicast/unicast
+         (SSDP/DIAL discovery). Unknown on older releases; requested before the cast picker. -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Background audio with the screen off: OEM battery managers kill optimized apps (BackgroundPlay). -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- LAUNCH MODES: every touch activity is singleTop (NOT the TV's singleInstance) so ALL
+         screens share ONE task, like a normal phone app. singleInstance put each screen in its
+         own task, and Android 12+ plays a non-overridable system slide/zoom for every cross-TASK
+         switch - the "brutal sliding transition" on video open/minimize/expand. In-task activity
+         transitions honor the theme animations (PlayerWindowAnimation/BrowseWindowAnimation).
+         Instance reuse (what singleInstance used to provide) comes from
+         FLAG_ACTIVITY_REORDER_TO_FRONT, added by ViewManager on the touch flavor
+         (setReorderToFrontEnabled in MobileMainApplication) and by the notification intent. -->
+    <!-- NEWTUBE(ui-mode): every touch activity also lists uiMode in configChanges. A light/dark switch
+         - which a scheduled dark mode or battery saver does unattended - used to recreate them,
+         which reloaded the playing video. With the Theme setting (System default / Light / Dark,
+         ThemeMode) the app decides itself when a screen changes side: MobileActivity.checkTheme
+         recreates an ordinary screen (Browse and Settings keep their state across it), and the
+         player re-colours its watch page in place so the video never stops. -->
+    <application
+        android:name="com.newtube.mobile.MobileMainApplication"
+        android:theme="@style/Theme.NewTube"
+        tools:replace="android:name,android:theme">
+
+        <!-- The TV manifest makes Splash singleInstance, which puts it in a separate task and
+             forces Android's non-overridable cross-task slide when it routes into mobile Home.
+             Keep the launcher and Home in the same normal phone task. -->
+        <!-- NEWTUBE(theme): uiMode too - the first launch after the Theme setting's migration applies
+             the app's night mode (ThemeMode, setApplicationNightMode on Android 12+) while this
+             routing screen may still be starting; it draws nothing, so it must not be relaunched. -->
+        <activity
+            android:name="com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|uiMode"
+            android:theme="@style/Theme.VoidTube.Splash"
+            tools:replace="android:launchMode,android:configChanges">
+            <!-- VOIDXDEV(app icon): the launcher entries are the aliases below, one per icon. -->
+            <intent-filter tools:node="removeAll" />
+        </activity>
+
+        <!-- VOIDXDEV(app icon): Settings > Customization > App icon enables exactly one (AppIcon). -->
+        <activity-alias
+            android:name="com.newtube.mobile.icon.Default"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/app_icon"
+            android:targetActivity="com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name="com.newtube.mobile.icon.Classic"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/app_icon_classic"
+            android:targetActivity="com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name="com.newtube.mobile.icon.Fantasy"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/app_icon_fantasy"
+            android:targetActivity="com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity
+            android:name="com.newtube.mobile.ui.browse.MobileBrowseActivity"
+            android:exported="false"
+            android:supportsPictureInPicture="true"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+        <!--
+          Touch player (Wave 2). configChanges covers orientation/screenSize/keyboardHidden so
+          the Activity (and the live ExoPlayer instance it holds) survives device rotation
+          instead of being torn down and recreated - rotating to landscape is exactly how the
+          user reaches fullscreen. screenOrientation="user" lets the sensor decide within the
+          system auto-rotate setting, so portrait playback still works on devices/users with
+          auto-rotate off. Not "unspecified" like the other screens: this window is translucent,
+          and a translucent activity with an unspecified orientation has no say - the display
+          followed whatever was behind it, so a video opened from another app over the launcher
+          (portrait-only on Pixel) never rotated. MobilePlaybackActivity.FREE_ORIENTATION.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.playback.MobilePlaybackActivity"
+            android:enableOnBackInvokedCallback="true"
+            tools:targetApi="33"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="user"
+            android:theme="@style/Theme.NewTube.Player" />
+
+        <!--
+          Background-playback foreground service (Background Audio + PiP wave). Reuses the single
+          ExoPlayer instance owned by MobilePlaybackActivity - it does NOT create a second player.
+          Holds the MediaSessionCompat + MediaSessionConnector + PlayerNotificationManager and
+          promotes itself to the foreground (type mediaPlayback) while audio is playing so playback
+          survives backgrounding / screen-off on API 34+.
+        -->
+        <service
+            android:name="com.newtube.mobile.ui.playback.MobilePlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!--
+          Cast-session foreground service (casting wave). While a Lounge session is active the
+          phone is only a remote, but the process must survive backgrounding so the status
+          subscription keeps flowing: holds a WifiLock + partial wakelock and a media-style
+          notification with play/pause + disconnect. Same FGS pattern as MobilePlaybackService
+          (first startForeground reached from the foreground; API 31+ rejection tolerated).
+        -->
+        <service
+            android:name="com.newtube.mobile.casting.CastSessionService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!--
+          Video-download foreground service (downloads wave). Drains the download queue one
+          item at a time with a progress notification; type dataSync is the one Android 14+
+          allows for transfers. Started from the foreground on enqueue, promoted at once in
+          onStartCommand, stopped when the queue is empty.
+        -->
+        <service
+            android:name="com.newtube.mobile.downloads.MobileDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- NEWTUBE(update-flow): holds the app in the foreground while an update APK downloads,
+             so leaving the app doesn't cut the transfer (UpdateDownloadService). -->
+        <service
+            android:name="com.newtube.mobile.update.UpdateDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!--
+          Touch AppDialog renderer (Wave 3). configChanges/launchMode mirror the other
+          registered View Activities: ViewManager.startActivity() always launches with
+          FLAG_ACTIVITY_NEW_TASK from a non-Activity Context, and surviving rotation matters
+          here too - the in-memory dialog level backstack (and the OptionItem callback
+          closures captured by it) would otherwise be lost on a config change.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.dialog.MobileAppDialogActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube.Dialog" />
+
+        <!--
+          Update sheet (NEWTUBE update-flow): a transparent host for one bottom sheet, so About's
+          Check for updates, the You tab's update row and the update snackbars all open it, and it
+          is still there to resume the install after Android's "Install unknown apps" screen.
+          configChanges: a rotation keeps the sheet (the download state lives in AppUpdates).
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.update.MobileUpdateActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube.Dialog" />
+
+        <!--
+          Touch Channel-Uploads list + Channel page (Wave 4a). Same singleInstance +
+          configChanges pattern as the other touch Activities: ViewManager.startActivity()
+          launches with FLAG_ACTIVITY_NEW_TASK, and surviving rotation keeps the loaded
+          content (and the presenter's in-flight Rx load) instead of recreating the screen.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.channel.MobileChannelUploadsActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+        <activity
+            android:name="com.newtube.mobile.ui.channel.MobileChannelActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+        <!--
+          Touch Search screen (Wave 4b). Same singleInstance + configChanges pattern as the
+          other touch Activities (ViewManager.startActivity() launches with FLAG_ACTIVITY_NEW_TASK;
+          surviving rotation keeps the loaded results + the presenter's in-flight Rx load).
+          adjustResize so the results grid shrinks (rather than being covered) when the soft
+          keyboard is up while typing a query.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.search.MobileSearchActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.NewTube" />
+
+        <!--
+          Touch device-code sign-in screen (Wave 5, ARCHITECTURE.md section 7). Same
+          singleInstance + configChanges pattern as the other touch Activities:
+          ViewManager.startActivity() launches with FLAG_ACTIVITY_NEW_TASK, and surviving
+          rotation keeps the live device-code OAuth poll (the YTSignInPresenter Rx subscription)
+          and the already-rendered code/QR instead of restarting the whole sign-in flow.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.signin.MobileSignInActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+        <!--
+          Sign-in keep-alive (shortService): keeps the device-code token poll's network alive
+          while the browser Custom Tab covers the app, so the success auto-return can fire
+          behind the tab. Started on approval hand-off, stopped on success/error/exit.
+        -->
+        <service
+            android:name="com.newtube.mobile.ui.signin.MobileSignInKeepaliveService"
+            android:exported="false"
+            android:foregroundServiceType="shortService" />
+
+        <!--
+          External-link handoff (parity gap). Implements WebBrowserView by launching the device
+          browser via ACTION_VIEW and finishing immediately (no UI of its own), so About /
+          SponsorBlock / DeArrow "open link" actions leave the app instead of showing the TV QR
+          web page. Translucent dialog theme avoids a black flash on this finish-in-onCreate screen.
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.webbrowser.MobileWebBrowserActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube.Dialog" />
+
+        <!--
+          Companion-device / remote-control pairing (parity gap). Touch replacement for the Leanback
+          AddDeviceActivity (GuidedStep); implements AddDeviceView. Same singleInstance +
+          configChanges pattern as the other touch Activities - surviving rotation keeps the live
+          pairing-code Rx subscription and the already-rendered code.
+        -->
+        <!--
+          Phone Settings (issue #2): the settings tree of com.newtube.mobile.ui.settings, one page
+          at a time. Same shared task and configChanges as the other touch screens (a theme switch
+          recreates it through MobileActivity.checkTheme, landing on the same page).
+        -->
+        <activity
+            android:name="com.newtube.mobile.ui.settings.MobileSettingsActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+        <activity
+            android:name="com.newtube.mobile.ui.adddevice.MobileAddDeviceActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection|keyboardHidden|uiMode"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.NewTube" />
+
+    </application>
+
+</manifest>

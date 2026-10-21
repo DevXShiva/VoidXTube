@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A search result: the icon of its section, its title (the matched words in bold) and where it
+     is ("Tabs and feeds › Hidden videos"). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="64dp"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/mobile_settings_row_inset"
+    android:paddingEnd="@dimen/mobile_settings_row_inset">
+
+    <ImageView
+        android:id="@+id/settings_result_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="@dimen/mobile_settings_icon_gap"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:tint="@color/mobile_color_on_surface_secondary" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/mobile_settings_row_padding_vertical"
+        android:paddingBottom="@dimen/mobile_settings_row_padding_vertical">
+
+        <TextView
+            android:id="@+id/settings_result_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="@dimen/mobile_settings_row_title_size"
+            tools:text="Sleep timer" />
+
+        <TextView
+            android:id="@+id/settings_result_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="@dimen/mobile_settings_row_summary_size"
+            tools:text="Playback" />
+
+    </LinearLayout>
+
+</LinearLayout>

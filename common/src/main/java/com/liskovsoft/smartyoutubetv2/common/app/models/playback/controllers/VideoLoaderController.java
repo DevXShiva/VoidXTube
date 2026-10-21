@@ -1,0 +1,1211 @@
+package com.liskovsoft.smartyoutubetv2.common.app.models.playback.controllers;
+
+import android.os.Build.VERSION;
+import android.os.SystemClock;
+import android.text.TextUtils;
+
+import com.liskovsoft.mediaserviceinterfaces.MediaItemService;
+import com.liskovsoft.mediaserviceinterfaces.data.MediaFormat;
+import com.liskovsoft.mediaserviceinterfaces.data.MediaItemFormatInfo;
+import com.liskovsoft.mediaserviceinterfaces.data.MediaItemMetadata;
+import com.liskovsoft.sharedutils.helpers.Helpers;
+import com.liskovsoft.sharedutils.helpers.MessageHelpers;
+import com.liskovsoft.sharedutils.mylogger.Log;
+import com.liskovsoft.sharedutils.rx.RxHelper;
+import com.liskovsoft.smartyoutubetv2.common.R;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Playlist;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.SimpleMediaItem;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.VideoGroup;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.BasePlayerController;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.QueuePlaybackMode;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.manager.PlayerConstants;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.AppDialogPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.PlaybackPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.VideoActionPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.views.PlaybackView;
+import com.liskovsoft.smartyoutubetv2.common.misc.LiveStartPollPolicy;
+import com.liskovsoft.smartyoutubetv2.common.misc.MediaServiceManager;
+import com.liskovsoft.smartyoutubetv2.common.misc.VideoDownloads;
+import com.liskovsoft.smartyoutubetv2.common.misc.NetPath;
+import com.liskovsoft.smartyoutubetv2.common.prefs.PlayerData;
+import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
+
+import io.reactivex.rxjava3.disposables.Disposable;
+
+public class VideoLoaderController extends BasePlayerController {
+    private static final String TAG = VideoLoaderController.class.getSimpleName();
+    private static final int MIN_SHUFFLE_SIZE = 30;
+    /** Media3 has already unwound the failed source; only a short main-loop turn is needed. */
+    private static final int URL_REMINT_RELOAD_DELAY_MS = 100;
+    private final Playlist mPlaylist;
+    private Video mPendingVideo;
+    private SuggestionsController mSuggestionsController;
+    private ErrorFixerController mErrorFixerController;
+    private long mSleepTimerStartMs;
+    private Disposable mFormatInfoAction;
+    private long mPlaybackGeneration;
+    private final PreMediaRetryGate mPreMediaRetry = new PreMediaRetryGate();
+    // NEWTUBE(autoplay-budget): see UnplayableAutoplayBudget.
+    private final UnplayableAutoplayBudget mUnplayableBudget = new UnplayableAutoplayBudget();
+    /**
+     * NEWTUBE(upcoming-poll): a scheduled live stream / premiere is re-opened until /player answers
+     * with media. That used to happen every 30 s regardless of the schedule, visibility or how long
+     * it had been waiting, and every poll also re-fetched /next. The delay now comes from
+     * {@link LiveStartPollPolicy#PLAYER} (scheduled start when known, else the not-live streak),
+     * doubled while the slate is hidden, and suggestions are fetched once per video.
+     */
+    private String mUpcomingVideoId;
+    private int mUpcomingNotLiveAnswers;
+    private long mUpcomingStartMs;
+    /** elapsedRealtime of the last not-live answer, and the foreground delay chosen at that time. */
+    private long mUpcomingAnsweredAtMs;
+    private long mUpcomingForegroundDelayMs;
+    /** elapsedRealtime the pending poll fires at; 0 = no upcoming poll is pending. */
+    private long mUpcomingPollDueAtMs;
+    private boolean mViewResumed = true;
+    /** True while our own delayed reload re-enters onNewVideo (not a user open). */
+    private boolean mReloadDispatching;
+    private final Runnable mReloadVideo = () -> {
+        Video video = getVideo();
+        NetPath.log(NetPath.context() + " reload-dispatch video="
+                + (video != null ? video.videoId : "?")
+                + " pos=" + (getPlayer() != null ? getPlayer().getPositionMs() : -1));
+        mReloadDispatching = true;
+        try {
+            getMainController().onNewVideo(video);
+        } finally {
+            mReloadDispatching = false;
+        }
+    };
+    private final Runnable mLoadNext = this::loadNext;
+    private final Runnable mLoadNextPastUnplayable = () -> {
+        // Before loadNext: the open it leads to may land later (suggestions still loading, or a
+        // playlist item resolved first).
+        mUnplayableBudget.onAdvance(SystemClock.elapsedRealtime());
+        loadNext();
+    };
+    /**
+     * VOIDXDEV(shorts): a swipe past the last loaded short waits for the feed's next page instead of
+     * being dropped. Signed in, the Shorts tab opens on a partial first page (a subscription short
+     * or two) and the rest of the feed lands seconds later, appended to the queue by the tab.
+     */
+    private static final int SHORTS_NEXT_TRIES = 30; // 500 ms apart: 15 s
+    private Video mShortsNextWaitFor;
+    private int mShortsNextTries;
+    private final Runnable mShortsNextRetry = () -> {
+        if (getPlayer() != null && getVideo() != null && getVideo() == mShortsNextWaitFor) {
+            loadNext();
+        }
+    };
+    private final Runnable mMetadataSync = () -> {
+        if (getPlayer() != null) {
+            waitMetadataSync(getVideo(), false);
+        }
+    };
+    private final Runnable mRestartEngine = () -> {
+        if (getPlayer() != null) {
+            getPlayer().restartEngine(); // properly save position of the current track
+        }
+    };
+    private final Runnable mOnApplyPlaybackMode = () -> {
+        if (getPlayer() != null && getPlayer().getPositionMs() >= getPlayer().getDurationMs()) {
+            applyPlaybackMode(getPlaybackMode());
+        }
+    };
+    private final Runnable mShowProgressBar = () -> {
+        if (getPlayer() != null) {
+            getPlayer().showProgressBar(true);
+        }
+    };
+    /** NEWTUBE(next-prefetch): one-shot deadline timer, see {@link NextPrefetchPolicy}. */
+    private final Runnable mNextPrefetchDue = this::onNextPrefetchDue;
+    /** What this playback may still spend on autoplay-next resolutions (targets, retries). */
+    private final NextPrefetchLedger mNextPrefetchLedger = new NextPrefetchLedger();
+    /** Wall time this open has spent PLAYING, for the short-clip guard (a seek adds nothing). */
+    private long mPlayedWallMs;
+    private long mPlayingSinceMs = -1;
+
+    public VideoLoaderController() {
+        mPlaylist = Playlist.instance();
+    }
+
+    @Override
+    public void onInit() {
+        mSuggestionsController = getController(SuggestionsController.class);
+        mErrorFixerController = getController(ErrorFixerController.class);
+        mSleepTimerStartMs = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onNewVideo(Video item) {
+        mPreMediaRetry.clear();
+        mUnplayableBudget.onOpen(mReloadDispatching, SystemClock.elapsedRealtime());
+        if (!mReloadDispatching) {
+            mUpcomingVideoId = null; // NEWTUBE(upcoming-poll): a user open starts a fresh streak
+        }
+        if (item == null) {
+            return;
+        }
+
+        item.isShuffled = false;
+        // Opening something outside the shuffled playlist ends that queue's shuffle.
+        QueuePlaybackMode.onNewVideo(item);
+
+        if (!item.fromQueue && !item.belongsToPlaybackQueue()) {
+            mPlaylist.add(item);
+        } else {
+            item.fromQueue = false;
+        }
+
+        if (getPlayer() != null && getPlayer().isEngineInitialized()) { // player is initialized
+            // Fix improperly resized video after exit from PIP (Device Formuler Z8 Pro)
+            loadVideo(item); // force play immediately even the same video
+        } else {
+            mPendingVideo = item;
+        }
+    }
+
+    @Override
+    public void onEngineInitialized() {
+        if (getPlayer() == null) {
+            return;
+        }
+        
+        loadVideo(Helpers.firstNonNull(mPendingVideo, getVideo()));
+        // The EFFECTIVE mode, so a queue-scoped shuffle shows as shuffle rather than lying.
+        getPlayer().setButtonState(R.id.action_repeat, getPlaybackMode());
+        mSleepTimerStartMs = System.currentTimeMillis();
+        mPendingVideo = null;
+    }
+
+    @Override
+    public void onEngineReleased() {
+        mPlaybackGeneration++;
+        mPreMediaRetry.clear();
+        disposeActions();
+    }
+
+    @Override
+    public void onPlayClicked() {
+        retryPreMediaDenial();
+    }
+
+    @Override
+    public void onPauseClicked() {
+        // The first toggle after a denial may be Pause because playWhenReady stayed true.
+        retryPreMediaDenial();
+    }
+
+    private void retryPreMediaDenial() {
+        PlaybackView player = getPlayer();
+        Video video = getVideo();
+        if (player == null || video == null || player.containsMedia()
+                || !mPreMediaRetry.tryBeginRetry(video.videoId)) {
+            return;
+        }
+
+        // A server playability denial happens before a MediaSource exists, so the engine's
+        // error-capped retry never owns it. Re-enter ONLY the normal format-fetch path: keep
+        // its negative cache and bot-check cooldown, and never apply the media-error route
+        // switch or invalidate authentication. A repeated tap cannot overlap this fetch.
+        NetPath.logTap(video.videoId);
+        NetPath.log(NetPath.context() + " pre-media-retry user=y cache-policy=unchanged");
+        player.setPlayWhenReady(true);
+        loadVideo(video);
+    }
+
+    @Override
+    public void onViewResumed() {
+        mViewResumed = true;
+        hastenUpcomingPollIfNeeded();
+    }
+
+    @Override
+    public void onViewPaused() {
+        mViewResumed = false;
+    }
+
+    @Override
+    public void onVideoLoaded(Video video) {
+        if (getPlayer() == null) {
+            return;
+        }
+        
+        // getPlaybackMode() already folds in finishOnEnded -> CLOSE, plus any queue-scoped shuffle.
+        getPlayer().setButtonState(R.id.action_repeat, getPlaybackMode());
+        // Can't set title at this point
+        //checkSleepTimer();
+    }
+
+    @Override
+    public boolean onPreviousClicked() {
+        loadPrevious();
+
+        return true;
+    }
+
+    @Override
+    public boolean onNextClicked() {
+        mShortsNextTries = 0; // VOIDXDEV(shorts): a new swipe waits afresh
+        if (getGeneralData().isChildModeEnabled()) {
+            onPlayEnd();
+        } else {
+            loadNext();
+        }
+
+        return true;
+    }
+
+    public void loadPrevious() {
+        mUnplayableBudget.onUserPick();
+        if (getPlayer() == null) {
+            return;
+        }
+
+        openVideoInt(mSuggestionsController.getPrevious());
+
+        if (getPlayerTweaksData().isPlayerUiOnNextEnabled()) {
+            getPlayer().showOverlay(true);
+        }
+    }
+
+    public void loadNext() {
+        if (getPlayer() == null || getVideo() == null) {
+            return;
+        }
+
+        Video next = mSuggestionsController.getNext();
+
+        if (next != null) {
+            openVideoInt(next);
+        } else {
+            waitMetadataSync(getVideo(), true);
+        }
+
+        if (getPlayerTweaksData().isPlayerUiOnNextEnabled()) {
+            getPlayer().showOverlay(true);
+        }
+    }
+
+    @Override
+    public void onPlayEnd() {
+        stopPlayedClock();
+        Utils.removeCallbacks(mNextPrefetchDue);
+        if (getPlayer() == null) {
+            return;
+        }
+
+        // Stop the playback if the user is browsing options or reading comments
+        int playbackMode = getPlaybackMode();
+        if (getAppDialogPresenter().isDialogShown() && !getAppDialogPresenter().isOverlay() && playbackMode != PlayerConstants.PLAYBACK_MODE_ONE) {
+            getAppDialogPresenter().setOnFinish(mOnApplyPlaybackMode);
+        } else {
+            applyPlaybackMode(playbackMode);
+        }
+    }
+
+    @Override
+    public void onSuggestionItemClicked(Video item) {
+        mUnplayableBudget.onUserPick();
+        openVideoInt(item);
+
+        if (getPlayer() != null)
+            getPlayer().showControls(false);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode) {
+        mSleepTimerStartMs = System.currentTimeMillis();
+
+        // Remove error msg if needed
+        if (getPlayer() != null && getPlayerData().getSleepTimerHours() > 0) {
+            getPlayer().setVideo(getVideo());
+        }
+
+        Utils.removeCallbacks(mRestartEngine);
+
+        return false;
+    }
+
+    @Override
+    public void onTickle() {
+        checkSleepTimer();
+        preloadNextVideoIfNeeded(); // fallback only - the deadline timer below normally fires first
+    }
+
+    // NEWTUBE(next-prefetch): keep the autoplay-next deadline in step with the playhead. Every
+    // event that moves "wall time until the end" re-arms it; pause/end/open cancel it.
+    @Override
+    public void onPlay() {
+        if (mPlayingSinceMs < 0) {
+            mPlayingSinceMs = SystemClock.elapsedRealtime();
+        }
+        scheduleNextPrefetch();
+    }
+
+    @Override
+    public void onPause() {
+        stopPlayedClock();
+        Utils.removeCallbacks(mNextPrefetchDue);
+    }
+
+    @Override
+    public void onBuffering() {
+        stopPlayedClock(); // a rebuffer is not watching; onPlay restarts the clock and the timer
+    }
+
+    private void stopPlayedClock() {
+        if (mPlayingSinceMs >= 0) {
+            mPlayedWallMs += SystemClock.elapsedRealtime() - mPlayingSinceMs;
+            mPlayingSinceMs = -1;
+        }
+    }
+
+    private long playedWallMs() {
+        return mPlayedWallMs + (mPlayingSinceMs >= 0 ? SystemClock.elapsedRealtime() - mPlayingSinceMs : 0);
+    }
+
+    @Override
+    public void onSeekEnd() {
+        scheduleNextPrefetch();
+    }
+
+    @Override
+    public void onSpeedChanged(float speed) {
+        scheduleNextPrefetch();
+    }
+
+    private void scheduleNextPrefetch() {
+        Utils.removeCallbacks(mNextPrefetchDue);
+        PlaybackView player = getPlayer();
+        if (player == null || getVideo() == null || getVideo().isLive || !player.isPlaying()) {
+            return;
+        }
+        // VOIDXDEV(shorts): the next swipe can come any second - warm the next short as soon as this
+        // one is playing (its own first media is in by then), not five seconds in.
+        long delayMs = isShortsSwipe() ? Math.max(0, SHORTS_PREFETCH_AFTER_MS - playedWallMs())
+                : NextPrefetchPolicy.delayUntilDueMs(player.getDurationMs(),
+                player.getPositionMs(), player.getSpeed(), playedWallMs());
+        if (delayMs == NextPrefetchPolicy.NEVER) {
+            return;
+        }
+        if (delayMs == 0) {
+            preloadNextVideoIfNeeded();
+        } else {
+            Utils.postDelayed(mNextPrefetchDue, delayMs);
+        }
+    }
+
+    private void onNextPrefetchDue() {
+        PlaybackView player = getPlayer();
+        if (player == null) {
+            return;
+        }
+        // A rebuffer or a slow playhead makes the timer early; re-arm from the real position.
+        if (isShortsSwipe() || NextPrefetchPolicy.isDue(player.getDurationMs(), player.getPositionMs(),
+                player.getSpeed(), playedWallMs())) {
+            preloadNextVideoIfNeeded();
+        } else {
+            scheduleNextPrefetch();
+        }
+    }
+
+    private void checkSleepTimer() {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        float sleepHours = getPlayerData().getSleepTimerHours();
+        if (sleepHours > 0 && System.currentTimeMillis() - mSleepTimerStartMs > sleepHours * 60 * 60 * 1_000) {
+            getPlayer().setPlayWhenReady(false);
+            getPlayer().setTitle(getContext().getString(R.string.player_sleep_timer)
+                    + " (" + getContext().getResources().getQuantityString(R.plurals.hours, (int) sleepHours, Helpers.toString(sleepHours)) + ")");
+            getPlayer().showOverlay(true);
+            Helpers.enableScreensaver(getActivity());
+        }
+    }
+
+    /**
+     * Force load and play!
+     */
+    private void loadVideo(Video item) {
+        if (getPlayer() != null && item != null) {
+            mPlaybackGeneration++;
+            mPlayedWallMs = 0; // NEWTUBE(next-prefetch): the short-clip guard counts per open
+            mPlayingSinceMs = -1;
+            NetPath.logOpen(item.videoId, item.getTitle()); // NetPath milestone 1: open requested
+            mPlaylist.setCurrent(item);
+            getPlayer().setVideo(item);
+            getPlayer().resetPlayerState();
+            loadFormatInfo(item);
+        }
+    }
+
+    /**
+     * Force load suggestions.
+     */
+    private void loadSuggestions(Video item) {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        if (item != null) {
+            mPlaylist.setCurrent(item);
+            getPlayer().setVideo(item);
+            mSuggestionsController.loadSuggestions(item);
+        }
+    }
+
+    private void waitMetadataSync(Video current, boolean showLoadingMsg) {
+        if (current == null) {
+            return;
+        }
+
+        if (current.belongsToShorts()) {
+            // VOIDXDEV(shorts): past the loaded shorts - never the watch page's next (a normal video);
+            // keep asking while the feed's next page loads (mShortsNextRetry).
+            if (current != mShortsNextWaitFor) {
+                mShortsNextWaitFor = current;
+                mShortsNextTries = 0;
+            }
+            if (mShortsNextTries++ < SHORTS_NEXT_TRIES) {
+                Utils.postDelayed(mShortsNextRetry, 500);
+            }
+            return;
+        }
+
+        if (current.nextMediaItem != null) {
+            openVideoInt(Video.from(current.nextMediaItem));
+        } else if (!current.isSynced) { // Maybe there's nothing left. E.g. when casting from phone
+            // Wait in a loop while suggestions have been loaded...
+            if (showLoadingMsg) {
+                MessageHelpers.showMessage(getContext(), R.string.wait_data_loading);
+            }
+            // Short videos next fix (suggestions aren't loaded yet)
+            boolean isEnded = getPlayer() != null && Math.abs(getPlayer().getDurationMs() - getPlayer().getPositionMs()) < 100;
+            if (isEnded) {
+                Utils.postDelayed(mMetadataSync, 1_000);
+            }
+        }
+    }
+
+    private void loadFormatInfo(Video video) {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        // Fix no progress on next video (the engine may still buffering a bit)
+        //getPlayer().showProgressBar(true);
+        Utils.post(mShowProgressBar);
+        disposeActions();
+
+        // NEWTUBE(downloads): a downloaded video plays straight from its file. There is nothing to
+        // resolve and nothing to fail over to, so the whole /player path is skipped.
+        if (video.isLocal()) {
+            mPreMediaRetry.clear();
+            getPlayer().showProgressBar(false);
+            getPlayer().openUrlList(java.util.Collections.singletonList(video.localUri));
+            return;
+        }
+
+        // NEWTUBE(kids-channel): the channel the card or the next-video slot carries.
+        MediaServiceManager.noteChannel(video);
+        MediaItemService mediaItemManager = getMediaItemService();
+        mFormatInfoAction = mediaItemManager.getFormatInfoObserve(video.videoId)
+                .subscribe(this::processFormatInfo,
+                           error -> {
+                               mPreMediaRetry.clear(); // ordinary transport-error recovery owns this failure
+                               getPlayer().showProgressBar(false);
+                               // NEWTUBE(downloads): the network path failed, but a downloaded
+                               // copy of this very video is on the device - play that instead of
+                               // showing an outage. Online, the download never pre-empts streaming.
+                               String localCopy = VideoDownloads.localUriFor(video.videoId);
+                               if (localCopy != null && getPlayer() != null) {
+                                   video.localUri = localCopy;
+                                   getPlayer().openUrlList(java.util.Collections.singletonList(localCopy));
+                                   return;
+                               }
+                               mErrorFixerController.runFormatErrorAction(error);
+                           });
+    }
+
+    private void processFormatInfo(MediaItemFormatInfo formatInfo) {
+        PlaybackView player = getPlayer();
+
+        if (player == null || getVideo() == null) {
+            return;
+        }
+
+        mPreMediaRetry.onResult(getVideo().videoId,
+                formatInfo.isUnplayable() && formatInfo.isBotCheckRequired());
+
+        // NetPath milestone 2: InnerTube metadata/streamingData arrived (consumer side).
+        NetPath.logInfo(getVideo().videoId,
+                formatInfo.containsDashFormats() && formatInfo.getAdaptiveFormats() != null
+                        ? formatInfo.getAdaptiveFormats().size() : 0,
+                formatInfo.containsHlsUrl(), formatInfo.containsSabrFormats(), formatInfo.isLive());
+
+        String bgImageUrl = null;
+
+        boolean hadTitle = !TextUtils.isEmpty(getVideo().getTitleFull());
+
+        getVideo().sync(formatInfo);
+
+        // A deep-link open starts with an id-only Video, so nothing has painted a title yet. If the
+        // sync above took one from /player's videoDetails, push it now instead of waiting for /next.
+        // Same rebind the SuggestionsController does once the metadata folds in.
+        // Measured on a Pixel 9: only the web clients answer with a populated videoDetails
+        // (WEB/WEB_EMBED -> title, author, viewCount, shortDescription all present). The
+        // authenticated TV clients this app prefers when signed in (TV, TV_DOWNGRADED) return a
+        // videoDetails stripped down to videoId + lengthSeconds, so a signed-in open still has to
+        // wait for /next. Kept because it is free and covers the signed-out path.
+        if (!hadTitle && !TextUtils.isEmpty(getVideo().getTitleFull())) {
+            player.setVideo(getVideo());
+        }
+
+        // Fix stretched video for a couple milliseconds (before the onVideoSizeChanged gets called)
+        applyAspectRatio(formatInfo);
+
+        if (formatInfo.getPaidContentText() != null && getSponsorBlockData().isPaidContentNotificationEnabled()) {
+            MessageHelpers.showMessage(getContext(), formatInfo.getPaidContentText());
+        }
+
+        if (!formatInfo.isUnplayable()) {
+            mUnplayableBudget.onPlayable();
+            // Clear a persistent mobile error only after /player has produced a usable result.
+            // Same-video retries keep the previous reason visible while the retry is in flight.
+            player.showPlaybackNotice(null);
+        }
+
+        if (formatInfo.isUnplayable()) {
+            if (isEmbedPlayer()) {
+                player.finish();
+                return;
+            }
+
+            player.setTitle(formatInfo.getPlayabilityReason());
+            // The touch portrait layout hides the legacy overlay title because the normal
+            // video title already appears below the player. Put errors in its dedicated,
+            // persistent notice so a zero-duration denial cannot look like a frozen player.
+            player.showPlaybackNotice(formatInfo.getPlayabilityReason());
+            player.showProgressBar(false);
+            bgImageUrl = getVideo().getBackgroundUrl();
+
+            player.showOverlay(true);
+
+            if (formatInfo.isBotCheckRequired()) {
+                // A bot-check is a session/IP throttle, not a bad video. Loading suggestions and
+                // auto-advancing turns one rejection into a tight /player + /next request loop and
+                // extends the restriction. Leave recovery to an explicit retry or sign-in.
+                // Mobile may already have started its eager /next in parallel with /player, so
+                // cancel and clear it as well as declining to launch another request here.
+                mSuggestionsController.cancelPendingSuggestions();
+                android.util.Log.w("NetPath", "bot-check autoplay=n suggestions=cancelled");
+            } else {
+                mSuggestionsController.loadSuggestions(getVideo());
+                // 18+ video or the video is hidden/removed
+                if (mUnplayableBudget.onUnplayable()) {
+                    loadNextVideoPastUnplayable(5_000);
+                } else {
+                    // NEWTUBE(autoplay-budget): the second unplayable video in a row autoplay
+                    // reached - stop here instead of walking the related list (issue #5 storm).
+                    NetPath.log(NetPath.context() + " autoplay-stop reason=unplayable-streak skips="
+                            + mUnplayableBudget.skips());
+                }
+            }
+
+            //if (formatInfo.isUnknownError()) { // the bot error or the video not available
+            //    scheduleRebootAppTimer(5_000);
+            //} else { // 18+ video or the video is hidden/removed
+            //    scheduleNextVideoTimer(5_000);
+            //}
+        } else if (formatInfo.isLive() && (formatInfo.containsDashUrl() || formatInfo.containsHlsUrl())) {
+            // NEWTUBE(live): a live stream must ride a URL manifest - media3 refreshes it natively
+            // (live window, manifest reload, behind-live-window recovery). The generated MPD is a
+            // static side-load that cannot refresh: on media3 it produced a fake ~48h static
+            // window that ended playback instantly (zero media fetched). Prefer the DASH manifest
+            // url; the HLS-forced tweak (or a missing dash url) picks HLS. Only when NEITHER url
+            // exists does live fall through to the generated-MPD last resort below.
+            if (formatInfo.containsDashUrl()
+                    && !(getPlayerTweaksData().isHlsStreamsForced() && formatInfo.containsHlsUrl())) {
+                Log.d(TAG, "Loading live video in dash format (manifest url)...");
+                player.openDashUrl(formatInfo.getDashManifestUrl());
+            } else {
+                Log.d(TAG, "Loading live video in hls format...");
+                player.openHlsUrl(formatInfo.getHlsManifestUrl());
+            }
+        } else if (acceptAdaptiveFormats(formatInfo) && formatInfo.containsDashFormats()) {
+            Log.d(TAG, "Loading regular video in dash format...");
+
+            if (getPlayerTweaksData().isHighBitrateFormatsEnabled() && formatInfo.hasExtendedHlsFormats()) {
+                player.openMerged(formatInfo, formatInfo.getHlsManifestUrl());
+            } else {
+                player.openDash(formatInfo);
+            }
+        } else if (acceptAdaptiveFormats(formatInfo) && formatInfo.containsSabrFormats()) {
+            Log.d(TAG, "Loading video in sabr format...");
+            player.openSabr(formatInfo);
+        } else if (acceptDashLive(formatInfo)) {
+            Log.d(TAG, "Loading live video (current or past live stream) in dash format...");
+            player.openDashUrl(formatInfo.getDashManifestUrl());
+        } else if (formatInfo.isLive() && formatInfo.containsHlsUrl()) {
+            Log.d(TAG, "Loading live video (current or past live stream) in hls format...");
+            player.openHlsUrl(formatInfo.getHlsManifestUrl());
+        } else if (formatInfo.isHlsVodSelected()
+                && !(getPlayerData().isLegacyCodecsForced() && formatInfo.containsUrlFormats())) {
+            // NEWTUBE(delivery): SABR-only adaptive formats, but the answer carries HLS (VodDelivery).
+            Log.d(TAG, "Loading regular video in hls format (no adaptive links)...");
+            player.openHlsVod(formatInfo);
+        } else if (formatInfo.containsUrlFormats()) {
+            Log.d(TAG, "Loading url list video. This is always LQ...");
+            player.openProgressive(formatInfo);
+        } else {
+            Log.d(TAG, "Empty format info received. Seems future live translation. No video data to pass to the player.");
+            player.setTitle(formatInfo.getPlayabilityReason());
+            player.showProgressBar(false);
+            // NEWTUBE(upcoming-poll): every poll re-runs the whole open; the watch page already
+            // shows this video's /next from the first one (or its eager fetch is in flight).
+            mSuggestionsController.loadSuggestionsOnce(getVideo());
+            bgImageUrl = getVideo().getBackgroundUrl();
+            player.showOverlay(true);
+            scheduleUpcomingPoll(formatInfo);
+        }
+
+        player.showBackground(bgImageUrl); // remove bg (if video playing) or set another bg
+    }
+
+    private void reloadVideo(int delayMs) {
+        // NEWTUBE(upcoming-poll): any reload replaces a pending upcoming poll (same Runnable).
+        mUpcomingPollDueAtMs = 0;
+
+        if (getPlayer() == null) {
+            return;
+        }
+
+        if (getPlayer().isEngineInitialized()) {
+            Log.d(TAG, "Reloading the video...");
+            NetPath.log(NetPath.context() + " reload-post delayMs=" + delayMs
+                    + " pos=" + getPlayer().getPositionMs());
+            Utils.postDelayed(mReloadVideo, delayMs);
+        }
+    }
+
+    /**
+     * NEWTUBE(upcoming-poll): schedules the next "has it started yet?" reload. See the field docs.
+     */
+    private void scheduleUpcomingPoll(MediaItemFormatInfo formatInfo) {
+        Video video = getVideo();
+        PlaybackView player = getPlayer();
+        if (video == null || player == null) {
+            return;
+        }
+
+        if (!Helpers.equals(video.videoId, mUpcomingVideoId)) {
+            mUpcomingVideoId = video.videoId;
+            mUpcomingNotLiveAnswers = 0;
+            mUpcomingStartMs = 0;
+        }
+
+        long startMs = LiveStartPollPolicy.scheduledStartMs(formatInfo);
+        if (startMs > 0) {
+            mUpcomingStartMs = startMs; // a later client may omit it: keep the last known schedule
+        }
+
+        long nowMs = System.currentTimeMillis();
+        long foregroundDelayMs = LiveStartPollPolicy.PLAYER.delayMs(nowMs, mUpcomingStartMs, mUpcomingNotLiveAnswers);
+        boolean hidden = !isUpcomingSlateVisible();
+        long delayMs = hidden ? LiveStartPollPolicy.backgroundDelayMs(foregroundDelayMs) : foregroundDelayMs;
+        mUpcomingNotLiveAnswers++;
+
+        NetPath.log(NetPath.context() + " upcoming-poll in=" + delayMs
+                + " startIn=" + LiveStartPollPolicy.startInLabel(nowMs, mUpcomingStartMs)
+                + " answers=" + mUpcomingNotLiveAnswers + " hidden=" + (hidden ? "y" : "n"));
+        reloadVideo((int) delayMs);
+
+        if (player.isEngineInitialized()) {
+            mUpcomingAnsweredAtMs = SystemClock.elapsedRealtime();
+            mUpcomingForegroundDelayMs = foregroundDelayMs;
+            mUpcomingPollDueAtMs = mUpcomingAnsweredAtMs + delayMs;
+        }
+    }
+
+    /**
+     * The countdown slate is on screen: the watch page itself, or its PiP window (someone waiting
+     * in PiP is watching for the start). Background audio, screen off, the Browse mini-player and
+     * anything on top of the player count as hidden.
+     */
+    private boolean isUpcomingSlateVisible() {
+        PlaybackView player = getPlayer();
+        return player != null && (mViewResumed || player.isInPIPMode());
+    }
+
+    /**
+     * NEWTUBE(upcoming-poll): back on screen while a poll scheduled at the hidden (slowed) cadence
+     * is still pending - bring it in to where the foreground cadence would have put it.
+     */
+    private void hastenUpcomingPollIfNeeded() {
+        PlaybackView player = getPlayer();
+        if (mUpcomingPollDueAtMs <= 0 || player == null || !player.isEngineInitialized()) {
+            return;
+        }
+
+        long foregroundDueAtMs = mUpcomingAnsweredAtMs + mUpcomingForegroundDelayMs;
+        if (foregroundDueAtMs >= mUpcomingPollDueAtMs) {
+            return; // not slowed down
+        }
+
+        long nowMs = SystemClock.elapsedRealtime();
+        long delayMs = Math.max(1_000, foregroundDueAtMs - nowMs);
+        NetPath.log(NetPath.context() + " upcoming-poll hasten in=" + delayMs
+                + " (was " + (mUpcomingPollDueAtMs - nowMs) + ")");
+        reloadVideo((int) delayMs);
+        mUpcomingPollDueAtMs = nowMs + delayMs;
+    }
+
+    private void loadNextVideoPastUnplayable(int delayMs) {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        if (getPlayer().isEngineInitialized()) {
+            Log.d(TAG, "Starting the next video...");
+            Utils.postDelayed(mLoadNextPastUnplayable, delayMs);
+        }
+    }
+
+    private void restartEngine(int delayMs) {
+        if (getPlayer() != null) {
+            Log.d(TAG, "Restarting the engine...");
+            NetPath.log(NetPath.context() + " engine-restart-post delayMs=" + delayMs
+                    + " pos=" + getPlayer().getPositionMs());
+            Utils.postDelayed(mRestartEngine, delayMs);
+        }
+    }
+
+    private void openVideoInt(Video item) {
+        if (item == null) {
+            return;
+        }
+
+        disposeActions();
+
+        // NEWTUBE(switch-cancel): the same warm-and-cancel the browse tap does in
+        // PlaybackPresenter.openVideo, for the IN-PLAYER switch (related tap, queue tap, next).
+        // That path used to reach neither half, and both matter on a slow link:
+        //   - cancel: VideoInfoService.getVideoInfo is synchronized on the singleton for a whole
+        //     client-ring walk, and disposeActions() above cannot stop it (RxHelper subscribes on
+        //     a non-interruptible Scheduler). So a still-running walk for the ABANDONED video -
+        //     the next-video preload, or the video the user just gave up on - held the monitor
+        //     while the video they actually picked waited behind it, and its response body kept
+        //     consuming the narrow pipe. cancelStaleFormatInfoRequests() (inside prefetch) trips
+        //     the walk's own abort checkpoints instead.
+        //   - warm: the fetch overlaps the rest of this open rather than starting after it.
+        // Latest-wins and single-flighted, so a same-video call is a no-op, not a second request.
+        if (PlaybackPresenter.isPrefetchOnOpenEnabled()) {
+            MediaServiceManager.instance().prefetchFormatInfo(item);
+        }
+
+        if (item.hasVideo()) {
+            // NOTE: Next clicked: instant playback even a mix
+            // NOTE: Bypass PIP fullscreen on next caused by startView
+            getMainController().onNewVideo(item);
+            //getPlayer().showOverlay(true);
+        } else {
+            VideoActionPresenter.instance(getContext()).apply(item);
+        }
+    }
+
+    private boolean isActionsRunning() {
+        return RxHelper.isAnyActionRunning(mFormatInfoAction);
+    }
+
+    private void disposeActions() {
+        MediaServiceManager.instance().disposeActions();
+        RxHelper.disposeActions(mFormatInfoAction);
+        Utils.removeCallbacks(mReloadVideo, mLoadNext, mLoadNextPastUnplayable, mRestartEngine,
+                mMetadataSync, mNextPrefetchDue, mShortsNextRetry);
+        mUpcomingPollDueAtMs = 0; // NEWTUBE(upcoming-poll): its reload was just removed above
+    }
+
+    public void restartEngine() {
+        restartEngine(1_000);
+    }
+
+    public void reloadVideo() {
+        reloadVideo(1_000);
+    }
+
+    /**
+     * ErrorFixer's source-error path already invalidated the format-info cache. Avoid spending a
+     * fixed extra second idle before starting the fresh /player + signed-URL mint; keep the shared
+     * one-second reload default for unrelated legacy callers that may rely on its settling time.
+     */
+    public void reloadVideoAfterUrlRemint() {
+        reloadVideo(URL_REMINT_RELOAD_DELAY_MS);
+    }
+
+    private void applyPlaybackMode(int playbackMode) {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        Video video = getVideo();
+        // Fix simultaneous videos loading (e.g. when playback ends and user opens new video)
+        if (video == null || isActionsRunning()) {
+            return;
+        }
+
+        if (isEmbedPlayer()) {
+            playbackMode = PlayerConstants.PLAYBACK_MODE_CLOSE;
+        }
+
+        switch (playbackMode) {
+            case PlayerConstants.PLAYBACK_MODE_REVERSE_LIST:
+                if (video.hasPlaylist() || video.belongsToChannelUploads() || video.belongsToChannel()) {
+                    VideoGroup group = video.getGroup();
+                    if (group != null && group.indexOf(video) != 0) { // stop after first
+                        onPreviousClicked();
+                    }
+                    break;
+                }
+            case PlayerConstants.PLAYBACK_MODE_ALL:
+            case PlayerConstants.PLAYBACK_MODE_SHUFFLE:
+                autoNext();
+                break;
+            case PlayerConstants.PLAYBACK_MODE_ONE:
+                if (VERSION.SDK_INT <= 19) {
+                    // Fix frozen image on Android 4
+                    restartEngine();
+                } else {
+                    getPlayer().setPositionMs(0);
+                }
+                break;
+            case PlayerConstants.PLAYBACK_MODE_CLOSE:
+                // Close player if suggestions not shown
+                // Except when playing from queue
+                if (mPlaylist.getNext() != null && !getPlayerTweaksData().isQueueRespectsPlaybackMode()) {
+                    autoNext();
+                } else {
+                    AppDialogPresenter dialog = getAppDialogPresenter();
+                    if (!getPlayer().isSuggestionsShown() && (!dialog.isDialogShown() || dialog.isOverlay())) {
+                        dialog.closeDialog();
+                        getPlayer().finishReally();
+                    }
+                }
+                break;
+            case PlayerConstants.PLAYBACK_MODE_PAUSE:
+                // Stop player after each video.
+                // Except when playing from queue
+                if (mPlaylist.getNext() != null && !getPlayerTweaksData().isQueueRespectsPlaybackMode()) {
+                    autoNext();
+                } else {
+                    stopPlayback();
+                }
+                break;
+            case PlayerConstants.PLAYBACK_MODE_LIST:
+                // if video has a playlist load next or restart playlist
+                if (video.hasNextPlaylist() || mPlaylist.getNext() != null) {
+                    autoNext();
+                } else {
+                    //restartPlaylistIfNeeded();
+                    stopPlayback();
+                }
+                break;
+            default:
+                Log.e(TAG, "Undetected repeat mode " + playbackMode);
+                break;
+        }
+    }
+
+    /** VOIDXDEV(up-next): the end-of-video advance, which the view may hold behind its countdown. */
+    private void autoNext() {
+        Video video = getVideo();
+        if (video != null && !video.belongsToShorts()
+                && getPlayer().showNextCountdown(mSuggestionsController.getNext(), mLoadNext)) {
+            return;
+        }
+        loadNext();
+    }
+
+    private void stopPlayback() {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        getPlayer().setPositionMs(getPlayer().getDurationMs());
+        getPlayer().setPlayWhenReady(false);
+        getPlayer().showSuggestions(true);
+    }
+
+    private void restartPlaylistIfNeeded() {
+        if (getPlayer() == null || getVideo() == null) {
+            return;
+        }
+        
+        VideoGroup group = getVideo().getGroup(); // Get the VideoGroup (playlist)
+
+        if (group != null && !group.isEmpty() && getVideo().belongsToSamePlaylistGroup()) {
+            openVideoInt(group.get(0));
+        } else {
+            Log.e(TAG, "VideoGroup is null or empty. Can't restart playlist.");
+            stopPlayback();
+        }
+    }
+
+    private boolean acceptAdaptiveFormats(MediaItemFormatInfo formatInfo) {
+        if (getPlayerData().isLegacyCodecsForced() && formatInfo.containsUrlFormats()) {
+            return false;
+        }
+
+        if (getPlayerTweaksData().isHlsStreamsForced() && formatInfo.isLive() && formatInfo.containsHlsUrl()) {
+            return false;
+        }
+
+        // Not enough info for full length live streams
+        if (formatInfo.isLive() && formatInfo.getStartTimeMs() == 0) {
+            return false;
+        }
+
+        // Live dash url doesn't work with None buffer
+        //if (formatInfo.isLive() && (getPlayerTweaksData().isDashUrlStreamsForced() || getPlayerData().getVideoBufferType() == PlayerData.BUFFER_NONE)) {
+        if (formatInfo.isLive() && getPlayerTweaksData().isDashUrlStreamsForced() && formatInfo.containsDashUrl()) {
+            return false;
+        }
+
+        if (formatInfo.isLive() && getPlayerTweaksData().isHlsStreamsForced() && formatInfo.containsHlsUrl()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean acceptDashLive(MediaItemFormatInfo formatInfo) {
+        if (getPlayerTweaksData().isHlsStreamsForced() && formatInfo.isLive() && formatInfo.containsHlsUrl()) {
+            return false;
+        }
+
+        return formatInfo.isLive() && formatInfo.containsDashUrl();
+    }
+
+    @Override
+    public void onMetadata(MediaItemMetadata metadata) {
+        initRandomNext();
+    }
+
+    private void initRandomNext() {
+        MediaServiceManager.instance().disposeActions();
+
+        PlaybackView player = getPlayer();
+        PlayerData playerData = getPlayerData();
+        Video current = getVideo();
+
+        if (player == null || playerData == null || current == null || current.playlistInfo == null ||
+                getPlaybackMode() != PlayerConstants.PLAYBACK_MODE_SHUFFLE) {
+            return;
+        }
+
+        // NOTE: Shuffle only user created playlists (size != -1)
+        if (current.playlistInfo.getSize() > MIN_SHUFFLE_SIZE) {
+            Video video = new Video();
+            video.playlistId = current.playlistId;
+            video.playlistIndex = Utils.getRandomIndex(current.playlistInfo.getCurrentIndex(), current.playlistInfo.getSize());
+            MediaServiceManager.instance().loadMetadata(video, randomMetadata -> {
+                if (randomMetadata.getNextVideo() == null) {
+                    return;
+                }
+
+                current.nextMediaItem = SimpleMediaItem.from(randomMetadata);
+                current.isShuffled = true;
+                player.setNextTitle(Video.from(current.nextMediaItem));
+            });
+        }
+        //else {
+        //    VideoGroup topRow = player.getSuggestionsByIndex(0); // the playlist row
+        //
+        //    if (topRow != null && topRow.isChapters()) {
+        //        topRow = player.getSuggestionsByIndex(1);
+        //    }
+        //
+        //    if (topRow != null) {
+        //        int currentIdx = topRow.indexOf(current);
+        //        int randomIndex = Utils.getRandomIndex(currentIdx, topRow.getSize());
+        //
+        //        if (randomIndex != -1) {
+        //            Video nextVideo = topRow.get(randomIndex);
+        //            current.nextMediaItem = SimpleMediaItem.from(nextVideo);
+        //            current.isShuffled = true;
+        //            player.setNextTitle(nextVideo);
+        //        }
+        //    }
+        //}
+    }
+
+    /**
+     * The mode playback actually runs by: the stored one, with a queue-scoped shuffle laid over it
+     * ({@link QueuePlaybackMode} - the playlist page's Shuffle button no longer flips the app-wide
+     * setting), and then the two per-video specials that outrank both.
+     */
+    private int getPlaybackMode() {
+        Video video = getVideo();
+        int playbackMode = QueuePlaybackMode.apply(video, getPlayerData().getPlaybackMode());
+
+        if (video != null && video.finishOnEnded) {
+            playbackMode = PlayerConstants.PLAYBACK_MODE_CLOSE;
+        } else if (video != null && video.belongsToShortsGroup() && getPlayerTweaksData().isLoopShortsEnabled()) {
+            playbackMode = PlayerConstants.PLAYBACK_MODE_ONE;
+        }
+        return playbackMode;
+    }
+
+    /**
+     * Fix stretched video for a couple milliseconds (before the onVideoSizeChanged gets called)
+     */
+    private void applyAspectRatio(MediaItemFormatInfo formatInfo) {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        // Fix stretched video for a couple milliseconds (before the onVideoSizeChanged gets called)
+        if (formatInfo.containsDashFormats()) {
+            MediaFormat format = formatInfo.getAdaptiveFormats().get(0);
+            int width = format.getWidth();
+            int height = format.getHeight();
+            boolean isShorts = width < height;
+            if (width > 0 && height > 0 && (getPlayerData().getAspectRatio() == PlayerData.ASPECT_RATIO_DEFAULT || isShorts)) {
+                getPlayer().setAspectRatio((float) width / height);
+            } else {
+                getPlayer().setAspectRatio(getPlayerData().getAspectRatio());
+            }
+        }
+    }
+
+    /**
+     * NEWTUBE(next-prefetch): called by the deadline timer ({@link #scheduleNextPrefetch}, armed on
+     * play/seek/speed) and, as a fallback, the minute {@link #onTickle()}. Once
+     * {@link NextPrefetchPolicy} says the end is near, prefetch the NEXT video's format info: it
+     * lands in the media service's format cache (and the single-flight collapses a concurrent
+     * fetch), so the autoplay advance skips the full InnerTube round-trip, and the fetch's
+     * media-host preconnect warms the next googlevideo host shortly before it is needed.
+     * The mobile engine may also preload bounded media once current playback is safely buffered.
+     * Skipped while paused (user browsing) and when the playback mode
+     * won't auto-advance.
+     */
+    /** VOIDXDEV(shorts): a short looping in the swipe player (its next one is a swipe away). */
+    private static final long SHORTS_PREFETCH_AFTER_MS = 300;
+    /** VOIDXDEV(shorts): the last short-after-next whose /player was asked for (see prefetchShortAfterNext). */
+    private String mShortAheadId;
+
+    private boolean isShortsSwipe() {
+        return getVideo() != null && getVideo().belongsToShorts()
+                && getPlaybackMode() == PlayerConstants.PLAYBACK_MODE_ONE;
+    }
+
+    private void preloadNextVideoIfNeeded() {
+        if (isEmbedPlayer() || getPlayer() == null || getVideo() == null || getVideo().isLive) {
+            return;
+        }
+
+        if (!getPlayer().isPlaying()) {
+            return; // paused near the end = user browsing, don't burn a request
+        }
+
+        int playbackMode = getPlaybackMode();
+        // VOIDXDEV(shorts): a looping short still warms the next one - the next swipe is coming.
+        boolean shortsSwipe = playbackMode == PlayerConstants.PLAYBACK_MODE_ONE && getVideo().belongsToShorts();
+        if (playbackMode != PlayerConstants.PLAYBACK_MODE_ALL
+                && playbackMode != PlayerConstants.PLAYBACK_MODE_SHUFFLE
+                && playbackMode != PlayerConstants.PLAYBACK_MODE_LIST
+                && !shortsSwipe) {
+            return; // autoplay-next is off for this mode
+        }
+
+        if ((shortsSwipe && playedWallMs() >= SHORTS_PREFETCH_AFTER_MS) || NextPrefetchPolicy.isDue(getPlayer().getDurationMs(),
+                getPlayer().getPositionMs(), getPlayer().getSpeed(), playedWallMs())) {
+            // NEWTUBE(prepare-stash): once the next video's info lands, also pre-build its
+            // MediaSource (the MPD XML gen+parse the open path would otherwise pay) - but ONLY
+            // when the open dispatch below (processFormatInfo) would take the plain
+            // openDash(formatInfo) branch. The engine stashes it one-slot and consumes it on the
+            // matching openDash. No-op on TV (default PlayerEngine method).
+            Video currentVideo = getVideo();
+            long generation = mPlaybackGeneration;
+            // Inside the lead window the candidate is re-read every RECHECK_MS (a local call): a
+            // queue edit, a late shuffle pick or /next landing after the deadline changes it, and
+            // a short video could end before the minute tick noticed. Network is only spent on a
+            // target the ledger allows (new target, bounded retry, stale answer).
+            Utils.removeCallbacks(mNextPrefetchDue);
+            Utils.postDelayed(mNextPrefetchDue, NextPrefetchPolicy.RECHECK_MS);
+            Video next = mSuggestionsController.getNext();
+            if (next == null || next.videoId == null) {
+                return; // /next (the autoplay target's source) may still be in flight
+            }
+            String nextId = next.videoId;
+            if (!mNextPrefetchLedger.tryStart(generation, nextId, SystemClock.elapsedRealtime())) {
+                return;
+            }
+            NetPath.log(NetPath.context() + " next-prefetch video=" + nextId
+                    + " remainingMs=" + (getPlayer().getDurationMs() - getPlayer().getPositionMs())
+                    + " speed=" + getPlayer().getSpeed() + " playedMs=" + playedWallMs());
+            loadNextFormatInfo(next, formatInfo -> {
+                mNextPrefetchLedger.onSuccess(generation, nextId, SystemClock.elapsedRealtime());
+                // A slow callback from a previous video must not inherit the new engine generation
+                // and start speculative media after a manual switch.
+                if (getVideo() != currentVideo || mPlaybackGeneration != generation) {
+                    return;
+                }
+                PlaybackView player = getPlayer();
+                if (player != null && formatInfo != null && wouldOpenPlainDash(formatInfo)) {
+                    player.prebuildNextSource(formatInfo, shortsSwipe);
+                }
+                if (currentVideo.belongsToShorts()) {
+                    prefetchShortAfterNext();
+                }
+            }, error -> {
+                // Error or no answer: the ledger allows one retry, which the running recheck
+                // timer picks up after NextPrefetchLedger.RETRY_AFTER_MS.
+                mNextPrefetchLedger.onFailure(generation, nextId, SystemClock.elapsedRealtime());
+                NetPath.log(NetPath.context() + " next-prefetch failed video=" + nextId
+                        + " retry=" + (mNextPrefetchLedger.canRetry(generation, nextId) ? "y" : "n"));
+            });
+        }
+    }
+
+    /** The autoplay-next resolution itself; a seam so the deadline logic is testable offline. */
+    /**
+     * VOIDXDEV(shorts): once the next short is resolved, the one after it gets its /player answer
+     * too - MediaServiceCore keeps four (the previous, this, next and that one), so a quick second
+     * swipe skips the round trip, and that short's own next-prefetch finds its info cached and
+     * goes straight to building and preloading the source. One request per target; a failure is
+     * left to the ordinary open.
+     */
+    private void prefetchShortAfterNext() {
+        Video ahead = mSuggestionsController.getShortAfterNext();
+        if (ahead == null || ahead.videoId == null || ahead.videoId.equals(mShortAheadId)) {
+            return;
+        }
+        mShortAheadId = ahead.videoId;
+        NetPath.log(NetPath.context() + " next-prefetch ahead video=" + ahead.videoId);
+        loadNextFormatInfo(ahead, formatInfo -> { }, error -> NetPath.log(NetPath.context()
+                + " next-prefetch ahead failed video=" + ahead.videoId));
+    }
+
+    protected void loadNextFormatInfo(Video next, MediaServiceManager.OnFormatInfo onFormatInfo,
+            MediaServiceManager.OnError onError) {
+        MediaServiceManager.instance().loadFormatInfo(next, onFormatInfo, onError);
+    }
+
+    /**
+     * NEWTUBE(prepare-stash): true only when {@link #processFormatInfo} would route this info
+     * through the plain {@code player.openDash(formatInfo)} branch (generated static MPD).
+     * Mirrors that dispatch exactly: unplayable, live (URL-manifest routes AND the generated-MPD
+     * live last resort), merged (high-bitrate + extended HLS), sabr and url-list routes must NOT
+     * be pre-built.
+     */
+    private boolean wouldOpenPlainDash(MediaItemFormatInfo formatInfo) {
+        return !formatInfo.isUnplayable()
+                && !formatInfo.isLive()
+                && acceptAdaptiveFormats(formatInfo)
+                && formatInfo.containsDashFormats()
+                && !(getPlayerTweaksData().isHighBitrateFormatsEnabled() && formatInfo.hasExtendedHlsFormats());
+    }
+}

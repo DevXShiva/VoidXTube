@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Simple single-choice player sheet (YouTube-style): a plain title over one list of
+  item_mobile_quality_row rows. Quality (Auto + the video's distinct resolutions,
+  MobilePlaybackActivity.showQualitySheet), the Audio track list (showAudioTrackSheet swaps the
+  title) and Direct Cast's quality cap (showDirectCastQualitySheet) all use it. Replaces the TV HQ
+  dialog (every codec/fps variant) as the everyday picker - the full dialog stays reachable from
+  the overflow menu for power users.
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_mobile_sheet">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="12dp">
+
+        <View
+            android:layout_width="36dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_mobile_sheet_handle" />
+
+        <!-- NEWTUBE(sheets): the Speed/Subtitles header - plain title + hairline divider (was bold,
+             no divider: the one picker that looked different). -->
+        <TextView
+            android:id="@+id/quality_sheet_quality_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="12dp"
+            android:text="@string/mobile_quality_title"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/mobile_color_divider" />
+
+        <LinearLayout
+            android:id="@+id/quality_sheet_quality_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,11 @@
+{
+  "note": "Extra fixtures from the 2026-09-28 Pixel 9 test (issue5/pixel). Merged over ../corpus.json by id: wGltuo1B1sM is also in the main corpus (RO / Siaris Kids); this file re-tags it. KUcmvVHh_RA is not in the main corpus.",
+  "videos": [
+    {"id": "KUcmvVHh_RA", "category": "made_for_kids", "subcategory": "pixel-2026-09-28", "made_for_kids": true,
+     "expected_signed_out": "play",
+     "notes": "Pixel LTE: WEB_EMBED answered OK with adaptive SABR-only (usableAdaptive=0) but an hlsManifestUrl; Wi-Fi 8 min later: 26 usable adaptive."},
+    {"id": "wGltuo1B1sM", "category": "made_for_kids", "subcategory": "pixel-2026-09-28", "made_for_kids": true,
+     "expected_signed_out": "play",
+     "notes": "Pixel 2026-09-28: WEB_EMBED OK formats=24+1 usableAdaptive=24 hls=y sabr=y (b-kids2-lte.log)."}
+  ]
+}

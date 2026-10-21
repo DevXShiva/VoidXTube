@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(motion): pause morphing back into play (see avd_player_play_to_pause). -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="36dp"
+            android:height="36dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:name="glyph"
+                android:fillColor="#FFFFFFFF"
+                android:pathData="@string/path_player_pause" />
+        </vector>
+    </aapt:attr>
+    <target android:name="glyph">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="@integer/mobile_player_glyph_morph_ms"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="pathData"
+                android:valueFrom="@string/path_player_pause"
+                android:valueTo="@string/path_player_play"
+                android:valueType="pathType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

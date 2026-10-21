@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Phone Settings (issue #2): titles and one-line summaries of the settings tree
+     (com.newtube.mobile.ui.settings). Spanish in values-es. -->
+<resources>
+    <!-- Shared -->
+    <string name="mobile_settings_restart_needed">Restart VoidTube to apply this change</string>
+    <string name="mobile_settings_restart">Restart</string>
+    <string name="mobile_settings_off">Off</string>
+    <string name="mobile_settings_more">More</string>
+    <string name="mobile_settings_default_value">%1$s (default)</string>
+    <string name="mobile_settings_clear">Clear</string>
+    <string name="mobile_settings_cleared">Cleared</string>
+    <string name="mobile_settings_unavailable">Not available on this phone</string>
+    <plurals name="mobile_settings_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="mobile_settings_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <string name="mobile_settings_hours_minutes">%1$d h %2$d min</string>
+
+    <!-- Top level -->
+    <string name="mobile_settings_account">Account</string>
+    <string name="mobile_settings_account_signed_out">Not signed in · Sign in to see your subscriptions</string>
+    <string name="mobile_settings_account_switch">Switch or manage accounts</string>
+    <string name="mobile_settings_group_app">App</string>
+    <string name="mobile_settings_group_video">Video and audio</string>
+    <string name="mobile_settings_group_other">Other</string>
+    <string name="mobile_settings_general">General</string>
+    <string name="mobile_settings_general_summary">Language, country, voice search, clock</string>
+    <string name="mobile_settings_customize">Customization</string>
+    <string name="mobile_settings_customize_summary">Theme, tabs, Home layout, video menu</string>
+    <string name="mobile_settings_customize_summary_value">%1$s theme, tabs, Home layout, video menu</string>
+    <string name="mobile_settings_theme_system_short">System</string>
+    <string name="mobile_settings_theme_light_short">Light</string>
+    <string name="mobile_settings_theme_dark_short">Dark</string>
+    <string name="mobile_settings_feeds">Feeds</string>
+    <string name="mobile_settings_feeds_summary">Hidden videos, titles, channel order</string>
+    <string name="mobile_settings_privacy">History and privacy</string>
+    <string name="mobile_settings_privacy_summary">Watch and search history</string>
+    <string name="mobile_settings_playback">Playback</string>
+    <string name="mobile_settings_playback_summary">Autoplay, background play, speed</string>
+    <string name="mobile_settings_quality">Video quality</string>
+    <string name="mobile_settings_captions">Captions</string>
+    <string name="mobile_settings_captions_summary">Style, size and position</string>
+    <string name="mobile_settings_sponsorblock_on">On · skips sponsors and intros</string>
+    <string name="mobile_settings_dearrow_both">Better titles and thumbnails</string>
+    <string name="mobile_settings_dearrow_titles_only">Better titles</string>
+    <string name="mobile_settings_dearrow_thumbnails_only">Better thumbnails</string>
+    <string name="mobile_settings_backup">Backup and restore</string>
+    <string name="mobile_settings_backup_summary">Save your settings to a file</string>
+    <string name="mobile_settings_advanced">Advanced</string>
+    <string name="mobile_settings_advanced_summary">Streaming, network and fixes</string>
+    <string name="mobile_settings_about">About</string>
+    <string name="mobile_settings_coffee">Buy me a coffee</string>
+    <string name="mobile_settings_coffee_summary">If you love VoidTube and want to support it</string>
+    <string name="mobile_about_thanks">Thanks for using VoidTube</string>
+    <string name="mobile_about_thanks_support">Keep supporting · Buy me a coffee</string>
+    <string name="mobile_settings_coffee_url" translatable="false">https://buymeacoffee.com/yashwynth</string>
+
+    <!-- General -->
+    <string name="mobile_settings_language">Language</string>
+    <string name="mobile_settings_country">Location</string>
+    <string name="mobile_settings_start_screen">Start screen</string>
+    <string name="mobile_settings_interface_size">Interface size</string>
+    <string name="mobile_settings_voice_search">Search by voice right away</string>
+    <string name="mobile_settings_voice_search_summary">Opening Search starts listening</string>
+    <string name="mobile_settings_24_hour">Use 24-hour time</string>
+    <string name="mobile_settings_24_hour_summary">For the start times of premieres and live streams</string>
+    <string name="mobile_settings_liquid_glass">Liquid glass</string>
+    <string name="mobile_settings_liquid_glass_summary">Lens, light and grain on the glass bars. Off: a plain frosted blur that is easier on the battery</string>
+    <string name="mobile_settings_indian_counts">Lakh and crore counts</string>
+    <string name="mobile_settings_indian_counts_summary">Views and likes as 2.5 lakh and 1.2 crore instead of 250K and 12M</string>
+
+    <!-- Tabs and feeds -->
+    <string name="mobile_settings_tabs">Tabs</string>
+    <string name="mobile_settings_tabs_summary">Choose what shows in the bottom bar and in You</string>
+    <string name="mobile_settings_tabs_bottom_bar">Bottom bar</string>
+    <string name="mobile_settings_nav_labels">Tab names</string>
+    <string name="mobile_settings_nav_labels_summary">Show each tab\'s name under its icon in the bottom bar</string>
+    <string name="mobile_settings_tabs_you">You</string>
+    <string name="mobile_settings_tabs_before_search">Tab before Search</string>
+    <string name="mobile_settings_tabs_after_search">Tab after Search</string>
+    <string name="mobile_settings_tabs_none">None</string>
+    <string name="mobile_settings_tabs_bar_note">Home, Search and You always stay on the bar. Picking what the other tab shows swaps the two.</string>
+    <string name="mobile_settings_tabs_note">You can also hold a tab or a row in You to move, rename or hide it.</string>
+    <string name="mobile_settings_hidden">Hidden videos</string>
+    <string name="mobile_settings_hidden_none">Nothing hidden</string>
+    <plurals name="mobile_settings_hidden_count">
+        <item quantity="one">%d kind of video hidden</item>
+        <item quantity="other">%d kinds of videos hidden</item>
+    </plurals>
+    <string name="mobile_settings_hidden_watched">Watched videos</string>
+    <string name="mobile_settings_hidden_watched_home">Hide watched videos on Home</string>
+    <string name="mobile_settings_hidden_watched_subscriptions">Hide watched videos in Subscriptions</string>
+    <string name="mobile_settings_hidden_watched_later">Remove watched videos from Watch later</string>
+    <string name="mobile_settings_hidden_watched_later_summary">Takes a video off your Watch later playlist once you finish it</string>
+    <string name="mobile_settings_hidden_watched_note">Uses your YouTube watch history, so it needs you signed in.</string>
+    <string name="mobile_settings_hidden_upcoming">Upcoming premieres and streams</string>
+    <string name="mobile_settings_hidden_upcoming_home">Hide on Home</string>
+    <string name="mobile_settings_hidden_upcoming_subscriptions">Hide in Subscriptions</string>
+    <string name="mobile_settings_hidden_upcoming_channels">Hide on channel pages</string>
+    <string name="mobile_settings_hidden_live">Live streams</string>
+    <string name="mobile_settings_hidden_live_subscriptions">Hide live streams in Subscriptions</string>
+    <string name="mobile_settings_video_menu">Video menu</string>
+    <string name="mobile_settings_video_menu_summary">Choose what the ⋮ menu offers</string>
+    <string name="mobile_settings_video_menu_note">What the ⋮ menu on a video offers, and the menu you get by holding a tab. An item only shows where it applies.</string>
+    <string name="mobile_settings_menu_play">Playing</string>
+    <string name="mobile_settings_menu_queue_add">Add to queue</string>
+    <string name="mobile_settings_menu_save">Saving</string>
+    <string name="mobile_settings_menu_recent_playlist">Save to the last playlist used</string>
+    <string name="mobile_settings_menu_save_playlist">Save or remove the playlist</string>
+    <string name="mobile_settings_menu_channel">Channel and recommendations</string>
+    <string name="mobile_settings_menu_hide_subscriptions">Hide from Subscriptions</string>
+    <string name="mobile_settings_menu_share">Sharing and details</string>
+    <string name="mobile_settings_menu_playlists">Playlists</string>
+    <string name="mobile_settings_menu_tabs">Tab menu</string>
+    <string name="mobile_settings_menu_move_section">Move up and down</string>
+    <string name="mobile_settings_menu_usual_order">Usual order</string>
+    <string name="mobile_settings_menu_usual_order_summary">Put the menu items back in their usual places</string>
+    <string name="mobile_settings_menu_usual_order_done">Menu order restored</string>
+    <string name="mobile_settings_thumbnails">Thumbnails</string>
+    <string name="mobile_settings_thumbnails_default">The uploader\'s thumbnail</string>
+    <string name="mobile_settings_thumbnails_start">A frame from the start of the video</string>
+    <string name="mobile_settings_thumbnails_middle">A frame from the middle of the video</string>
+    <string name="mobile_settings_thumbnails_end">A frame from the end of the video</string>
+    <string name="mobile_settings_original_titles">Original titles</string>
+    <string name="mobile_settings_original_titles_summary">Show titles in the language they were written in, not YouTube\'s translation</string>
+    <string name="mobile_settings_channels_order">Order of Channels in You</string>
+    <string name="mobile_settings_channels_order_recent">Recently watched first</string>
+    <string name="mobile_settings_channels_order_name">A to Z</string>
+    <string name="mobile_settings_channels_order_new">New videos first</string>
+    <string name="mobile_settings_pinned_channels">Pinned channels show</string>
+    <string name="mobile_settings_pinned_channels_all">The channel\'s home page</string>
+    <string name="mobile_settings_pinned_channels_uploads">Just its videos</string>
+    <string name="mobile_settings_playlists_style">Playlists in You</string>
+    <string name="mobile_settings_playlists_style_grid">Each playlist</string>
+    <string name="mobile_settings_playlists_style_rows">All their videos, one after another</string>
+
+    <!-- History and privacy -->
+    <string name="mobile_settings_watch_history">Watch history</string>
+    <string name="mobile_settings_watch_history_auto">Follow my YouTube setting</string>
+    <string name="mobile_settings_watch_history_auto_desc">Saved if your YouTube account keeps history</string>
+    <string name="mobile_settings_watch_history_on">Always save</string>
+    <string name="mobile_settings_watch_history_on_desc">Turns your YouTube watch history back on each time VoidTube opens</string>
+    <string name="mobile_settings_watch_history_off">Don\'t save</string>
+    <string name="mobile_settings_watch_history_off_desc">VoidTube stops telling YouTube what you watch</string>
+    <string name="mobile_settings_clear_watch_history">Clear watch history</string>
+    <string name="mobile_settings_clear_watch_history_summary">Deletes the videos you watched from your YouTube history</string>
+    <string name="mobile_settings_clear_watch_history_confirm">Clear watch history?</string>
+    <string name="mobile_settings_clear_watch_history_body">Every video in your YouTube watch history is removed. This can\'t be undone.</string>
+    <string name="mobile_settings_search_history_off">Don\'t keep search history</string>
+    <string name="mobile_settings_search_history_off_summary">Past searches aren\'t kept or suggested</string>
+    <string name="mobile_settings_clear_search_history">Clear search history</string>
+    <string name="mobile_settings_clear_search_history_summary">Deletes the searches saved on this phone</string>
+    <string name="mobile_settings_clear_search_history_confirm">Clear search history?</string>
+    <string name="mobile_settings_clear_search_history_body">The searches VoidTube saved on this phone are deleted. This can\'t be undone.</string>
+
+    <!-- Backup -->
+    <string name="mobile_settings_backup_now">Back up now</string>
+    <string name="mobile_settings_backup_now_summary">Saves your settings to %1$s</string>
+    <string name="mobile_settings_backup_done">Backup saved</string>
+    <string name="mobile_settings_restore">Restore</string>
+    <string name="mobile_settings_restore_summary">From a backup in %1$s</string>
+    <string name="mobile_settings_auto_backup">Automatic backup</string>
+    <string name="mobile_settings_auto_backup_off">Never</string>
+    <string name="mobile_settings_backup_note">A backup holds everything you set up in VoidTube. What belongs to your YouTube account, like subscriptions and history, stays there.</string>
+
+    <!-- VOIDXDEV(home-rows): General > Home layout (issue #4). -->
+    <string name="mobile_settings_home_layout">Home layout</string>
+    <string name="mobile_settings_app_icon">App icon</string>
+    <string name="mobile_app_icon_default">VoidTube (default)</string>
+    <string name="mobile_app_icon_classic">VoidTube (Classic)</string>
+    <string name="mobile_app_icon_fantasy">VoidTube (Fantasy)</string>
+    <string name="mobile_app_icon_pending">Restart VoidTube to use the new icon everywhere, or it switches once you leave the app</string>
+    <string name="mobile_settings_home_layout_feed">Feed</string>
+    <string name="mobile_settings_home_layout_feed_desc">One list of videos, like YouTube</string>
+    <string name="mobile_settings_home_layout_rows">Rows</string>
+    <string name="mobile_settings_home_layout_rows_desc">A row you swipe sideways for each topic, like SmartTube</string>
+
+    <!-- Playback -->
+    <!-- VOIDXDEV(background): the battery-optimization exemption row (Playback). -->
+    <string name="mobile_settings_screen_off">Keep playing with the screen off</string>
+    <string name="mobile_settings_screen_off_on">Allowed: battery saver won\'t stop the audio</string>
+    <string name="mobile_settings_screen_off_off">Battery saver may stop the audio. Tap to allow VoidTube in the background</string>
+    <string name="mobile_settings_video_ends">When a video ends</string>
+    <string name="mobile_settings_video_ends_next">Play the next video</string>
+    <string name="mobile_settings_video_ends_repeat">Repeat the video</string>
+    <string name="mobile_settings_video_ends_shuffle">Shuffle the playlist</string>
+    <string name="mobile_settings_video_ends_list">Finish the playlist, then stop</string>
+    <string name="mobile_settings_video_ends_reverse">Play the playlist backwards</string>
+    <string name="mobile_settings_video_ends_pause">Pause</string>
+    <string name="mobile_settings_video_ends_close">Close the player</string>
+    <string name="mobile_settings_background">When you leave the app</string>
+    <string name="mobile_settings_background_pip_desc">The video keeps playing in a small window</string>
+    <string name="mobile_settings_background_audio_desc">Only the sound keeps playing</string>
+    <string name="mobile_settings_remember_speed">Remember playback speed</string>
+    <string name="mobile_settings_remember_speed_channel">For each channel</string>
+    <string name="mobile_settings_remember_speed_video">For each video</string>
+    <string name="mobile_settings_remember_speed_all">The same for every video</string>
+    <string name="mobile_settings_remember_speed_none">Don\'t remember</string>
+    <string name="mobile_settings_remember_speed_none_desc">Back to 1x each time VoidTube starts</string>
+    <string name="mobile_settings_speed_list">Speeds under More speeds</string>
+    <string name="mobile_settings_speed_list_basic">A short list</string>
+    <string name="mobile_settings_speed_list_fine">Fine steps</string>
+    <string name="mobile_settings_speed_list_finest">Every 0.05x</string>
+    <string name="mobile_settings_natural_voice">Natural voice at other speeds</string>
+    <string name="mobile_settings_natural_voice_summary">Keeps voices at their normal pitch when you speed up or slow down</string>
+    <string name="mobile_settings_sleep_timer">Sleep timer</string>
+    <string name="mobile_settings_sleep_timer_summary">Pauses %1$s after you open a video</string>
+    <string name="mobile_settings_audio_focus">Pause for other sounds</string>
+    <string name="mobile_settings_audio_focus_summary">Pauses for calls and other apps\' audio. Applies to the next video you open</string>
+    <string name="mobile_settings_resume">Resume</string>
+    <string name="mobile_settings_resume_short">Resume short videos</string>
+    <string name="mobile_settings_resume_short_summary">Videos under 6 minutes start from the beginning unless this is on</string>
+    <string name="mobile_settings_resume_live">Resume live streams</string>
+    <string name="mobile_settings_resume_live_summary">Pick up a live stream where you left it, not at the live point</string>
+    <string name="mobile_settings_watch_page">Under the video</string>
+    <string name="mobile_settings_ambient">Ambient mode</string>
+    <string name="mobile_settings_ambient_summary">The video\'s colours glow under the player and fill the black bands in vertical fullscreen</string>
+    <string name="mobile_settings_hide_related">Hide Up next</string>
+    <string name="mobile_settings_hide_related_summary">Leaves out the related videos under the player</string>
+    <string name="mobile_settings_dislikes">Show dislike counts</string>
+    <string name="mobile_settings_dislikes_summary">From Return YouTube Dislike, which receives the video\'s ID</string>
+    <string name="mobile_settings_paid_promotion">Tell me about paid promotion</string>
+    <string name="mobile_settings_paid_promotion_summary">A short message when a video says it includes a paid promotion</string>
+
+    <!-- Video quality -->
+    <string name="mobile_settings_quality_intro">The quality videos start in. You can change it for one video from the player\'s settings.</string>
+    <string name="mobile_settings_default_quality">Default quality</string>
+    <!-- VOIDXDEV(quality-network): one default per network; "%1$s" are the two picks' labels. -->
+    <string name="mobile_settings_quality_wifi">On Wi-Fi</string>
+    <string name="mobile_settings_quality_mobile">On mobile data</string>
+    <string name="mobile_settings_quality_same">Same as Wi-Fi</string>
+    <string name="mobile_settings_quality_both">Wi-Fi: %1$s · Mobile data: %2$s</string>
+    <string name="mobile_settings_quality_auto">Auto (up to %1$dp)</string>
+    <string name="mobile_settings_quality_auto_desc">Recommended. The best your connection allows</string>
+    <string name="mobile_settings_quality_up_to">Up to %1$s</string>
+    <string name="mobile_settings_quality_more_data">Uses more data</string>
+    <string name="mobile_settings_quality_less_data">Uses less data</string>
+    <string name="mobile_settings_quality_data_saver">Saves data</string>
+    <string name="mobile_settings_audio">Audio</string>
+    <string name="mobile_settings_loudness">Even out loudness</string>
+    <string name="mobile_settings_loudness_summary">Turns loud videos down to YouTube\'s normal level</string>
+    <string name="mobile_settings_player_volume">Player volume</string>
+    <string name="mobile_settings_quality_data_saver_note">With Android\'s Data Saver on, VoidTube buffers less on mobile data.</string>
+
+    <!-- Captions -->
+    <string name="mobile_settings_caption_style">Style</string>
+    <string name="mobile_settings_caption_size">Size</string>
+    <string name="mobile_settings_caption_position">Distance from the bottom</string>
+    <string name="mobile_settings_caption_per_channel">Remember captions per channel</string>
+    <string name="mobile_settings_caption_per_channel_summary">Captions you turn on come back for that channel only. Off: your last caption language follows you to every video</string>
+    <string name="mobile_settings_caption_system">Android caption settings</string>
+    <string name="mobile_settings_caption_system_summary">Used by the System style</string>
+    <string name="mobile_settings_captions_note">Turn captions on, or pick their language, from the CC button in the player.</string>
+
+    <!-- SponsorBlock -->
+    <string name="mobile_settings_sponsorblock_summary">Skips the parts of videos the community marked</string>
+    <string name="mobile_settings_sponsorblock_segments">When a part starts</string>
+    <string name="mobile_settings_segment_skip">Skip</string>
+    <string name="mobile_settings_segment_skip_notify">Skip and say so</string>
+    <string name="mobile_settings_segment_ask">Ask me</string>
+    <string name="mobile_settings_segment_nothing">Don\'t skip</string>
+    <string name="mobile_settings_segment_marks">Marks on the seek bar</string>
+    <string name="mobile_settings_segment_marks_summary">%1$d of %2$d kinds marked</string>
+    <string name="mobile_settings_segment_marks_note">Coloured marks on the seek bar show where each kind of part is, even ones that aren\'t skipped.</string>
+    <string name="mobile_settings_segment_min">Don\'t skip parts shorter than</string>
+    <string name="mobile_settings_segment_once">Skip each part only once</string>
+    <string name="mobile_settings_segment_once_summary">If you go back into a part you skipped, it plays</string>
+    <string name="mobile_settings_segment_alt_server_summary">Try this if segments stop loading</string>
+    <string name="mobile_settings_segment_alt_server">Use the alternative server</string>
+
+    <!-- DeArrow -->
+    <string name="mobile_settings_dearrow_titles">Better titles</string>
+    <string name="mobile_settings_dearrow_titles_summary">Replaces clickbait titles with ones the community wrote</string>
+    <string name="mobile_settings_dearrow_thumbnails">Better thumbnails</string>
+    <string name="mobile_settings_dearrow_thumbnails_summary">Replaces thumbnails with frames the community picked</string>
+    <string name="mobile_settings_dearrow_note">DeArrow receives the IDs of the videos you see in lists.</string>
+
+    <!-- Advanced -->
+    <string name="mobile_settings_advanced_note">Most people never need these. They change how VoidTube streams and connects.</string>
+    <string name="mobile_settings_streaming">Streaming</string>
+    <string name="mobile_settings_video_format">Video format</string>
+    <string name="mobile_settings_buffer">Buffer</string>
+    <string name="mobile_settings_buffer_low_desc">About 25 seconds ahead. Uses the least memory</string>
+    <string name="mobile_settings_buffer_med_desc">About 50 seconds ahead</string>
+    <string name="mobile_settings_buffer_high_desc">Up to 75 seconds ahead</string>
+    <string name="mobile_settings_buffer_highest_desc">Up to 2 minutes ahead. Uses the most memory</string>
+    <string name="mobile_settings_stall_quality">Lower quality when it keeps buffering</string>
+    <string name="mobile_settings_stall_quality_summary">Drops one quality step after about 20 seconds of buffering. Turning it off can help with a VPN</string>
+    <string name="mobile_settings_high_bitrate">High-bitrate formats</string>
+    <string name="mobile_settings_high_bitrate_summary">Adds YouTube\'s higher-bitrate 1080p streams when a video has them. Costs an extra request</string>
+    <string name="mobile_settings_sabr">Stream with SABR (experimental)</string>
+    <string name="mobile_settings_sabr_summary">YouTube\'s newer streaming protocol, from the next video on. Uses a bit less data</string>
+    <string name="mobile_settings_legacy_codecs">Single-file streams</string>
+    <string name="mobile_settings_legacy_codecs_summary">Plays the old one-file stream, usually 360p, with no quality changes. Only for very slow phones</string>
+    <string name="mobile_settings_live">Live streams</string>
+    <string name="mobile_settings_live_edge">Start at the live point</string>
+    <string name="mobile_settings_live_edge_summary">Plays streams as live as possible, with no 15-second cushion</string>
+    <string name="mobile_settings_live_hls">Play live streams over HLS</string>
+    <string name="mobile_settings_live_hls_summary">Can run smoother on slow phones. You can\'t rewind, and quality stops at 1080p</string>
+    <string name="mobile_settings_player">Player</string>
+    <string name="mobile_settings_controls_on_next">Show controls on the next video</string>
+    <string name="mobile_settings_controls_on_next_summary">The controls appear when the next video starts</string>
+    <string name="mobile_settings_list_queue">Play the list you started from</string>
+    <string name="mobile_settings_list_queue_summary">A video opened from a playlist plays the rest of it as you saw it</string>
+    <string name="mobile_settings_queue_mode">Queue follows \"When a video ends\"</string>
+    <string name="mobile_settings_queue_mode_summary">With Pause or Close the player, the queue stops too</string>
+    <string name="mobile_settings_chapter_popup">Chapter pop-ups</string>
+    <string name="mobile_settings_chapter_popup_summary">Shows each chapter\'s name as it starts. Tap it to go to the next one</string>
+    <string name="mobile_settings_network">Network</string>
+    <string name="mobile_settings_proxy">Web proxy</string>
+    <string name="mobile_settings_proxy_summary">Sends VoidTube\'s traffic through an HTTP or SOCKS proxy</string>
+    <string name="mobile_settings_dns">Finding YouTube\'s servers</string>
+    <string name="mobile_settings_dns_ipv4">IPv4 first</string>
+    <string name="mobile_settings_dns_ipv4_desc">The default. Fixes networks with broken IPv6</string>
+    <string name="mobile_settings_dns_system">The phone\'s DNS</string>
+    <string name="mobile_settings_dns_google">Google DNS</string>
+    <string name="mobile_settings_conscrypt">Conscrypt</string>
+    <string name="mobile_settings_conscrypt_summary">A built-in security library for connections. Can help where YouTube is blocked, with apps like ByeByeDPI</string>
+    <string name="mobile_settings_accounts">Accounts</string>
+    <string name="mobile_settings_multi_profiles">Separate settings for each account</string>
+    <string name="mobile_settings_multi_profiles_summary">Each account keeps its own, starting from the defaults</string>
+    <string name="mobile_settings_legacy_feeds">Older feeds</string>
+    <string name="mobile_settings_legacy_feeds_summary">Loads Subscriptions, channels and playlists the way YouTube\'s TV app does. Try it if they come back empty</string>
+
+    <!-- About -->
+    <string name="mobile_settings_version">Version</string>
+    <string name="mobile_settings_update_notify_summary">Tells you when a new version is out</string>
+</resources>

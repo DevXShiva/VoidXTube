@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(chapters): press feedback for the current-chapter button above the seek bar. Nothing is
+     drawn at rest (the title sits on the controls scrim like the times do); a pressed rounded
+     highlight, the same in both themes since the player stays dark. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+</ripple>

@@ -1,0 +1,10 @@
+# Local data only: results, logs, APKs, caches, built proxy binaries and a regenerated recap never
+# go into the repo (point NETBENCH_DATA somewhere outside the checkout to keep them apart).
+harness/results/
+harness/.cache/
+appbench/results/
+appbench/apk/
+recap/recap.json
+recap/RECAP.md
+proxy/netbench-proxy-*
+__pycache__/

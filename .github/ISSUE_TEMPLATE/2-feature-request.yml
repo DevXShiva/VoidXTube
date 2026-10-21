@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest something VoidTube should do
+title: "[Feature]: "
+labels: [enhancement]
+
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like VoidTube to do?
+      placeholder: "Add 'Not interested' to the menu on a video in Home"
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: How would you use it?
+      description: What you're trying to do, and what you do today instead.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots of how another app does it, or links, are welcome.

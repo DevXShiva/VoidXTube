@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(support): Buy Me a Coffee row - a yellow badge with a dark cup (Material "local_cafe",
+     Apache 2.0). Drawn in its own colours: SettingsAdapter leaves this one untinted. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:fillColor="#FFDD00"
+      android:pathData="M12,0a12,12 0,1 1,0 24a12,12 0,1 1,0 -24z"/>
+  <group
+      android:pivotX="12"
+      android:pivotY="12"
+      android:scaleX="0.6"
+      android:scaleY="0.6"
+      android:translateX="0.4">
+    <path
+        android:fillColor="#0D0C22"
+        android:pathData="M2,21h18v-2H2v2zM20,3H4v10c0,2.21 1.79,4 4,4h6c2.21,0 4,-1.79 4,-4v-3h2c1.11,0 2,-0.89 2,-2V5c0,-1.11 -0.89,-2 -2,-2zM18,8V5h2v3h-2z"/>
+  </group>
+</vector>

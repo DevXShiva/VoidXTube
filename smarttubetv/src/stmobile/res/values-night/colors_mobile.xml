@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NEWTUBE(theme): the dark palette - exactly the values the app shipped before the Theme
+         setting, moved here from values/ (which now holds the light ones). Only the colours that
+         differ between the themes are listed; see values/colors_mobile.xml for what they're for. -->
+    <color name="mobile_color_cast_active">#64D2FF</color>
+    <!-- VOIDXDEV(amoled): pages are true black - an AMOLED pixel showing #000 is off. -->
+    <color name="mobile_color_background">#000000</color>
+    <color name="mobile_color_surface">#1C1C21</color>
+    <color name="mobile_color_on_surface">#F5F5F7</color>
+    <color name="mobile_color_section_title">#8B5CF6</color>
+    <color name="mobile_color_on_surface_secondary">#99FFFFFF</color>
+    <color name="mobile_color_placeholder">#1C1C21</color>
+    <!-- NEWTUBE(motion): the light that sweeps over skeleton blocks (ShimmerLinearLayout). -->
+    <color name="mobile_color_skeleton_highlight">#2C2C32</color>
+    <color name="mobile_color_link">#64D2FF</color>
+    <color name="mobile_color_divider">#1FFFFFFF</color>
+    <color name="mobile_color_pill">#1FFFFFFF</color>
+    <color name="mobile_color_subscribed_button">#2C2C32</color>
+    <color name="mobile_color_comment_parent">#0FFFFFFF</color>
+    <color name="mobile_color_comment_creator_pill">#24FFFFFF</color>
+    <color name="mobile_color_menu_surface">#24242A</color>
+    <color name="mobile_color_comment_handle">#D1FFFFFF</color>
+
+    <!-- Tokens added with the light theme; each is what that spot used before it. -->
+    <color name="mobile_color_card">#17FFFFFF</color>
+    <color name="mobile_color_inverse_surface">#F5F5F7</color>
+    <color name="mobile_color_on_inverse_surface">#000000</color>
+    <color name="mobile_color_inverse_ripple">#33000000</color>
+    <color name="mobile_color_track">#33FFFFFF</color>
+    <color name="mobile_color_field">#1C1C21</color>
+    <color name="mobile_color_background_scrim">#66000000</color>
+    <color name="mobile_color_navigation_bar">#000000</color>
+
+    <!-- The shared edit dialogs keep the library's AppDialog colours (sharedutils / common). -->
+    <color name="dialog_bg_color">#101010</color>
+    <color name="dialog_text_color">#a1a1a6</color>
+    <color name="dialog_hint_color">#33FFFFFF</color>
+    <color name="dialog_proxy_hint_color">#80FFFFFF</color>
+
+    <!-- VOIDXDEV(glass): BitChord's glass tint (#121212 at 40%), 14% white hairline, 14% white lit tab. -->
+    <color name="voidx_glass_tint">#66000000</color>
+    <color name="voidx_search_glass_tint">#26FFFFFF</color>
+    <!-- VOIDXDEV(glass): a pill on a frosted sheet ("Add a comment"): a see-through lift. -->
+    <color name="voidx_glass_pill_tint">#1FFFFFFF</color>
+    <!-- Static glass (no live blur behind it): a 9% white lift so it reads on the flat page. -->
+    <color name="voidx_sheet_glass">#C71C1C21</color>
+    <color name="voidx_glass_fill">#17FFFFFF</color>
+    <color name="voidx_glass_stroke">#24FFFFFF</color>
+    <color name="voidx_glass_selected">#24FFFFFF</color>
+    <color name="voidx_nav_inactive">#ADFFFFFF</color>
+    <!-- VOIDXDEV(glass): the frosted top bar - the page colour at ~75%. -->
+    <color name="voidx_bar_tint">#B8000000</color>
+    <color name="voidx_switch_off">#3A3A3F</color>
+    <color name="voidx_accent">#8B5CF6</color>
+    <color name="voidx_switch_on">@color/voidx_accent</color>
+</resources>

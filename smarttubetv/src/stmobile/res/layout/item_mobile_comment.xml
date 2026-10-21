@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NEWTUBE(comments-panel): one comment (CommentsAdapter). 28dp avatar, the text column at 52dp;
+  an optional "Pinned by" line, handle + time on one 12sp line, the comment folded at 4 lines
+  (CommentTextView draws "Read more"), then a 36dp action row: like + count, and "N replies" on a
+  top-level comment. The action row is 48dp tall to the finger (bg_comment_action draws the 36dp
+  pill); its negative margins keep the 36dp look. The replies page's comment reuses this layout
+  on a lighter ground (CommentsAdapter.TYPE_PARENT).
+  NEWTUBE(write-comments): a Reply button after the like, and a ⋮ at the end of the person's own
+  comments (Delete).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/comment_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/comment_avatar"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_watch_channel_placeholder" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/comment_pinned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_comment_pin" />
+
+            <TextView
+                android:id="@+id/comment_pinned_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:maxLines="1"
+                android:textColor="@color/mobile_color_on_surface_secondary"
+                android:textSize="12sp"
+                android:lineHeight="16sp"
+                tools:text="Pinned by \@harborscience" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/comment_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textDirection="locale"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="12sp"
+            android:lineHeight="16sp"
+            tools:text="\@author • 2 days ago" />
+
+        <com.newtube.mobile.ui.playback.CommentTextView
+            android:id="@+id/comment_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:breakStrategy="simple"
+            android:hyphenationFrequency="none"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="14sp"
+            app:lineHeight="20sp"
+            tools:text="This is a great comment that might wrap across several lines of text." />
+
+        <LinearLayout
+            android:id="@+id/comment_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="-8dp"
+            android:layout_marginTop="-6dp"
+            android:layout_marginBottom="-4dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/comment_like"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_comment_action"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:minWidth="48dp"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <ImageView
+                    android:id="@+id/comment_like_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_watch_thumb_up_outline" />
+
+                <FrameLayout
+                    android:id="@+id/comment_like_count_box"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="6dp">
+
+                    <TextView
+                        android:id="@+id/comment_like_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFeatureSettings="tnum"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textColor="@color/mobile_color_on_surface_secondary"
+                        android:textSize="12sp"
+                        android:lineHeight="16sp"
+                        tools:text="1.2K" />
+
+                    <TextView
+                        android:id="@+id/comment_like_count_next"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:alpha="0"
+                        android:fontFeatureSettings="tnum"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textColor="@color/mobile_color_on_surface_secondary"
+                        android:textSize="12sp"
+                        android:lineHeight="16sp" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/comment_reply"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_comment_action"
+                android:clickable="true"
+                android:contentDescription="@string/mobile_comments_reply"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_comment_reply" />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/comment_replies"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_comment_action"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="4dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/comment_replies_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textSize="12sp"
+                    tools:text="12 replies" />
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="2dp"
+                    android:autoMirrored="true"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_chevron_right" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/comment_more"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="-10dp"
+        android:layout_marginEnd="-10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/mobile_comments_more"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_mobile_more_vert"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</LinearLayout>

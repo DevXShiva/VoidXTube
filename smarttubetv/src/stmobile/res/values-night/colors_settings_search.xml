@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- YouTube's dark search field. -->
+    <color name="mobile_settings_search_bar">#272727</color>
+    <color name="mobile_settings_search_highlight">#2EFFFFFF</color>
+</resources>

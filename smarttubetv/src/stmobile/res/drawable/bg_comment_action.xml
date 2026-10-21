@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(comments-panel): press feedback for a comment's like / replies buttons and the panel's
+     sort button - a 36dp pill inside a 48dp touch target, like mobile_watch_segment_ripple. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetTop="6dp"
+    android:insetBottom="6dp">
+    <ripple android:color="?android:attr/colorControlHighlight">
+        <item android:id="@android:id/mask">
+            <shape android:shape="rectangle">
+                <solid android:color="@android:color/white" />
+                <corners android:radius="18dp" />
+            </shape>
+        </item>
+    </ripple>
+</inset>

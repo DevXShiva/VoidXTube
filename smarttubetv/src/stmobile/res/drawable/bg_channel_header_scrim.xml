@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(channel header): the banner wash fades into the page, so the tabs below sit on plain background. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:centerColor="@color/mobile_color_background_scrim"
+        android:endColor="@color/mobile_color_background"
+        android:startColor="@android:color/transparent" />
+</shape>

@@ -1,0 +1,96 @@
+# Axes: named patches that can be applied to ANY selected variant from the command line,
+#   netbench run ... --variant-ids 'nt-WEB,nt-IOS' --axis identity=none,tv,watch,embed
+# Each value is merged onto the variant exactly like an `extends` child (null deletes). Several
+# --axis flags multiply (cartesian product). Derived ids read <variant>~<axis>=<value>; the value
+# `base` keeps the variant unmodified. Add a new axis or value here - no code change needed.
+
+axes:
+  # Which anonymous visitor the request presents (body context.client.visitorData + X-Goog-Visitor-Id).
+  # Pages are fetched once per identity session and trial (nt-* share session nt-app, ytdlp-* share
+  # session ytdlp), so e.g. `watch` gives every client of a trial the same fresh watch-page visitor.
+  identity:
+    none:
+      tags: {identity: none, cookies: "none"}
+      identity: {pages: [], visitor: null, flags: null, context: null, cookies: false}
+    tv:
+      tags: {identity: tv-page, cookies: "tv-page:SOCS; player:none"}
+      identity:
+        pages: [tv]
+        visitor: tv
+        flags: null
+        context: null
+        pages_config:
+          tv: {ua: "Mozilla/5.0 (Linux armeabi-v7a; Android 7.1.2; Fire OS 6.0) Cobalt/22.lts.3.306369-gold (unlike Gecko) v8/8.8.278.8-jit gles Starboard/13, Amazon_ATV_mediatek8695_2019/NS6294 (Amazon, AFTMM, Wireless) com.amazon.firetv.youtube/22.3.r2.v66.0",
+               cookies: {SOCS: CAISEwgDEgk5NTA1MzE4OTQaAmVuIAEaBgiA7frSBg}}
+    watch:
+      tags: {identity: watch-page, cookies: "watch-page:SOCS; player:none"}
+      identity:
+        pages: [watch]
+        visitor: watch
+        flags: null
+        context: null
+        pages_config:
+          watch: {cookies: {SOCS: CAI}}
+    embed:
+      tags: {identity: embed-page, cookies: "none"}
+      identity:
+        pages: [embed]
+        visitor: embed
+        flags: null
+        context: null
+    embed+flags:
+      tags: {identity: embed-page+flags, cookies: "none"}
+      identity: {pages: [embed], visitor: embed, flags: embed, context: null}
+    sw:
+      tags: {identity: sw-js-data, cookies: "none"}
+      identity: {pages: [sw_js_data], visitor: sw_js_data, flags: null, context: null}
+    home:
+      tags: {identity: home-page, cookies: "home-page:SOCS; player:none"}
+      identity:
+        pages: [home]
+        visitor: home
+        flags: null
+        context: null
+        pages_config:
+          home: {cookies: {SOCS: CAI}}
+
+  # devicePlaybackCapabilities.supportXhr (NewTube sends true on every non-TV client except
+  # WEB_EMBED; yt-dlp sends no devicePlaybackCapabilities block at all).
+  xhr:
+    "true":
+      tags: {capability: supportXhr=true}
+      body: {playbackContext.devicePlaybackCapabilities.supportXhr: true}
+    "false":
+      tags: {capability: supportXhr=false}
+      body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}
+    absent:
+      tags: {capability: supportXhr=absent}
+      body: {playbackContext.devicePlaybackCapabilities: null}
+
+  # signatureTimestamp: the player's value, the TV form (value + "001"), or none at all.
+  sts:
+    player: {tags: {sts: player}, sts: player}
+    plus001: {tags: {sts: player+001}, sts: player+001}
+    none: {tags: {sts: none}, sts: none}
+
+  # clientScreen (NewTube: WATCH everywhere but TV_EMBED; yt-dlp's embedded test uses EMBED).
+  # client_overrides applies even when a page context replaced `client` (ytdlp-*).
+  screen:
+    WATCH: {tags: {context: clientScreen=WATCH}, client_overrides: {clientScreen: WATCH}}
+    EMBED: {tags: {context: clientScreen=EMBED}, client_overrides: {clientScreen: EMBED}}
+
+  # (No ad-field axis on purpose: scope rule of 2026-09-28 - the harness MEASURES the enforced
+  # pre-roll wait (ads.ad_wait_s vs first_ok_after_s); it does not try to remove or shorten it.)
+
+  # Cookies the identity pages set, sent (or not) on /player.
+  cookies:
+    send: {tags: {cookies: "player:page-set cookies"}, identity: {cookies: true}}
+    drop: {tags: {cookies: "player:none"}, identity: {cookies: false}}
+
+  # TLS / HTTP fingerprint of the /player request (curl_cffi 0.15 targets; no okhttp target exists).
+  tls:
+    chrome: {tags: {transport: chrome-tls}, transport: {impersonate: chrome, http_version: v2}}
+    safari: {tags: {transport: safari-tls}, transport: {impersonate: safari184, http_version: v2}}
+    firefox: {tags: {transport: firefox-tls}, transport: {impersonate: firefox147, http_version: v2}}
+    android-chrome: {tags: {transport: chrome-android-tls}, transport: {impersonate: chrome131_android, http_version: v2}}
+    plain-h1: {tags: {transport: plain-tls-h1}, transport: {impersonate: null, http_version: v1}}

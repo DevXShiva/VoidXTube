@@ -1,0 +1,91 @@
+name: Bug report
+description: Something in VoidTube doesn't work
+title: "[Bug]: "
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a VoidTube bug. This tracker is for the VoidTube phone app only.
+        Bugs in SmartTube on a TV belong in [SmartTube's tracker](https://github.com/yuliskov/SmartTube/issues).
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: "I searched the [open and closed issues](https://github.com/DevXShiva/VoidXTube/issues?q=is%3Aissue) and this isn't there yet."
+          required: true
+        - label: "This issue is about one bug."
+          required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: VoidTube version
+      description: Settings → About.
+      placeholder: "1.10.2"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Phone or tablet, and Android version
+      placeholder: "Pixel 9, Android 16 / Redmi Note 14, HyperOS 3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: signed-in
+    attributes:
+      label: Signed in to a Google account?
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network when it happened
+      options:
+        - "Wi-Fi"
+        - "Mobile data"
+        - "Both"
+        - "Not sure"
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead. Paste any error message word for word.
+      placeholder: |
+        1. Opened a video from Subscriptions
+        2. After about a minute it stopped with "Unknown source error"
+    validations:
+      required: true
+
+  - type: input
+    id: video
+    attributes:
+      label: Video link
+      description: If it happens with a particular video.
+      placeholder: "https://youtu.be/..."
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Diagnostic log
+      description: |
+        Settings → About → **Send diagnostic log**, save the file, then drag it here.
+        Passwords, sign-in tokens, cookies, e-mail and IP addresses are removed before it leaves the phone,
+        but it does list the videos you opened, so look through it before attaching it to this public page.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots or a screen recording help a lot.

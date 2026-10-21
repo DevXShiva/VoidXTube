@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NEWTUBE(theme): these are the LIGHT values; values-night/colors_mobile.xml holds the dark
+         ones (the palette the app shipped before the Theme setting, unchanged). A colour with no
+         night entry is the same in both themes: the accent, and everything drawn over pictures. -->
+    <!-- VOIDXDEV(theme): electric violet brand accent (was the fork's red). -->
+    <color name="mobile_color_primary">#8B5CF6</color>
+    <color name="mobile_color_primary_dark">#6D28D9</color>
+    <!-- Cast: the only place the app tints an icon to show a live connection. Was the stock
+         Material pink (#FF4081) inherited from the theme's colorAccent, which leaked into
+         every checkbox, radio, caret and untinted spinner - see Theme.NewTube. -->
+    <color name="mobile_color_cast_active">#0891B2</color>
+    <color name="mobile_color_background">#FFFFFF</color>
+    <color name="mobile_color_surface">#FFFFFF</color>
+    <color name="mobile_color_on_surface">#0F0F0F</color>
+    <!-- Group titles in Settings and dialogs: the accent, dark enough for small text on white (5:1). -->
+    <color name="mobile_color_section_title">#6D28D9</color>
+    <color name="mobile_color_on_surface_secondary">#606060</color>
+    <color name="mobile_color_badge_bg">#73000000</color>
+    <color name="mobile_color_badge_live_bg">#CCD32F2F</color>
+    <color name="mobile_color_progress_track">#33FFFFFF</color>
+    <!-- NEWTUBE(seek bar): YouTube's red since its 2024 refresh, the seek bar's played colour
+         (PlayerTimeBar.PLAYED_COLOR). VOIDXDEV: the seek bar now follows the violet brand accent
+         instead of YouTube's red. -->
+    <color name="mobile_color_progress">#8B5CF6</color>
+    <color name="mobile_color_placeholder">#E5E5E5</color>
+    <!-- NEWTUBE(motion): the light that sweeps over skeleton blocks (ShimmerLinearLayout). -->
+    <color name="mobile_color_skeleton_highlight">#F6F6F6</color>
+    <color name="mobile_color_link">#0891B2</color>
+    <color name="mobile_color_qr_bg">#FFFFFF</color>
+    <color name="mobile_color_divider">#1A000000</color>
+    <color name="mobile_color_pill">#0D000000</color>
+    <!-- Opaque equivalent of the translucent pill over #0F0F0F. MaterialButton flattens a
+         translucent background tint onto its white base, which made white "Subscribed" text
+         disappear into a white button on-device. -->
+    <color name="mobile_color_subscribed_button">#F2F2F2</color>
+    <!-- NEWTUBE(comments-panel): the comment a replies page is about, set apart from its replies. -->
+    <color name="mobile_color_comment_parent">#0D000000</color>
+    <!-- The creator's handle on their own comments, and the panel's Top / Newest menu. -->
+    <color name="mobile_color_comment_creator_pill">#14000000</color>
+    <color name="mobile_color_menu_surface">#FFFFFF</color>
+    <!-- A commenter's handle: brighter than the time beside it, quieter than the comment. -->
+    <color name="mobile_color_comment_handle">#2E2E2E</color>
+
+    <!-- NEWTUBE(theme): tokens added with the light theme (night values in values-night). -->
+    <!-- A raised card on the page: the watch page's Comments / Live chat / queue cards. -->
+    <color name="mobile_color_card">#F2F2F2</color>
+    <!-- The app's one main-action pill ("Play all", "Subscribe", "Sign in"): white on the dark
+         page, near-black on the light one, like YouTube's. -->
+    <color name="mobile_color_inverse_surface">#0F0F0F</color>
+    <color name="mobile_color_on_inverse_surface">#FFFFFF</color>
+    <color name="mobile_color_inverse_ripple">#33FFFFFF</color>
+    <!-- The unfilled part of a progress bar on a page or sheet (not over a picture). -->
+    <color name="mobile_color_track">#1F000000</color>
+    <!-- Search box: a grey pill on the light top bar; the dark one keeps its old look. -->
+    <color name="mobile_color_field">#F2F2F2</color>
+    <!-- The page colour at 40%, for the playlist header's wash into the page. -->
+    <color name="mobile_color_background_scrim">#66FFFFFF</color>
+    <!-- The navigation bar. Black here: Android 7-8.0 can't draw dark navigation buttons, so a
+         white bar would hide them; values-v27 has the white one that matches the page. -->
+    <color name="mobile_color_navigation_bar">#000000</color>
+
+    <!-- NEWTUBE(theme): the shared edit dialogs (SimpleEditDialog - new/rename playlist, passwords -
+         and WebProxyDialog) use the library's fixed dark AppDialog colours; the light side
+         overrides them here, values-night keeps the library's values. -->
+    <color name="dialog_bg_color">#FFFFFF</color>
+    <color name="dialog_text_color">#0F0F0F</color>
+    <color name="dialog_hint_color">#61000000</color>
+    <color name="dialog_proxy_hint_color">#8A000000</color>
+
+    <!-- NEWTUBE(theme): player chrome, the same in BOTH themes - the player stays dark like
+         YouTube's: controls and chips over the video, the mini player, the cast overlays. -->
+    <color name="mobile_player_on_video">#FFFFFF</color>
+    <color name="mobile_player_pill">#6B18181C</color>
+    <color name="mobile_player_cast_active">#64D2FF</color>
+
+    <!-- VOIDXDEV(glass): the floating-glass surfaces (light side; dark in values-night). -->
+    <color name="voidx_glass_tint">#66FAFAFA</color>
+    <!-- VOIDXDEV(search): the search pill stays visible over a plain page, frosted over results. -->
+    <color name="voidx_search_glass_tint">#14000000</color>
+    <!-- VOIDXDEV(glass): a pill on a frosted sheet ("Add a comment"): a see-through lift. -->
+    <color name="voidx_glass_pill_tint">#14000000</color>
+    <!-- VOIDXDEV(glass): sheet surfaces - the surface, a little see-through over the blurred page. -->
+    <color name="voidx_sheet_glass">#D6FFFFFF</color>
+    <color name="voidx_glass_fill">#0D000000</color>
+    <color name="voidx_glass_stroke">#1A000000</color>
+    <color name="voidx_glass_selected">#14000000</color>
+    <color name="voidx_nav_inactive">#99000000</color>
+    <!-- VOIDXDEV(glass): the frosted top bar - the page colour at ~75%. -->
+    <color name="voidx_bar_tint">#C7FFFFFF</color>
+    <color name="voidx_switch_off">#E3E3E8</color>
+    <!-- VOIDXDEV(accent): the app's accent - switches and choice radios (a picker can come later). -->
+    <color name="voidx_accent">#8B5CF6</color>
+    <color name="voidx_switch_on">@color/voidx_accent</color>
+</resources>

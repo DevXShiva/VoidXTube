@@ -1,0 +1,1316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Touch WATCH PAGE (PLAYER WATCH PAGE wave, on top of PLAYER POLISH).
+
+  Structure:
+    PlayerContainerLayout (root, swipe-DOWN-to-dismiss, scoped to the video area)
+      LinearLayout (vertical page)
+        FrameLayout  @id/mobile_video_area  - the video + its custom controls overlay.
+            Portrait: fixed 16:9 height (set in code). Landscape: match_parent (full-bleed).
+            Children (back to front): DoubleTapPlayerView, YouTubeOverlay, controls overlay,
+            seek bar (PlayerTimeBar, whose dot hangs over the page below), buffering spinner.
+        NestedScrollView  @id/mobile_watch_scroll  - the YouTube-style content column.
+            Portrait: fills the rest and scrolls. Landscape: GONE (immersive video only).
+            Holds: title, views/date, actions row (Like/Dislike + counts, Share), channel row
+            (avatar + name + Subscribe), expandable description, and the related/up-next list.
+
+  In landscape the content is hidden and the video area is match_parent, restoring the
+  PLAYER POLISH immersive full-bleed video with only the custom controls.
+-->
+<!-- No android:keepScreenOn here (#50): a view that always holds it keeps the window awake
+     forever, overriding the player listener that sets it on the PlayerView only while playing
+     or buffering - so an ended or paused video never let the screen turn off. -->
+<com.newtube.mobile.ui.playback.PlayerContainerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_player_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <com.newtube.mobile.ui.playback.WatchRootLayout
+        android:id="@+id/mobile_watch_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:orientation="vertical">
+
+        <!-- Video area: 16:9 in portrait (set in code), match_parent in landscape.
+             PinchZoomLayout adds the YouTube pinch gesture (fill <-> original) over all of it.
+             NEWTUBE(theme): the player stays dark in both themes - PlayerChrome gives everything
+             in here the dark theme's ripples and control colours, and the glyphs that are shared
+             with the (themed) pages are tinted mobile_player_on_video. -->
+        <com.newtube.mobile.ui.playback.PinchZoomLayout
+            android:id="@+id/mobile_video_area"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/black"
+            android:clipChildren="false"
+            android:theme="@style/ThemeOverlay.NewTube.PlayerChrome"
+            tools:ignore="Suspicious0dp">
+
+            <!-- surface_type=none: the video renders on a code-managed TextureView with a
+                 PERSISTENT SurfaceTexture (see MobilePlaybackActivity#setupVideoSurface). A
+                 TextureView (not SurfaceView) because the swipe-down minimize MORPHS this view
+                 and a SurfaceView goes BLACK under view transforms; and code-managed (not
+                 PlayerView-managed) because PlayerView/SimpleExoPlayer detach the surface on
+                 every view/activity hand-off, which forces a full video-codec re-init - seconds
+                 of frozen frames while the audio keeps playing (worst on mini-player minimize/
+                 expand). With one session-long SurfaceTexture the codec's surface NEVER changes;
+                 the texture is simply re-parented between this view and the Browse mini card
+                 (same technique as the YouTube app). PlayerView still does aspect-ratio,
+                 subtitles and the double-tap layer. -->
+            <!-- VOIDXDEV(glass): the video, recorded so the player's glass buttons (GlassDrawable)
+                 frost it. Shorts margins and the edge fade apply to this box (applyShortsLayout). -->
+            <com.newtube.mobile.ui.common.GlassSource
+                android:id="@+id/mobile_player_glass"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.github.vkay94.dtpv3.DoubleTapPlayerViewImpl
+                    android:id="@+id/mobile_player_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
+
+            </com.newtube.mobile.ui.common.GlassSource>
+
+            <com.github.vkay94.dtpv3.youtube.YouTubeOverlay
+                android:id="@+id/mobile_player_yt_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:yt_animationDuration="500"
+                app:yt_seekSeconds="10" />
+
+            <!-- VOIDXDEV(shorts): vertical-player overlay, under the controls. -->
+            <include layout="@layout/mobile_shorts_overlay" />
+
+            <!-- Custom controls overlay. clickable so taps on empty space hide it. -->
+            <FrameLayout
+                android:id="@+id/mobile_controls_root"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true">
+
+                <!-- The scrims cover the whole video area: in fullscreen the root is padded to the
+                     video's edges and the cutout, and applyControlsInsets gives these two the
+                     matching negative margins (clipToPadding=false above). -->
+                <View
+                    android:id="@+id/mobile_player_top_scrim"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/mobile_player_top_scrim_height"
+                    android:layout_gravity="top"
+                    android:background="@drawable/mobile_player_top_scrim" />
+
+                <View
+                    android:id="@+id/mobile_player_bottom_scrim"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/mobile_player_bottom_scrim_height"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/mobile_player_bottom_scrim" />
+
+                <!-- Top bar: back + title -->
+                <ImageButton
+                    android:id="@+id/mobile_player_back"
+                    android:layout_width="@dimen/mobile_player_icon_button"
+                    android:layout_height="@dimen/mobile_player_icon_button"
+                    android:layout_gravity="top|start"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/mobile_player_minimize"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_player_minimize"
+                    android:tint="@color/mobile_player_on_video" />
+
+                <!-- VOIDXDEV(audio-only): headphones - play the sound alone (the video track is dropped,
+                     the thumbnail stays), and Home keeps the audio going instead of a PiP window. -->
+                <ImageButton
+                    android:id="@+id/mobile_player_audio"
+                    android:layout_width="@dimen/mobile_player_icon_button"
+                    android:layout_height="@dimen/mobile_player_icon_button"
+                    android:layout_gravity="top|start"
+                    android:layout_marginStart="52dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/mobile_player_audio_only"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_player_headphones"
+                    android:tint="@color/mobile_player_audio_tint" />
+
+                <!-- paddingEnd must clear the full top-right options row (mobile_player_options):
+                     3 icon buttons * 48dp (no end margin) = 144dp. Otherwise the wrapped
+                     title runs under the leftmost option (cast) icon. -->
+                <TextView
+                    android:id="@+id/mobile_player_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:paddingStart="104dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="148dp"
+                    android:paddingBottom="12dp"
+                    android:shadowColor="#80000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="3"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="Video title goes here and may wrap onto a second line" />
+
+                <!-- Top-right player options, YouTube-style trio: Cast, Subtitles/CC, and the
+                     gear. Everything else (quality, speed, PiP, the long tail) lives one level
+                     down in the gear's bottom sheet (openPlayerMenu). -->
+                <LinearLayout
+                    android:id="@+id/mobile_player_options"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Cast picker (casting wave): lists DIAL-discovered TVs + paired screens.
+                         Route B only for now; see com.newtube.mobile.casting. -->
+                    <ImageButton
+                        android:id="@+id/mobile_player_cast"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_cast_button"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_mobile_cast"
+                        android:tint="@color/mobile_player_on_video" />
+
+                    <ImageButton
+                        android:id="@+id/mobile_player_subtitles"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_subtitles"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_cc_off" />
+
+                    <!-- Gear: opens the player-options bottom sheet (quality / speed / PiP up
+                         top, then repeat/shuffle/zoom/background/stats/rotate-lock/playlist/
+                         queue), each dispatched through PlaybackPresenter.onButtonClicked /
+                         onButtonLongClicked. -->
+                    <ImageButton
+                        android:id="@+id/mobile_player_more"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_settings"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_mobile_settings"
+                        android:tint="@color/mobile_player_on_video" />
+
+                </LinearLayout>
+
+                <!-- Center transport: previous / play-pause-replay / next.
+                     Previous & next dispatch PlaybackPresenter.onPreviousClicked / onNextClicked
+                     (manual skip; auto-advance already works via the controllers). -->
+                <LinearLayout
+                    android:id="@+id/mobile_player_transport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/mobile_player_previous"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:layout_marginEnd="20dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_previous"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_previous" />
+
+                    <!-- Large center play / pause / replay -->
+                    <ImageButton
+                        android:id="@+id/mobile_player_play_pause"
+                        android:layout_width="@dimen/mobile_player_center_button"
+                        android:layout_height="@dimen/mobile_player_center_button"
+                        android:contentDescription="@string/mobile_player_pause"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_pause" />
+
+                    <ImageButton
+                        android:id="@+id/mobile_player_next"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:layout_marginStart="20dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_next"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_next" />
+
+                </LinearLayout>
+
+                <!-- NEWTUBE(seek bar): the bottom row sits on the seek bar (PlayerTimeBar, outside this
+                     overlay, so that it can stay on the video's edge as a line while the controls
+                     are hidden): the time, the current chapter (YouTube's "· Title >"; tap = the
+                     Chapters list; gone without chapters) and fullscreen. Its bottom margin clears
+                     the bar's touch band (applyControlsInsets adds the fullscreen lift). -->
+                <LinearLayout
+                    android:id="@+id/mobile_player_bottom_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/mobile_player_bottom_row_margin"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="4dp">
+
+                    <!-- VOIDXDEV(glass): position / duration on one glass pill. -->
+                    <LinearLayout
+                        android:id="@+id/mobile_player_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="7dp">
+
+                    <TextView
+                        android:id="@+id/mobile_player_position"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:shadowColor="#80000000"
+                        android:shadowRadius="3"
+                        android:text="@string/mobile_player_time_default"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/mobile_player_time_text" />
+
+                    <TextView
+                        android:id="@+id/mobile_player_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:shadowColor="#80000000"
+                        android:shadowRadius="3"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/mobile_player_time_text"
+                        tools:text=" / 4:26:52" />
+
+                    </LinearLayout>
+
+                    <!-- Live streams only (toggled from onProgressTick): red at the live edge,
+                         dimmed while rewound into the DVR window; tap = jump back to the edge. -->
+                    <TextView
+                        android:id="@+id/mobile_player_live"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_mobile_live_chip"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="2dp"
+                        android:text="@string/mobile_player_live"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/mobile_player_time_text"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/mobile_player_chapter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:background="@drawable/bg_mobile_player_chapter"
+                            android:drawableEnd="@drawable/ic_player_chapter_chevron"
+                            android:drawablePadding="2dp"
+                            android:ellipsize="end"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:minHeight="32dp"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="4dp"
+                            android:shadowColor="#80000000"
+                            android:shadowRadius="3"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/mobile_player_time_text"
+                            android:visibility="gone"
+                            tools:text="· Working With Strings"
+                            tools:visibility="visible" />
+
+                    </FrameLayout>
+
+                    <ImageButton
+                        android:id="@+id/mobile_player_fullscreen"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_fullscreen"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_fullscreen" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- NEWTUBE(seek bar): the seek bar, YouTube-style - outside the controls overlay so that
+                 in portrait it stays on the video's bottom edge as a thin progress line while the
+                 controls are hidden. Its dot hangs over the watch page below the video, which is
+                 why this box and mobile_watch_root draw their children unclipped (WatchRootLayout
+                 draws the video box last). Only the shown bar takes touches. -->
+            <com.newtube.mobile.ui.playback.PlayerTimeBar
+                android:id="@+id/mobile_player_time_bar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/mobile_player_bar_height"
+                android:layout_gravity="bottom" />
+
+            <!-- While the bar is dragged: the time under the finger and its chapter, in a pill above
+                 the bar (the other controls step aside). -->
+            <TextView
+                android:id="@+id/mobile_player_scrub_chapter"
+                style="@style/MobilePlayerPill"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="@dimen/mobile_player_scrub_pill_margin"
+                android:visibility="gone"
+                tools:text="2:10:42   Dictionaries" />
+
+            <!-- Top pill: "Release to cancel" while a drag rests where playback was, "2x" while
+                 press-and-hold speeds the video up. -->
+            <TextView
+                android:id="@+id/mobile_player_top_pill"
+                style="@style/MobilePlayerPill"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                tools:text="Release to cancel" />
+
+            <!-- NEWTUBE(gestures): brightness or volume while a swipe on the side of the fullscreen
+                 video sets it (SwipeLevels), in the top pill's place - the finger is on the side. -->
+            <LinearLayout
+                android:id="@+id/mobile_player_level_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_mobile_player_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/mobile_player_level_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    tools:src="@drawable/ic_player_volume_up" />
+
+                <com.newtube.mobile.ui.playback.LevelBar
+                    android:id="@+id/mobile_player_level_bar"
+                    android:layout_width="120dp"
+                    android:layout_height="4dp"
+                    android:layout_marginStart="12dp" />
+
+            </LinearLayout>
+
+            <!-- Center loading stack: the spinner plus (fresh installs only) the one-time-setup
+                 hint shown while the first YouTube session is still being established. Both are
+                 toggled from showProgressBar(); the wrapper collapses when they're gone. -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/mobile_player_progress"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="@color/mobile_color_primary"
+                    android:indeterminateTintMode="src_in" />
+
+                <TextView
+                    android:id="@+id/mobile_player_setup_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="24dp"
+                    android:shadowColor="#B3000000"
+                    android:shadowRadius="4"
+                    android:text="@string/mobile_first_run_setup"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Persistent playback-status line (showPlaybackNotice): why the video stopped, e.g. a
+                 lost connection. Anchored to the bottom of the video box, clear of the centered
+                 transport controls (the play button is the retry affordance and must stay usable)
+                 and above the seek block. Keep the text to ONE short line: the portrait box is only
+                 ~190dp tall, so a second line runs straight into the controls. Stays visible across
+                 retries; only real playback or a new video clears it. -->
+            <TextView
+                android:id="@+id/mobile_player_notice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="60dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:paddingHorizontal="24dp"
+                android:shadowColor="#B3000000"
+                android:shadowRadius="4"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <!-- "Stats for nerds" debug overlay. DebugInfoManager inflates R.layout.debug_view into
+                 this group and toggles its visibility; it must not eat player taps, so it is not
+                 clickable. Offset below the top scrim so it clears the back button / title. -->
+            <FrameLayout
+                android:id="@+id/mobile_player_debug"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="56dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:visibility="gone" />
+
+            <!-- "Playing on TV" panel (casting wave): covers the whole video box while a cast
+                 session is active. Local playback is paused underneath (never torn down); this
+                 panel is a self-contained remote - play/pause + disconnect + its own seek bar
+                 driven by CastEvents (see the cast hooks in MobilePlaybackActivity). clickable so
+                 taps never reach the player controls below it. -->
+            <LinearLayout
+                android:id="@+id/mobile_cast_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E6101010"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_mobile_cast"
+                    android:tint="@color/mobile_player_on_video" />
+
+                <TextView
+                    android:id="@+id/mobile_cast_overlay_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingHorizontal="24dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="Playing on Living room TV" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/mobile_cast_play_pause"
+                        android:layout_width="@dimen/mobile_player_icon_button"
+                        android:layout_height="@dimen/mobile_player_icon_button"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/mobile_player_play"
+                        android:padding="12dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_player_pause" />
+
+                    <TextView
+                        android:id="@+id/mobile_cast_disconnect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:background="@drawable/mobile_player_pill_bg"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp"
+                        android:text="@string/mobile_cast_disconnect"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/mobile_cast_options"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/mobile_player_pill_bg"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp"
+                        android:text="@string/mobile_cast_more_options"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- Lounge exposes a livestream's absolute stream-uptime timestamps rather than a
+                     meaningful DVR window. Show a semantic state and suppress seeking instead of
+                     rendering values such as 1121:36:52 / 1134:36:26. -->
+                <TextView
+                    android:id="@+id/mobile_cast_live"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_mobile_live_chip"
+                    android:paddingHorizontal="9dp"
+                    android:paddingVertical="3dp"
+                    android:text="@string/mobile_player_live"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/mobile_player_time_text"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <!-- Cast seek row: mirrors the player's bottom seek row but drives the TV. -->
+                <LinearLayout
+                    android:id="@+id/mobile_cast_timeline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp">
+
+                    <TextView
+                        android:id="@+id/mobile_cast_position"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:text="@string/mobile_player_time_default"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/mobile_player_time_text" />
+
+                    <SeekBar
+                        android:id="@+id/mobile_cast_seekbar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:layout_weight="1"
+                        android:progressTint="@color/mobile_color_primary"
+                        android:thumbTint="@color/mobile_color_primary" />
+
+                    <TextView
+                        android:id="@+id/mobile_cast_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFeatureSettings="tnum"
+                        android:text="@string/mobile_player_time_default"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/mobile_player_time_text" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Pinch-zoom hint chip ("Zoomed to fill" / "Original"), faded in/out from code. -->
+            <TextView
+                android:id="@+id/mobile_player_zoom_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="64dp"
+                android:background="@drawable/bg_mobile_zoom_hint"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:visibility="gone"
+                tools:text="@string/mobile_player_zoom_fill"
+                tools:visibility="visible" />
+
+            <include layout="@layout/mobile_next_countdown" />
+
+        </com.newtube.mobile.ui.playback.PinchZoomLayout>
+
+        <!-- Everything under the video: the watch content, and the comments panel that slides
+             up over it (mobile_comments_panel, NEWTUBE(comments-panel)). -->
+        <FrameLayout
+            android:id="@+id/mobile_watch_area"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <!-- VOIDXDEV(glass): the page the floating fullscreen button frosts. -->
+        <com.newtube.mobile.ui.common.GlassSource
+            android:id="@+id/mobile_watch_glass"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <!-- Scrollable watch content (portrait only). -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/mobile_watch_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mobile_color_background"
+            android:fillViewport="true"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/mobile_watch_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <!-- VOIDXDEV: title and meta are one target - both open the description, so one
+                     press feedback covers the pair instead of two separate highlights. -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/mobile_watch_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@null"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="3"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textSize="18sp"
+                    tools:text="A great video title that may wrap across a couple of lines" />
+
+                <!-- views + date + expand-description affordance -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_meta_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:id="@+id/mobile_watch_meta"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/mobile_color_on_surface_secondary"
+                        android:textSize="14sp"
+                        tools:text="1,234,567 views • Jan 1, 2026" />
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Expandable description (collapsed by default) -->
+                <TextView
+                    android:id="@+id/mobile_watch_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding"
+                    android:autoLink="web"
+                    android:textColor="@color/mobile_color_on_surface_secondary"
+                    android:textColorLink="@color/mobile_color_link"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:text="Video description text..."
+                    tools:visibility="visible" />
+
+                <!-- Actions row: segmented Like|Dislike pill (YouTube-style) + Share + Save.
+                     Scrolls horizontally like YouTube's, so a fourth pill (or a wide count) can't
+                     push an action off a narrow screen. -->
+                <!-- NEWTUBE(touch): no top margin - the meta row above (48dp tall now) and the pills'
+                     own 6dp inset hold the old spacing. -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding">
+
+                    <!-- padding 0: an inset background otherwise becomes the view's padding. -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/mobile_watch_pill_bg_touch"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="0dp">
+
+                        <LinearLayout
+                            android:id="@+id/mobile_watch_like"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/mobile_watch_segment_ripple"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="12dp"
+                            android:paddingVertical="14dp">
+
+                            <ImageView
+                                android:id="@+id/mobile_watch_like_icon"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/mobile_watch_like"
+                                android:src="@drawable/ic_watch_thumb_up_outline" />
+
+                            <TextView
+                                android:id="@+id/mobile_watch_like_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/mobile_watch_count_placeholder"
+                                android:textColor="@color/mobile_color_on_surface"
+                                android:textSize="14sp"
+                                tools:text="12K" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="18dp"
+                            android:background="@color/mobile_color_divider" />
+
+                        <LinearLayout
+                            android:id="@+id/mobile_watch_dislike"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/mobile_watch_segment_ripple"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="14dp"
+                            android:paddingVertical="14dp">
+
+                            <ImageView
+                                android:id="@+id/mobile_watch_dislike_icon"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@string/mobile_watch_dislike"
+                                android:src="@drawable/ic_watch_thumb_down_outline" />
+
+                            <TextView
+                                android:id="@+id/mobile_watch_dislike_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/mobile_watch_count_placeholder"
+                                android:textColor="@color/mobile_color_on_surface"
+                                android:textSize="14sp"
+                                tools:text="123" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/mobile_watch_share"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/mobile_watch_pill_bg_touch"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="14dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/mobile_watch_share"
+                            android:src="@drawable/ic_watch_share" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="@string/mobile_watch_share"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <!-- VOIDXDEV(lyrics): the song's lyrics (LyricsSheet); shown only for videos YouTube Music has. -->
+                    <LinearLayout
+                        android:id="@+id/mobile_watch_music"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:visibility="gone"
+                        android:background="@drawable/mobile_watch_pill_bg_touch"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="14dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/mobile_lyrics"
+                            android:src="@drawable/ic_watch_lyrics" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="@string/mobile_lyrics"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <!-- Download. Opens the quality picker; once the video is on the device the
+                         pill reads "Downloaded" and opens the download's own menu. -->
+                    <LinearLayout
+                        android:id="@+id/mobile_watch_download"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/mobile_watch_pill_bg_touch"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="14dp">
+
+                        <ImageView
+                            android:id="@+id/mobile_watch_download_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/dialog_download"
+                            android:src="@drawable/ic_watch_download" />
+
+                        <TextView
+                            android:id="@+id/mobile_watch_download_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="@string/dialog_download"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <!-- Save to playlist. Same action as gear -> More -> Save to playlist; it lives
+                         here too because that is where YouTube puts it and where people look. -->
+                    <LinearLayout
+                        android:id="@+id/mobile_watch_save"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/mobile_watch_pill_bg_touch"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="14dp">
+
+                        <ImageView
+                            android:id="@+id/mobile_watch_save_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/mobile_watch_save"
+                            android:src="@drawable/ic_player_playlist_add"
+                            android:tint="@color/mobile_color_on_surface" />
+
+                        <TextView
+                            android:id="@+id/mobile_watch_save_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="@string/mobile_watch_save"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <!-- Channel row: avatar + name/subs + Subscribe. Sections separate by
+                     whitespace, not hairline dividers (matches current YouTube).
+                     The row itself opens the channel page (Subscribe keeps its own click). -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_channel_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding"
+                    android:paddingVertical="8dp">
+
+                    <ImageView
+                        android:id="@+id/mobile_watch_avatar"
+                        android:layout_width="@dimen/mobile_watch_avatar_size"
+                        android:layout_height="@dimen/mobile_watch_avatar_size"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_watch_channel_placeholder" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/mobile_watch_channel_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-medium"
+                            android:maxLines="1"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="15sp"
+                            tools:text="Channel name" />
+
+                        <TextView
+                            android:id="@+id/mobile_watch_subs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/mobile_color_on_surface_secondary"
+                            android:textSize="13sp"
+                            android:visibility="gone"
+                            tools:text="1.2M subscribers"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
+
+                    <!-- VOIDXDEV(glass): a TextView, not a MaterialButton - Material re-tints its own
+                         background, so the glass "Subscribed" pill (bg_watch_subscribe, selected =
+                         subscribed) would never show. -->
+                    <TextView
+                        android:id="@+id/mobile_watch_subscribe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_watch_subscribe"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:minHeight="48dp"
+                        android:paddingHorizontal="16dp"
+                        android:text="@string/mobile_watch_subscribe"
+                        android:textColor="@color/mobile_color_on_inverse_surface"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- Comments entry: opens the comments panel over this page. Hidden until the loaded
+                     metadata reports that comments are enabled (a non-null comments key).
+                     Rendered as a rounded surface card, like YouTube's comments teaser. -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_comments_entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/mobile_watch_content_padding"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_watch_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="13dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_watch_comment" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/mobile_comments_entry"
+                        android:textColor="@color/mobile_color_on_surface"
+                        android:textSize="14sp" />
+
+                    <!-- NEWTUBE(comments-panel): the total from the same /next ("1.8K"). -->
+                    <TextView
+                        android:id="@+id/mobile_watch_comments_count"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:fontFeatureSettings="tnum"
+                        android:maxLines="1"
+                        android:textColor="@color/mobile_color_on_surface_secondary"
+                        android:textSize="14sp"
+                        tools:text="1.8K" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="@null"
+                        android:rotation="270"
+                        android:src="@drawable/ic_watch_expand" />
+
+                </LinearLayout>
+
+                <!-- Live chat entry: opens the live-chat bottom sheet. Hidden unless the current
+                     video is a live stream (a non-null live-chat key). -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_chat_entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/mobile_watch_content_padding"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_watch_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="13dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_watch_chat" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/mobile_live_chat_entry"
+                        android:textColor="@color/mobile_color_on_surface"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="@null"
+                        android:rotation="270"
+                        android:src="@drawable/ic_watch_expand" />
+
+                </LinearLayout>
+
+                <!-- Queue: "Playing from <playlist> - i/N". Shown only while the current video is
+                     playing as part of a playlist/queue (see MobilePlaybackActivity.bindQueueCard).
+                     Collapsed by default, like YouTube's: the header is the whole affordance and
+                     tapping it expands the queue in place. The list is a MaxHeightRecyclerView with
+                     its own scrolling (nestedScrollingEnabled=true) so a 200-item playlist scrolls
+                     inside the card instead of pushing "Up next" kilometres down the watch page. -->
+                <LinearLayout
+                    android:id="@+id/mobile_watch_queue_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/mobile_watch_content_padding"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_watch_card"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/mobile_watch_queue_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="13dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_player_queue"
+                            android:tint="@color/mobile_color_on_surface" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/mobile_watch_queue_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="@color/mobile_color_on_surface"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="Playing from Liked videos" />
+
+                            <TextView
+                                android:id="@+id/mobile_watch_queue_subtitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="@color/mobile_color_on_surface_secondary"
+                                android:textSize="12sp"
+                                tools:text="3 / 48" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/mobile_watch_queue_chevron"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_watch_expand" />
+
+                    </LinearLayout>
+
+                    <com.newtube.mobile.ui.dialog.MaxHeightRecyclerView
+                        android:id="@+id/mobile_watch_queue_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
+                        android:visibility="gone"
+                        tools:listitem="@layout/item_mobile_related_video" />
+
+                </LinearLayout>
+
+                <!-- Related / up next -->
+                <TextView
+                    android:id="@+id/mobile_watch_related_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/mobile_watch_content_padding"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/mobile_watch_related"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <include
+                    layout="@layout/mobile_watch_related_skeleton"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mobile_watch_related"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_mobile_related_video" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        </com.newtube.mobile.ui.common.GlassSource>
+
+        <!-- VOIDXDEV(fullscreen): a floating glass button, bottom-right over the page, that takes the
+             playing video fullscreen. Under the comments panel, which covers it when open; the
+             page (and with it this button) has no height in fullscreen and Shorts. -->
+        <com.newtube.mobile.ui.common.GlassView
+            android:id="@+id/mobile_watch_fullscreen_fab"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:contentDescription="@string/mobile_player_fullscreen"
+            android:elevation="6dp"
+            android:focusable="true"
+            app:glassCornerRadius="26dp"
+            app:glassTint="@color/voidx_glass_tint">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_player_fullscreen"
+                app:tint="@color/mobile_color_on_surface" />
+
+        </com.newtube.mobile.ui.common.GlassView>
+
+        <include layout="@layout/mobile_comments_panel" />
+
+        </FrameLayout>
+
+    </com.newtube.mobile.ui.playback.WatchRootLayout>
+
+</com.newtube.mobile.ui.playback.PlayerContainerLayout>

@@ -1,0 +1,110 @@
+name: Release VoidTube APK
+
+# Builds the signed release APKs and publishes them (plus the update manifest the
+# in-app updater reads) to a GitHub Release whenever a version tag like v3.0.1 is
+# pushed. Can also be run by hand from the Actions tab.
+#
+# Signing: if the SIGNING_KEY / KEY_STORE_PASSWORD / ALIAS / KEY_PASSWORD secrets
+# are set, the release is signed with your keystore. Without them the build still
+# succeeds, but the APKs are debug-signed and are NOT suitable for public release.
+# See docs/GITHUB-SETUP.md for how to create the keystore and the secrets.
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (e.g. v3.0.1). Must match versionName in smarttubetv/build.gradle.'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      HAS_SIGNING_KEY: ${{ secrets.SIGNING_KEY != '' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Verify submodules
+        run: |
+          if [ ! -f SharedModules/core_settings.gradle ] || [ ! -f MediaServiceCore/core_settings.gradle ]; then
+            echo "::error::Submodules are missing from this repository. Run 'bash tools/add-submodules.sh' locally, commit and push - see docs/GITHUB-SETUP.md section 2a."
+            exit 1
+          fi
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Resolve version
+        id: ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "Releasing $TAG"
+
+      - name: Configure Build Signing
+        if: ${{ env.HAS_SIGNING_KEY == 'true' }}
+        run: |
+          echo "storePassword=${{ secrets.KEY_STORE_PASSWORD }}" > keystore.properties
+          echo "keyAlias=${{ secrets.ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+          echo "storeFile=${{ github.workspace }}/key.jks" >> keystore.properties
+          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > "${{ github.workspace }}/key.jks"
+
+      - name: Warn if building unsigned
+        if: ${{ env.HAS_SIGNING_KEY != 'true' }}
+        run: echo "::warning::No SIGNING_KEY secret set - the APKs will be debug-signed and are not suitable for public release."
+
+      - name: Grant Gradle permissions
+        run: chmod +x gradlew
+
+      - name: Build Release APKs
+        run: ./gradlew clean assembleStmobileRelease
+
+      - name: Collect APKs
+        run: |
+          mkdir -p dist
+          # The build renames APKs into renamed_apks/stmobileRelease (VoidTube_<ver>_<abi>.apk).
+          if ls smarttubetv/build/outputs/renamed_apks/stmobileRelease/*.apk >/dev/null 2>&1; then
+            cp smarttubetv/build/outputs/renamed_apks/stmobileRelease/*.apk dist/
+          else
+            cp smarttubetv/build/outputs/apk/stmobile/release/*.apk dist/
+          fi
+          ls -l dist
+
+      - name: Generate update manifest (voidx.json)
+        run: |
+          python3 tools/update_manifest.py \
+            --tag "${{ steps.ver.outputs.tag }}" \
+            --dist dist \
+            --out dist/voidx.json
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: VoidTube ${{ steps.ver.outputs.name }}
+          generate_release_notes: true
+          files: dist/*
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false

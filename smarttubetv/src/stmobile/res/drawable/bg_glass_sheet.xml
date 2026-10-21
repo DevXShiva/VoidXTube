@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(glass): a sheet with no Material frame around it (MobileAppDialogActivity): the
+     see-through surface itself, over the blur its window asks for. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/voidx_sheet_glass" />
+    <corners android:radius="28dp" />
+</shape>

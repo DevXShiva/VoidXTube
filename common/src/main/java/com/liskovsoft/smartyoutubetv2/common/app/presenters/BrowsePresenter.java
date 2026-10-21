@@ -1,0 +1,1942 @@
+package com.liskovsoft.smartyoutubetv2.common.app.presenters;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.SystemClock;
+import android.text.TextUtils;
+import android.util.Pair;
+
+import androidx.annotation.Nullable;
+
+import com.liskovsoft.mediaserviceinterfaces.oauth.Account;
+import com.liskovsoft.mediaserviceinterfaces.data.MediaGroup;
+import com.liskovsoft.sharedutils.helpers.Helpers;
+import com.liskovsoft.sharedutils.locale.LocaleUtility;
+import com.liskovsoft.sharedutils.mylogger.Log;
+import com.liskovsoft.sharedutils.rx.RxHelper;
+import com.liskovsoft.smartyoutubetv2.common.R;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.BrowseSection;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Playlist;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.SettingsGroup;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.SettingsItem;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.VideoGroup;
+import com.liskovsoft.smartyoutubetv2.common.app.models.errors.CategoryEmptyError;
+import com.liskovsoft.smartyoutubetv2.common.app.models.errors.ErrorFragmentData;
+import com.liskovsoft.smartyoutubetv2.common.app.models.errors.PasswordError;
+import com.liskovsoft.smartyoutubetv2.common.app.models.errors.SignInError;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.controllers.DefaultNetworkRecoveryWatcher;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.service.VideoStateService;
+import com.liskovsoft.smartyoutubetv2.common.app.models.playback.service.VideoStateService.State;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.base.BasePresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.VideoActionPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.ChannelUploadsMenuPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.SectionMenuPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.VideoMenuPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.VideoMenuPresenter.VideoMenuCallback;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.providers.channelgroup.ChannelGroupServiceWrapper;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.interfaces.SectionPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.interfaces.VideoGroupPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.views.BrowseView;
+import com.liskovsoft.smartyoutubetv2.common.misc.AppDataSourceManager;
+import com.liskovsoft.smartyoutubetv2.common.misc.VideoDownloads;
+import com.liskovsoft.smartyoutubetv2.common.misc.BrowseProcessorManager;
+import com.liskovsoft.smartyoutubetv2.common.misc.MediaServiceManager;
+import com.liskovsoft.smartyoutubetv2.common.misc.MediaServiceManager.AccountChangeListener;
+import com.liskovsoft.smartyoutubetv2.common.misc.NetPath;
+import com.liskovsoft.smartyoutubetv2.common.prefs.AccountsData;
+import com.liskovsoft.smartyoutubetv2.common.prefs.BlockedChannelData;
+import com.liskovsoft.smartyoutubetv2.common.prefs.MainUIData;
+import com.liskovsoft.smartyoutubetv2.common.prefs.PlayerTweaksData;
+import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+
+public class BrowsePresenter extends BasePresenter<BrowseView> implements SectionPresenter, VideoGroupPresenter, AccountChangeListener {
+    private static final String TAG = BrowsePresenter.class.getSimpleName();
+    @SuppressLint("StaticFieldLeak")
+    private static BrowsePresenter sInstance;
+    private final List<BrowseSection> mSections;
+    private final List<BrowseSection> mErrorSections;
+    private final Map<Integer, Observable<MediaGroup>> mGridMapping;
+    private final Map<Integer, Observable<List<MediaGroup>>> mRowMapping;
+    private final Map<Integer, Callable<List<SettingsItem>>> mSettingsGridMapping;
+    private final Map<Integer, Callable<List<Video>>> mLocalGridMappings;
+    private final Map<Integer, BrowseSection> mSectionsMapping;
+    private final AppDataSourceManager mDataSourcePresenter;
+    private final BrowseProcessorManager mBrowseProcessor;
+    private final List<Disposable> mActions;
+    /**
+     * NEWTUBE(feed-retry): a failed section used to re-poll on a fixed 30 s forever - also while
+     * the app sat in the background (onViewPaused left the callback posted and getView() stays
+     * non-null while stopped) - and nothing retried when connectivity came back. Now the delay
+     * escalates ({@link FeedRetryBackoff}), the timer and the network edge only run while the view
+     * is resumed, and a resume retries the failed section promptly. See {@link #scheduleFeedRetry}.
+     */
+    private final Runnable mRefreshSection = () -> retryFailedSection("timer");
+    private static final String FEED_RETRY_LOG = "feed-retry";
+    /** A retry that finds other work of this presenter still loading looks again this much later. */
+    private static final long FEED_RETRY_BUSY_RECHECK_MS = 10_000;
+    private final FeedRetryBackoff mFeedRetry = new FeedRetryBackoff();
+    private final DefaultNetworkRecoveryWatcher mFeedNetworkWatcher = new DefaultNetworkRecoveryWatcher(FEED_RETRY_LOG);
+    private boolean mViewResumed;
+    private BrowseSection mCurrentSection;
+    private Video mCurrentVideo;
+    private long mLastUpdateTimeMs = -1;
+    private int mBootSectionIndex;
+    private int mBootstrapSectionId = -1;
+    /**
+     * Per-section last-successful-fetch times: a section refocused within
+     * {@link #SECTION_FRESH_MS} skips the network refetch entirely — the view keeps painting
+     * its (identical) snapshot. Pull-to-refresh and {@link #refresh()} bypass via
+     * {@link #mForceSectionUpdate}; cleared on account change and when a section's backing
+     * observable is swapped (sorting/style changes).
+     */
+    private static final long SECTION_FRESH_MS = 5 * 60 * 1_000;
+    private final Map<Integer, Long> mSectionFetchTimeMs = new HashMap<>();
+    private boolean mForceSectionUpdate;
+    /**
+     * Phone gates (set once from MobileMainApplication, never on TV — TV keeps upstream
+     * behavior). Row-pad: the eager MIN_ROW_GROUP_SIZE continuations exist to fill short
+     * TV shelf rows; the phone flattens every row into one grid, so they only add serial
+     * round trips before first paint. Refocus guard: at boot the view selects the boot
+     * section twice (refreshSections tail + onViewInitialized tail) — the second focus
+     * disposed the in-flight load and resubscribed the same observable.
+     */
+    private static volatile boolean sRowPadContinuationsDisabled;
+    private static volatile boolean sSkipRedundantRefocusLoad;
+
+    public static void setRowPadContinuationsDisabled(boolean disabled) {
+        sRowPadContinuationsDisabled = disabled;
+    }
+
+    public static void setSkipRedundantRefocusLoad(boolean skip) {
+        sSkipRedundantRefocusLoad = skip;
+    }
+
+    /**
+     * NEWTUBE(lazy-home): phone gate. Home's section list is fetched one page ahead of the
+     * reader instead of draining every continuation at launch - see {@link HomeSectionPacer}.
+     * TV never calls this -> the eager walk is unchanged there.
+     */
+    private static volatile HomeSectionPacer sHomePacer;
+
+    public static void setPacedHomeWalkEnabled(boolean enabled) {
+        HomeSectionPacer pacer = enabled ? new HomeSectionPacer() : null;
+        sHomePacer = pacer;
+        com.liskovsoft.youtubeapi.browse.v2.BrowseServiceGates.setSectionListPacer(pacer);
+    }
+
+    /** A paced Home walk is subscribed and has not completed: scroll-end asks it for the next page. */
+    private boolean mHomeWalkActive;
+    /** ...and has delivered its first page (it is now only waiting for the grid). */
+    private boolean mHomeWalkDelivered;
+    /** Scroll-end that asked the walk for a page; replayed as a shelf continuation if the walk ends first. */
+    private Video mPendingScrollEndItem;
+
+    /**
+     * NEWTUBE(shelf-tail): phone gate. Once a row section's section list is done, the end of the
+     * grid fetches the next page of its shelves in turn instead of only the last card's shelf - see
+     * {@link ShelfTail}. A grid section (Subscriptions, History...) pages its one group the same way,
+     * so a page the grid filtered away entirely (all Shorts) fetches the next one instead of
+     * stalling. TV never calls this -> scroll-end continues the focused row as before.
+     */
+    private static volatile boolean sShelfTailEnabled;
+
+    public static void setShelfTailEnabled(boolean enabled) {
+        sShelfTailEnabled = enabled;
+    }
+
+    /**
+     * Per row or grid section, replaced by that section's next load. Kept across section switches: a
+     * section repainted from FeedCache within its TTL shows the same groups (FeedCache pins them), so
+     * its shelves can still be continued without a reload.
+     */
+    private final Map<Integer, ShelfTail<VideoGroup>> mShelfTails = new HashMap<>();
+    /**
+     * The section's own load is still running (a row section's section list, a grid section's first
+     * page): its pages come before any tail page.
+     */
+    private boolean mSectionWalkActive;
+    /** The grid ran short while the walk was active: ask the shelf tail once the walk is done. */
+    private boolean mTailDemanded;
+    private int mTailDemandGridSize = -1;
+
+    /**
+     * NEWTUBE(boot-prefetch): phone gate. On a cold launch Home's first /browse used to leave only
+     * once MobileBrowseActivity had been created and its presenter had focused the boot section -
+     * 150-360 ms after SplashActivity had already decided to open Home (Pixel 9 release logs:
+     * "splash route" -> first "api-http[S] ... /browse"), in front of a ~1-1.6 s server response.
+     * Splash now starts that same observable ({@link #prefetchBootSection}); the Browse load adopts
+     * it instead of subscribing again. TV never enables it.
+     */
+    private static volatile boolean sBootPrefetchEnabled;
+    /** An unclaimed boot prefetch is dropped after this; Browse normally claims it within ~0.3 s. */
+    private static final long BOOT_PREFETCH_MAX_AGE_MS = 20_000;
+    private io.reactivex.rxjava3.observables.ConnectableObservable<List<MediaGroup>> mBootPrefetch;
+    private Disposable mBootPrefetchConnection;
+    private long mBootPrefetchStartMs;
+    private final Runnable mDropBootPrefetch = () -> dropBootPrefetch("unclaimed");
+
+    public static void setBootPrefetchEnabled(boolean enabled) {
+        sBootPrefetchEnabled = enabled;
+    }
+
+    public static boolean isBootPrefetchEnabled() {
+        return sBootPrefetchEnabled;
+    }
+
+    private BrowsePresenter(Context context) {
+        super(context);
+        mDataSourcePresenter = AppDataSourceManager.instance();
+        mSections = new ArrayList<>();
+        mErrorSections = new ArrayList<>();
+        mGridMapping = new HashMap<>();
+        mRowMapping = new HashMap<>();
+        mSettingsGridMapping = new HashMap<>();
+        mLocalGridMappings = new HashMap<>();
+        mSectionsMapping = new HashMap<>();
+        MediaServiceManager.instance().addAccountListener(this);
+
+        mBrowseProcessor = new BrowseProcessorManager(getContext(), this::syncItem);
+        mActions = new ArrayList<>();
+
+        initSectionMappings();
+        updateChannelSorting();
+        updatePlaylistsStyle();
+    }
+
+    public static BrowsePresenter instance(Context context) {
+        if (sInstance == null) {
+            sInstance = new BrowsePresenter(context);
+        }
+
+        sInstance.setContext(context);
+
+        return sInstance;
+    }
+
+    public static void unhold() {
+        sInstance = null;
+    }
+
+    @Override
+    public void onViewInitialized() {
+        super.onViewInitialized();
+
+        if (getView() == null) {
+            return;
+        }
+
+        updateSections();
+
+        // Move default focus
+        int selectedSectionIndex = findSectionIndex(mCurrentSection != null ? mCurrentSection.getId() : mBootstrapSectionId);
+        mBootstrapSectionId = -1;
+        getView().selectSection(selectedSectionIndex != -1 ? selectedSectionIndex : mBootSectionIndex, true);
+    }
+
+    @Override
+    public void onViewPaused() {
+        super.onViewPaused();
+
+        saveSelectedItems();
+        pauseFeedRetry();
+
+        HomeSectionPacer pacer = sHomePacer;
+        if (pacer != null) {
+            pacer.setViewResumed(false); // nothing is fetched behind the player
+        }
+    }
+
+    @Override
+    public void onViewResumed() {
+        super.onViewResumed();
+
+        HomeSectionPacer pacer = sHomePacer;
+        if (pacer != null) {
+            pacer.setViewResumed(true);
+        }
+
+        mViewResumed = true;
+        refreshIfNeeded();
+        resumeFeedRetry();
+    }
+
+    private void refreshIfNeeded() {
+        if (getView() == null || !isHomeSection() || mLastUpdateTimeMs == -1 || System.currentTimeMillis() - mLastUpdateTimeMs < 3 * 60 * 60 * 1_000) {
+            return;
+        }
+
+        refresh(false);
+    }
+
+    private void saveSelectedItems() {
+        // Fix position reset when jumping between sections
+        if (mCurrentVideo != null && mCurrentVideo.getPositionInsideGroup() == 0 && (System.currentTimeMillis() - mCurrentVideo.timestamp) < 10_000) {
+            return;
+        }
+
+        if ((isSubscriptionsSection() && getGeneralData().isRememberSubscriptionsPositionEnabled()) ||
+                (isPinnedSection() && getGeneralData().isRememberPinnedPositionEnabled())) {
+            getGeneralData().setSelectedItem(mCurrentSection.getId(), mCurrentVideo);
+        }
+    }
+
+    private void restoreSelectedItems() {
+        if (getView() == null) {
+            return;
+        }
+
+        if ((isSubscriptionsSection() && getGeneralData().isRememberSubscriptionsPositionEnabled()) ||
+                (isPinnedSection() && getGeneralData().isRememberPinnedPositionEnabled())) {
+            getView().selectSectionItem(getGeneralData().getSelectedItem(mCurrentSection.getId()));
+        }
+    }
+
+    private void initSectionMappings() {
+        initSectionMapping();
+
+        initRowAndGridMapping();
+
+        initSettingsGridMapping();
+        initLocalGridMapping();
+    }
+
+    private void initSectionMapping() {
+        String country = LocaleUtility.getCurrentLocale(getContext()).getCountry();
+        int uploadsType = getMainUIData().isUploadsOldLookEnabled() ? BrowseSection.TYPE_GRID : BrowseSection.TYPE_MULTI_GRID;
+
+        mSectionsMapping.put(MediaGroup.TYPE_HOME, new BrowseSection(MediaGroup.TYPE_HOME, getContext().getString(R.string.header_home), BrowseSection.TYPE_ROW, R.drawable.icon_home, false));
+        mSectionsMapping.put(MediaGroup.TYPE_SHORTS, new BrowseSection(MediaGroup.TYPE_SHORTS, getContext().getString(R.string.header_shorts), BrowseSection.TYPE_SHORTS_GRID, R.drawable.icon_shorts));
+        mSectionsMapping.put(MediaGroup.TYPE_TRENDING, new BrowseSection(MediaGroup.TYPE_TRENDING, getContext().getString(R.string.header_trending), BrowseSection.TYPE_ROW, R.drawable.icon_trending));
+        mSectionsMapping.put(MediaGroup.TYPE_KIDS_HOME, new BrowseSection(MediaGroup.TYPE_KIDS_HOME, getContext().getString(R.string.header_kids_home), BrowseSection.TYPE_ROW, R.drawable.icon_kids_home));
+        mSectionsMapping.put(MediaGroup.TYPE_SPORTS, new BrowseSection(MediaGroup.TYPE_SPORTS, getContext().getString(R.string.header_sports), BrowseSection.TYPE_ROW, R.drawable.icon_sports));
+        mSectionsMapping.put(MediaGroup.TYPE_LIVE, new BrowseSection(MediaGroup.TYPE_LIVE, getContext().getString(R.string.header_live), BrowseSection.TYPE_ROW, R.drawable.icon_live));
+        mSectionsMapping.put(MediaGroup.TYPE_MY_VIDEOS, new BrowseSection(MediaGroup.TYPE_MY_VIDEOS, getContext().getString(R.string.my_videos), BrowseSection.TYPE_GRID, R.drawable.icon_playlist));
+        mSectionsMapping.put(MediaGroup.TYPE_GAMING, new BrowseSection(MediaGroup.TYPE_GAMING, getContext().getString(R.string.header_gaming), BrowseSection.TYPE_ROW, R.drawable.icon_gaming));
+        if (!Helpers.equalsAny(country, "RU", "BY")) {
+            mSectionsMapping.put(MediaGroup.TYPE_NEWS, new BrowseSection(MediaGroup.TYPE_NEWS, getContext().getString(R.string.header_news), BrowseSection.TYPE_ROW, R.drawable.icon_news));
+        }
+        mSectionsMapping.put(MediaGroup.TYPE_MUSIC, new BrowseSection(MediaGroup.TYPE_MUSIC, getContext().getString(R.string.header_music), BrowseSection.TYPE_ROW, R.drawable.icon_music));
+        mSectionsMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, new BrowseSection(MediaGroup.TYPE_CHANNEL_UPLOADS, getContext().getString(R.string.header_channels), uploadsType, R.drawable.icon_channels, false));
+        mSectionsMapping.put(MediaGroup.TYPE_SUBSCRIPTIONS, new BrowseSection(MediaGroup.TYPE_SUBSCRIPTIONS, getContext().getString(R.string.header_subscriptions), BrowseSection.TYPE_GRID, R.drawable.icon_subscriptions, false));
+        mSectionsMapping.put(MediaGroup.TYPE_HISTORY, new BrowseSection(MediaGroup.TYPE_HISTORY, getContext().getString(R.string.header_history), BrowseSection.TYPE_GRID, R.drawable.icon_history, true));
+        mSectionsMapping.put(MediaGroup.TYPE_BLOCKED_CHANNELS,
+                new BrowseSection(MediaGroup.TYPE_BLOCKED_CHANNELS, getContext().getString(R.string.header_blocked_channels), BrowseSection.TYPE_GRID, R.drawable.icon_blocked_channels, false));
+        mSectionsMapping.put(MediaGroup.TYPE_USER_PLAYLISTS, new BrowseSection(MediaGroup.TYPE_USER_PLAYLISTS, getContext().getString(R.string.header_playlists), BrowseSection.TYPE_ROW, R.drawable.icon_playlist, false));
+        mSectionsMapping.put(MediaGroup.TYPE_NOTIFICATIONS, new BrowseSection(MediaGroup.TYPE_NOTIFICATIONS, getContext().getString(R.string.header_notifications), BrowseSection.TYPE_GRID, R.drawable.icon_notification, false));
+        mSectionsMapping.put(MediaGroup.TYPE_PLAYBACK_QUEUE, new BrowseSection(MediaGroup.TYPE_PLAYBACK_QUEUE, getContext().getString(R.string.playback_queue_category_title), BrowseSection.TYPE_GRID, R.drawable.icon_queue, false));
+        // NEWTUBE(downloads): a plain local grid; the phone installs the source (VideoDownloads).
+        mSectionsMapping.put(VideoDownloads.SECTION_ID, new BrowseSection(VideoDownloads.SECTION_ID, getContext().getString(R.string.header_downloads), BrowseSection.TYPE_GRID, R.drawable.icon_downloads, false));
+
+        if (getSidebarService().isSettingsSectionEnabled()) {
+            mSectionsMapping.put(MediaGroup.TYPE_SETTINGS, new BrowseSection(MediaGroup.TYPE_SETTINGS, getContext().getString(R.string.header_settings), BrowseSection.TYPE_SETTINGS_GRID, R.drawable.icon_settings));
+        }
+    }
+
+    private void initRowAndGridMapping() {
+        mRowMapping.put(MediaGroup.TYPE_HOME, getContentService().getHomeObserve());
+        mRowMapping.put(MediaGroup.TYPE_TRENDING, getContentService().getTrendingObserve());
+        mRowMapping.put(MediaGroup.TYPE_KIDS_HOME, getContentService().getKidsHomeObserve());
+        mRowMapping.put(MediaGroup.TYPE_SPORTS, getContentService().getSportsObserve());
+        mRowMapping.put(MediaGroup.TYPE_LIVE, getContentService().getLiveObserve());
+        mRowMapping.put(MediaGroup.TYPE_NEWS, getContentService().getNewsObserve());
+        mRowMapping.put(MediaGroup.TYPE_MUSIC, getContentService().getMusicObserve());
+        mRowMapping.put(MediaGroup.TYPE_GAMING, getContentService().getGamingObserve());
+        mRowMapping.put(MediaGroup.TYPE_USER_PLAYLISTS, getContentService().getPlaylistRowsObserve());
+
+        mGridMapping.put(MediaGroup.TYPE_SHORTS, getContentService().getShortsObserve());
+        mGridMapping.put(MediaGroup.TYPE_SUBSCRIPTIONS, getContentService().getSubscriptionsObserve());
+        mGridMapping.put(MediaGroup.TYPE_HISTORY, getContentService().getHistoryObserve());
+        mGridMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, getContentService().getSubscribedChannelsByNewContentObserve());
+        mGridMapping.put(MediaGroup.TYPE_NOTIFICATIONS, getNotificationsService().getNotificationItemsObserve());
+        mGridMapping.put(MediaGroup.TYPE_MY_VIDEOS, getContentService().getMyVideosObserve());
+    }
+
+    private void initPinnedSections() {
+        mSections.clear();
+
+        Collection<Video> pinnedItems = getSidebarService().getPinnedItems();
+
+        for (Video item : pinnedItems) {
+            if (item != null) {
+                if (item.sectionId == -1) { // pinned channel or playlist
+                    BrowseSection section = createPinnedSection(item);
+                    mSections.add(section);
+                } else {
+                    BrowseSection section = mSectionsMapping.get(item.sectionId);
+
+                    if (section != null) {
+                        mSections.add(section);
+                    }
+                }
+            }
+        }
+    }
+
+    private void initPinnedCallbacks() {
+        Collection<Video> pinnedItems = getSidebarService().getPinnedItems();
+
+        for (Video item : pinnedItems) {
+            if (item != null && item.sectionId == -1) {
+                createPinnedMapping(item);
+            }
+        }
+    }
+
+    private void initSettingsGridMapping() {
+        mSettingsGridMapping.put(MediaGroup.TYPE_SETTINGS, () -> mDataSourcePresenter.getSettingItems(getContext()));
+    }
+
+    private void initLocalGridMapping() {
+        mLocalGridMappings.put(MediaGroup.TYPE_PLAYBACK_QUEUE, () -> Playlist.instance().getAllReversed());
+        mLocalGridMappings.put(MediaGroup.TYPE_BLOCKED_CHANNELS, this::getBlockedChannels);
+        mLocalGridMappings.put(VideoDownloads.SECTION_ID, VideoDownloads::listSectionVideos);
+    }
+
+    private List<Video> getBlockedChannels() {
+        BlockedChannelData blockedChannelData = BlockedChannelData.instance(getContext());
+        List<Video> videos = new ArrayList<>();
+
+        for (Pair<String, String> entry : blockedChannelData.getChannelIdsWithNames()) {
+            Video video = new Video();
+            video.channelId = entry.first;
+            video.title = entry.second;
+            videos.add(video);
+        }
+
+        return videos;
+    }
+
+    public void updateSections() {
+        if (getView() == null) {
+            return;
+        }
+
+        initPinnedData();
+
+        refreshSections();
+    }
+
+    private void refreshSections() {
+        if (getView() == null) {
+            return;
+        }
+
+        // clean up (profile changed etc)
+        getView().removeAllSections();
+
+        int bootSectionId = getSidebarService().getBootSectionId();
+
+        int index = 0;
+
+        for (BrowseSection section : mErrorSections) {
+            getView().addSection(index++, section);
+        }
+
+        for (BrowseSection section : mSections) { // contains sections and pinned items!
+            if (section.getId() == MediaGroup.TYPE_SETTINGS) {
+                section.setEnabled(true);
+            }
+
+            if (section.isEnabled()) {
+                if (section.getId() == bootSectionId) {
+                    mBootSectionIndex = index;
+                }
+                getView().addSection(index++, section);
+            } else {
+                getView().removeSection(section);
+            }
+        }
+
+        // Refresh and restore last focus
+        int selectedSectionIndex = findSectionIndex(mCurrentSection != null ? mCurrentSection.getId() : -1);
+        getView().selectSection(selectedSectionIndex != -1 ? selectedSectionIndex : mBootSectionIndex, false);
+    }
+
+    private void initPinnedData() {
+        initPinnedSections();
+        initPinnedCallbacks();
+        initPasswordSection();
+    }
+
+    private void sortSections() {
+        // NOTE: Comparator.comparingInt API >= 24
+        Collections.sort(mSections, (o1, o2) -> {
+            return getSidebarService().getSectionIndex(o1.getId()) - getSidebarService().getSectionIndex(o2.getId());
+        });
+    }
+
+    public void updateChannelSorting() {
+        mSectionFetchTimeMs.remove(MediaGroup.TYPE_CHANNEL_UPLOADS); // backing observable changes
+
+        int sortingType = getMainUIData().getChannelCategorySorting();
+
+        switch (sortingType) {
+            case MainUIData.CHANNEL_SORTING_DEFAULT:
+                mGridMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, getContentService().getSubscribedChannelsObserve());
+                break;
+            case MainUIData.CHANNEL_SORTING_NAME2:
+            case MainUIData.CHANNEL_SORTING_NAME:
+                mGridMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, getContentService().getSubscribedChannelsByNameObserve());
+                break;
+            case MainUIData.CHANNEL_SORTING_NEW_CONTENT:
+                mGridMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, getContentService().getSubscribedChannelsByNewContentObserve());
+                break;
+            case MainUIData.CHANNEL_SORTING_LAST_VIEWED:
+                mGridMapping.put(MediaGroup.TYPE_CHANNEL_UPLOADS, getContentService().getSubscribedChannelsByLastViewedObserve());
+                break;
+        }
+    }
+
+    public void updatePlaylistsStyle() {
+        mSectionFetchTimeMs.remove(MediaGroup.TYPE_USER_PLAYLISTS); // backing observable changes
+
+        int playlistsStyle = getMainUIData().getPlaylistsStyle();
+
+        switch (playlistsStyle) {
+            case MainUIData.PLAYLISTS_STYLE_GRID:
+                mRowMapping.remove(MediaGroup.TYPE_USER_PLAYLISTS);
+                mGridMapping.put(MediaGroup.TYPE_USER_PLAYLISTS, getContentService().getPlaylistsObserve());
+                updateCategoryType(MediaGroup.TYPE_USER_PLAYLISTS, BrowseSection.TYPE_GRID);
+                break;
+            case MainUIData.PLAYLISTS_STYLE_ROWS:
+                mGridMapping.remove(MediaGroup.TYPE_USER_PLAYLISTS);
+                mRowMapping.put(MediaGroup.TYPE_USER_PLAYLISTS, getContentService().getPlaylistRowsObserve());
+                updateCategoryType(MediaGroup.TYPE_USER_PLAYLISTS, BrowseSection.TYPE_ROW);
+                break;
+        }
+    }
+
+    private void updateCategoryType(int categoryId, int categoryType) {
+        if (categoryType == -1 || categoryId == -1 || mSections == null) {
+            return;
+        }
+
+        BrowseSection section = mSectionsMapping.get(categoryId);
+
+        if (section != null) {
+            section.setType(categoryType);
+        }
+
+        for (BrowseSection category : mSections) {
+            if (category.getId() == categoryId) {
+                category.setType(categoryType);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onViewDestroyed() {
+        super.onViewDestroyed();
+        disposeActions();
+        saveSelectedItems();
+        // NEWTUBE(feed-retry): never leave a network registration behind a dead view.
+        mViewResumed = false;
+        mFeedNetworkWatcher.disarm();
+    }
+
+    @Override
+    public void onVideoItemSelected(Video item) {
+        if (getView() == null) {
+            return;
+        }
+
+        if (belongsToChannelUploadsMultiGrid(item)) {
+            if (getMainUIData().isUploadsAutoLoadEnabled()) {
+                updateChannelUploadsMultiGrid(item);
+            } else {
+                updateChannelUploadsMultiGrid(null); // clear
+            }
+        }
+
+        mCurrentVideo = item;
+    }
+
+    @Override
+    public void onVideoItemClicked(Video item) {
+        if (getContext() == null) {
+            return;
+        }
+
+        // Check that channels new look enabled and we're on the first columnAdd commentMore actions
+        if (belongsToChannelUploadsMultiGrid(item)) {
+            if (getMainUIData().isUploadsAutoLoadEnabled()) {
+                VideoActionPresenter.instance(getContext()).apply(item);
+            } else {
+                updateChannelUploadsMultiGrid(item);
+            }
+        } else {
+            VideoActionPresenter.instance(getContext()).apply(item);
+        }
+    }
+
+    @Override
+    public void onVideoItemLongClicked(Video item) {
+        if (getContext() == null) {
+            return;
+        }
+
+        if (belongsToChannelUploads(item)) { // We need to be sure we exactly on Channels section
+            ChannelUploadsMenuPresenter.instance(getContext()).showMenu(item, (videoItem, action) -> {
+                if (action == VideoMenuCallback.ACTION_UNSUBSCRIBE) { // works with any uploads section look
+                    removeItem(item);
+                }
+            });
+        } else {
+            VideoMenuPresenter.instance(getContext()).showMenu(item, (videoItem, action) -> {
+                if (action == VideoMenuCallback.ACTION_REMOVE ||
+                    action == VideoMenuCallback.ACTION_REMOVE_FROM_PLAYLIST ||
+                    (action == VideoMenuCallback.ACTION_REMOVE_FROM_QUEUE && isPlaybackQueueSection())) {
+                    removeItem(videoItem);
+                } else if (action == VideoMenuCallback.ACTION_UNSUBSCRIBE && isMultiGridChannelUploadsSection()) {
+                    removeItem(mCurrentVideo);
+                    VideoMenuPresenter.instance(getContext()).closeDialog();
+                } else if (action == VideoMenuCallback.ACTION_UNSUBSCRIBE && isSubscriptionsSection()) {
+                    removeItemAuthor(videoItem);
+                    VideoMenuPresenter.instance(getContext()).closeDialog();
+                } else if (action == VideoMenuCallback.ACTION_REMOVE_AUTHOR) {
+                    removeItemAuthor(videoItem);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onScrollEnd(Video item) {
+        if (item == null) {
+            Log.e(TAG, "Can't scroll. Video is null.");
+            return;
+        }
+
+        // NEWTUBE(lazy-home): while Home's section list still has pages, the next page (already
+        // requested by onScrollNearEnd, which fires further from the end) is what extends the
+        // grid; the shelf continuation below is for when the list is done. Remember this
+        // scroll-end in case the walk ends without another page (see onHomeWalkCompleted).
+        if (sHomePacer != null && mHomeWalkActive && isHomeSection()) {
+            mPendingScrollEndItem = item;
+            return;
+        }
+
+        // NEWTUBE(shelf-tail): a row section's end is extended by onScrollNearEnd (which fires
+        // further from the end, and again after every update), one shelf page at a time.
+        if (getShelfTail() != null) {
+            return;
+        }
+
+        VideoGroup group = item.getGroup();
+
+        continueGroup(group);
+    }
+
+    /**
+     * NEWTUBE(lazy-home): the grid has less than a screen plus the view's lookahead of cards left
+     * (while scrolling, or after an update that added too little - e.g. a page of filtered rows).
+     * Releases Home's next section page early enough that it lands before the reader gets there.
+     * NEWTUBE(shelf-tail): once the section list is done, the next shelf page instead.
+     *
+     * @param gridSize cards the grid shows now (-1: unknown) - how the shelf tail tells a page that
+     *                 added cards from one the grid filtered away entirely
+     */
+    public void onScrollNearEnd(int gridSize) {
+        HomeSectionPacer pacer = sHomePacer;
+        if (pacer != null && mHomeWalkActive && isHomeSection()) {
+            pacer.demand();
+        }
+
+        ShelfTail<VideoGroup> tail = getShelfTail();
+        if (tail == null) {
+            return;
+        }
+
+        if (mSectionWalkActive) {
+            mTailDemanded = true; // replayed when the walk is done (onSectionWalkCompleted)
+            mTailDemandGridSize = gridSize;
+            return;
+        }
+
+        requestShelfPage(tail, gridSize);
+    }
+
+    @Override
+    public void onSectionFocused(int sectionId) {
+        // Same section re-focused while its load is still in flight (the boot double-select):
+        // updateCurrentSection would dispose that load and resubscribe the same observable.
+        if (sSkipRedundantRefocusLoad && mCurrentSection != null && mCurrentSection.getId() == sectionId
+                && RxHelper.isAnyActionRunning(mActions)) {
+            // NEWTUBE(lazy-home): a paced Home walk stays "in flight" while it waits for the grid
+            // to ask for its next page, long after its first page painted. A refocus then
+            // (re-tapping the Home tab) has repainted the FeedCache snapshot, which IS the current
+            // content: say so and keep the walk, or the view keeps waiting for fresh content and
+            // the next lazily fetched page would swap the whole grid out instead of extending it.
+            // Past the freshness TTL it is an ordinary reload (which ends the parked walk).
+            if (mHomeWalkActive && mHomeWalkDelivered) {
+                if (isSectionFresh(mCurrentSection) && getView() != null) {
+                    Log.d(TAG, "Section %s is current (paced walk waiting) — skipping refocus reload", mCurrentSection.getTitle());
+                    getView().onSectionContentCurrent(sectionId);
+                    return;
+                }
+            } else {
+                Log.d(TAG, "Section %s load already in flight — skipping refocus reload", mCurrentSection.getTitle());
+                return;
+            }
+        }
+
+        saveSelectedItems(); // save previous state
+        mCurrentSection = findSectionById(sectionId);
+        // NEWTUBE(feed-retry): another section is a new episode; its own load decides.
+        if (mFeedRetry.isInError() && !mFeedRetry.isInError(sectionId)) {
+            clearFeedRetry("section-change");
+        }
+        mCurrentVideo = null; // fast scroll through the sections (fix empty selected item)
+        updateCurrentSection();
+        restoreSelectedItems(); // Don't place anywhere else
+    }
+
+    @Override
+    public void onSectionLongPressed(int sectionId) {
+        SectionMenuPresenter.instance(getContext()).showMenu(findSectionById(sectionId));
+    }
+
+    @Override
+    public boolean hasPendingActions() {
+        return RxHelper.isAnyActionRunning(mActions);
+    }
+
+    public boolean isItemPinned(Video item) {
+        Collection<Video> items = getSidebarService().getPinnedItems();
+
+        return items.contains(item);
+    }
+
+    public void moveSectionUp(BrowseSection section) {
+        mCurrentSection = section; // move current focus
+        getSidebarService().moveSectionUp(section.getId());
+        updateSections();
+    }
+
+    public void moveSectionDown(BrowseSection section) {
+        mCurrentSection = section; // move current focus
+        getSidebarService().moveSectionDown(section.getId());
+        updateSections();
+    }
+
+    public void renameSection(BrowseSection section) {
+        mCurrentSection = section; // move current focus
+        getSidebarService().renameSection(section.getId(), section.getTitle());
+        updateSections();
+    }
+
+    public void renameSection(Video section) {
+        getSidebarService().renameSection(section.getId(), section.getTitle());
+        updateSections();
+    }
+
+    public void enableAllSections(boolean enable) {
+        enableSection(MediaGroup.TYPE_HISTORY, enable);
+        enableSection(MediaGroup.TYPE_USER_PLAYLISTS, enable);
+        enableSection(MediaGroup.TYPE_SUBSCRIPTIONS, enable);
+        enableSection(MediaGroup.TYPE_CHANNEL_UPLOADS, enable);
+        enableSection(MediaGroup.TYPE_GAMING, enable);
+        enableSection(MediaGroup.TYPE_MUSIC, enable);
+        enableSection(MediaGroup.TYPE_NEWS, enable);
+        enableSection(MediaGroup.TYPE_HOME, enable);
+        enableSection(MediaGroup.TYPE_TRENDING, enable);
+        enableSection(MediaGroup.TYPE_SHORTS, enable);
+    }
+
+    public void enableSection(int sectionId, boolean enable) {
+        getSidebarService().enableSection(sectionId, enable);
+
+        if (!enable && mCurrentSection != null && mCurrentSection.getId() == sectionId) {
+            mCurrentSection = findNearestSection(sectionId);
+        }
+
+        updateSections();
+    }
+
+    public void pinItem(Video item) {
+        if (getView() == null) {
+            return;
+        }
+
+        int idx = getSidebarService().addPinnedItem(item);
+
+        createPinnedMapping(item);
+
+        BrowseSection newSection = createPinnedSection(item);
+        if (!mSections.contains(newSection)) {
+            if (idx != -1) {
+                mSections.add(idx, newSection);
+            } else {
+                mSections.add(newSection);
+            }
+        }
+        getView().addSection(idx, newSection);
+    }
+
+    public void pinItem(String title, int resId, ErrorFragmentData data) {
+        if (getView() == null) {
+            return;
+        }
+
+        BrowseSection newSection = new BrowseSection(title.hashCode(), title, BrowseSection.TYPE_ERROR, resId, false, data);
+        Helpers.removeIf(mErrorSections, section -> section.getId() == newSection.getId());
+        mErrorSections.add(newSection);
+        getView().addSection(0, newSection);
+    }
+
+    private void appendToSections(String title, int resId, ErrorFragmentData data) {
+        int id = title.hashCode();
+        Helpers.removeIf(mSections, section -> section.getId() == id);
+        mSections.add(new BrowseSection(id, title, BrowseSection.TYPE_ERROR, resId, false, data));
+    }
+
+    public void unpinItem(Video item) {
+        getSidebarService().removePinnedItem(item);
+        getGeneralData().removeSelectedItem(item.getId());
+
+        BrowseSection section = null;
+
+        for (BrowseSection cat : mSections) {
+            if (cat.getId() == item.getId()) {
+                section = cat;
+                break;
+            }
+        }
+
+        mGridMapping.remove(item.getId());
+
+        if (getView() != null) {
+            getView().removeSection(section);
+        }
+    }
+
+    public void refresh() {
+        refresh(true);
+    }
+
+    public void refresh(boolean focusOnContent) {
+        mForceSectionUpdate = true; // user-initiated (or staleness-driven): always refetch
+        updateCurrentSection();
+        if (focusOnContent && getView() != null) {
+            getView().focusOnContent();
+        }
+    }
+
+    private void updateRefreshTime() {
+        mLastUpdateTimeMs = System.currentTimeMillis();
+    }
+
+    /**
+     * TTL applies only to remote row/grid sections. History is exempt — the user expects a
+     * just-watched video to appear the moment they return to it. Local/settings sections are
+     * cheap in-process computations and never had a network cost to skip.
+     */
+    private boolean isSectionFresh(BrowseSection section) {
+        if (section.getId() == MediaGroup.TYPE_HISTORY) {
+            return false;
+        }
+
+        int type = section.getType();
+        boolean remote = (type == BrowseSection.TYPE_ROW && mRowMapping.containsKey(section.getId()))
+                || ((type == BrowseSection.TYPE_GRID || type == BrowseSection.TYPE_SHORTS_GRID || type == BrowseSection.TYPE_MULTI_GRID)
+                        && mGridMapping.containsKey(section.getId()));
+        if (!remote) {
+            return false;
+        }
+
+        Long fetchedMs = mSectionFetchTimeMs.get(section.getId());
+        return fetchedMs != null && System.currentTimeMillis() - fetchedMs < SECTION_FRESH_MS;
+    }
+
+    /**
+     * NEWTUBE(#36): a video was added to or removed from one of the user's playlists. The
+     * sections that list playlist content - pinned playlists such as the You tab's Watch later,
+     * and the Playlists section (video counts) - would otherwise keep painting their snapshot
+     * for up to {@link #SECTION_FRESH_MS}; drop their freshness so the next visit refetches.
+     */
+    public void onPlaylistEdited() {
+        mSectionFetchTimeMs.keySet().removeIf(id -> id == MediaGroup.TYPE_USER_PLAYLISTS || isPinnedId(id));
+    }
+
+    private void markSectionFetched(int sectionId) {
+        mSectionFetchTimeMs.put(sectionId, System.currentTimeMillis());
+
+        // NEWTUBE(feed-retry): content arrived - the error episode (if any) is over.
+        int failures = mFeedRetry.getFailures();
+        if (mFeedRetry.onSuccess()) {
+            NetPath.log(FEED_RETRY_LOG + " recovered section=" + sectionId + " failures=" + failures);
+            Utils.removeCallbacks(mRefreshSection);
+            mFeedNetworkWatcher.disarm();
+        }
+    }
+
+    private void updateCurrentSection() {
+        disposeActions();
+
+        if (getView() == null || mCurrentSection == null) {
+            return;
+        }
+
+        Log.d(TAG, "Update section %s", mCurrentSection.getTitle());
+        updateSection(mCurrentSection);
+    }
+
+    private void updateSection(BrowseSection section) {
+        boolean force = mForceSectionUpdate;
+        mForceSectionUpdate = false;
+
+        // Fresh-within-TTL section whose content the view is already painting: skip the refetch
+        // storm (a Home reload is 1 browse + ~6 serial continuations). The view is told its
+        // snapshot is current so its stale-while-revalidate machinery stands down.
+        if (!force && isSectionFresh(section) && getView() != null && !getView().isEmpty()) {
+            Log.d(TAG, "Section %s is fresh — skipping refetch", section.getTitle());
+            getView().showProgressBar(false);
+            getView().onSectionContentCurrent(section.getId());
+            return;
+        }
+
+        switch (section.getType()) {
+            case BrowseSection.TYPE_GRID:
+            case BrowseSection.TYPE_SHORTS_GRID:
+                if (mGridMapping.containsKey(section.getId())) {
+                    Observable<MediaGroup> group = mGridMapping.get(section.getId());
+                    updateVideoGrid(section, group, section.isAuthOnly());
+                } else if (mLocalGridMappings.containsKey(section.getId())) {
+                    Callable<List<Video>> localVideos = mLocalGridMappings.get(section.getId());
+                    updateLocalGrid(section, localVideos);
+                }
+                break;
+            case BrowseSection.TYPE_ROW:
+                Observable<List<MediaGroup>> groups = mRowMapping.get(section.getId());
+                updateVideoRows(section, groups, section.isAuthOnly());
+                break;
+            case BrowseSection.TYPE_SETTINGS_GRID:
+                Callable<List<SettingsItem>> items = mSettingsGridMapping.get(section.getId());
+                updateSettingsGrid(section, items);
+                break;
+            case BrowseSection.TYPE_MULTI_GRID:
+                Observable<MediaGroup> group2 = mGridMapping.get(section.getId());
+                updateVideoGrid(section, group2, 0, section.isAuthOnly());
+                break;
+            case BrowseSection.TYPE_ERROR:
+                getView().showProgressBar(false);
+                break;
+        }
+
+        updateRefreshTime();
+    }
+
+    private void updateSettingsGrid(BrowseSection section, Callable<List<SettingsItem>> items) {
+        getView().updateSection(SettingsGroup.from(Helpers.get(items), section));
+        getView().showProgressBar(false);
+    }
+
+    private void updateLocalGrid(BrowseSection section, Callable<List<Video>> items) {
+        VideoGroup videoGroup = VideoGroup.from(Helpers.get(items), section);
+        videoGroup.setAction(VideoGroup.ACTION_REPLACE);
+        videoGroup.setId(videoGroup.hashCode());
+        videoGroup.setTitle(section.getTitle());
+        getView().updateSection(videoGroup);
+        getView().showProgressBar(false);
+    }
+
+    private void updateVideoRows(BrowseSection section, Observable<List<MediaGroup>> groups, boolean authCheck) {
+        Log.d(TAG, "loadRowsHeader: Start loading section: " + section.getTitle());
+
+        authCheck(authCheck, () -> updateVideoRows(section, groups));
+    }
+
+    private void updateVideoGrid(BrowseSection section, Observable<MediaGroup> group, boolean authCheck) {
+        updateVideoGrid(section, group, -1, authCheck);
+    }
+
+    private void updateVideoGrid(BrowseSection section, Observable<MediaGroup> group, int column, boolean authCheck) {
+        Log.d(TAG, "loadMultiGridHeader: Start loading section: " + section.getTitle());
+
+        authCheck(authCheck, () -> updateVideoGrid(section, group, column));
+    }
+
+    private void updateVideoRows(BrowseSection section, Observable<List<MediaGroup>> groups) {
+        Log.d(TAG, "updateRowsHeader: Start loading section: " + section.getTitle());
+
+        disposeActions();
+
+        if (getView() == null) {
+            Log.e(TAG, "Browse view has been unloaded from the memory. Low RAM?");
+            getViewManager().startView(BrowseView.class);
+            return;
+        }
+        
+        getView().showProgressBar(true);
+
+        VideoGroup firstGroup = VideoGroup.from(section);
+        firstGroup.setAction(VideoGroup.ACTION_REPLACE);
+        getView().updateSection(firstGroup);
+
+        if (groups == null) {
+            // No group. Maybe just clear.
+            getView().showProgressBar(false);
+            return;
+        }
+
+        Observable<List<MediaGroup>> prefetched = takeBootPrefetch(section);
+        if (prefetched != null) {
+            groups = prefetched;
+        }
+
+        // NEWTUBE(shelf-tail): this load's shelves, continued in turn once its section list is done.
+        ShelfTail<VideoGroup> shelfTail = sShelfTailEnabled ? new ShelfTail<>(shelf -> shelf.getNextPageKey() != null) : null;
+        if (shelfTail != null) {
+            mShelfTails.put(section.getId(), shelfTail);
+        }
+
+        walkRows(section, groups, shelfTail, false);
+    }
+
+    /**
+     * Subscribes a row section's section list and hands its rows to the view.
+     *
+     * @param append NEWTUBE(shelf-tail): a further round of an already painted section - rows are
+     *               appended (the grid drops the cards it already shows), nothing is cleared, and a
+     *               failure leaves the grid alone instead of showing the error screen
+     */
+    private void walkRows(BrowseSection section, Observable<List<MediaGroup>> groups,
+                          @Nullable ShelfTail<VideoGroup> shelfTail, boolean append) {
+        boolean pacedHome = sHomePacer != null && section.getId() == MediaGroup.TYPE_HOME;
+        mHomeWalkActive = pacedHome;
+        mHomeWalkDelivered = false;
+        mPendingScrollEndItem = null;
+        mSectionWalkActive = true;
+        mTailDemanded = false;
+
+        Disposable updateAction = groups
+                .subscribe(
+                        mediaGroups -> {
+                            getView().showProgressBar(false);
+
+                            if (pacedHome) {
+                                mHomeWalkDelivered = true;
+                                mPendingScrollEndItem = null; // the grid grew; the view re-triggers if needed
+                            }
+
+                            filterHomeIfNeeded(mediaGroups);
+
+                            boolean pageHadRows = false;
+
+                            for (MediaGroup mediaGroup : mediaGroups) {
+                                if (mediaGroup.isEmpty()) {
+                                    Log.e(TAG, "loadRowsHeader: MediaGroup is empty. Group Name: " + mediaGroup.getTitle());
+                                    continue;
+                                }
+
+                                pageHadRows = true;
+
+                                VideoGroup videoGroup = VideoGroup.from(mediaGroup, section);
+
+                                if (TextUtils.isEmpty(videoGroup.getTitle())) {
+                                    videoGroup.setTitle(getContext().getString(R.string.suggestions));
+                                }
+
+                                getView().updateSection(videoGroup);
+                                mBrowseProcessor.process(videoGroup);
+                                markSectionFetched(section.getId());
+
+                                if (shelfTail != null) {
+                                    shelfTail.offer(videoGroup);
+                                }
+
+                                continueGroupIfNeeded(videoGroup, false);
+                            }
+
+                            // NEWTUBE(lazy-home): a page with no rows at all never reaches the grid,
+                            // so the grid cannot ask for more on its behalf - it did not add runway.
+                            HomeSectionPacer pacer = sHomePacer;
+                            if (pacedHome && !pageHadRows && pacer != null) {
+                                pacer.demand();
+                            }
+                            // NEWTUBE(shelf-tail): likewise a pending shelf-tail demand stays for the
+                            // walk's end unless this page reached the grid, whose runway check (posted
+                            // after the update) asks again if it is still short.
+                            if (pageHadRows) {
+                                mTailDemanded = false;
+                            }
+                        },
+                        error -> {
+                            Log.e(TAG, "updateRowsHeader error: %s", error.getMessage());
+                            if (pacedHome) {
+                                mHomeWalkActive = false;
+                                mPendingScrollEndItem = null;
+                            }
+                            mSectionWalkActive = false; // shelves delivered so far can still be continued
+                            mTailDemanded = false;
+                            if (append) {
+                                if (getView() != null) {
+                                    getView().showProgressBar(false);
+                                }
+                                return; // the painted grid stays; a later scroll asks the tail again
+                            }
+                            handleLoadError(error);
+                        }, () -> {
+                            if (pacedHome) {
+                                onHomeWalkCompleted();
+                            }
+                            onSectionWalkCompleted(shelfTail);
+                            if (!append) {
+                                handleLoadError(null);
+                            } else if (getView() != null) {
+                                getView().showProgressBar(false);
+                            }
+                        });
+
+        mActions.add(updateAction);
+    }
+
+    /**
+     * Called by SplashPresenter right before it opens Home: start Home's load now, so its first
+     * /browse overlaps the Browse Activity's creation. Only when Home is the boot section, no Browse
+     * view exists (a warm launch just brings the existing Home to the front) and Home is not fresh
+     * within its TTL (then it is repainted from FeedCache without a fetch).
+     */
+    public void prefetchBootSection() {
+        if (!sBootPrefetchEnabled || mBootPrefetch != null || getView() != null
+                || getSidebarService().getBootSectionId() != MediaGroup.TYPE_HOME) {
+            return;
+        }
+        BrowseSection home = mSectionsMapping.get(MediaGroup.TYPE_HOME);
+        Observable<List<MediaGroup>> groups = mRowMapping.get(MediaGroup.TYPE_HOME);
+        if (home == null || groups == null || home.isAuthOnly() || home.getType() != BrowseSection.TYPE_ROW
+                || isSectionFresh(home)) { // a fresh Home is repainted from FeedCache, not refetched
+            return;
+        }
+
+        // replay(): every page that lands before Browse subscribes is kept and handed over in
+        // order; the connection (not a subscriber) owns the network walk, so disposing it ends it.
+        mBootPrefetch = groups.replay();
+        mBootPrefetchConnection = mBootPrefetch.connect();
+        mBootPrefetchStartMs = SystemClock.elapsedRealtime();
+        Utils.postDelayed(mDropBootPrefetch, BOOT_PREFETCH_MAX_AGE_MS);
+        NetPath.log("home-prefetch start");
+    }
+
+    /** The boot prefetch for this section, now owned by the caller's load (or null). */
+    @Nullable
+    private Observable<List<MediaGroup>> takeBootPrefetch(BrowseSection section) {
+        io.reactivex.rxjava3.observables.ConnectableObservable<List<MediaGroup>> prefetch = mBootPrefetch;
+        Disposable connection = mBootPrefetchConnection;
+        if (prefetch == null) {
+            return null;
+        }
+        mBootPrefetch = null;
+        mBootPrefetchConnection = null;
+        Utils.removeCallbacks(mDropBootPrefetch);
+
+        long ageMs = SystemClock.elapsedRealtime() - mBootPrefetchStartMs;
+        if (section.getId() != MediaGroup.TYPE_HOME || ageMs > BOOT_PREFETCH_MAX_AGE_MS) {
+            connection.dispose();
+            NetPath.log("home-prefetch dropped reason=" + (section.getId() != MediaGroup.TYPE_HOME ? "other-section" : "stale")
+                    + " ageMs=" + ageMs);
+            return null;
+        }
+
+        // Disposing the section's actions (section switch, refresh, account change) must end the
+        // underlying walk, not just this subscriber.
+        mActions.add(connection);
+        NetPath.log("home-prefetch adopted ageMs=" + ageMs);
+        return prefetch;
+    }
+
+    private void dropBootPrefetch(String reason) {
+        Utils.removeCallbacks(mDropBootPrefetch);
+        if (mBootPrefetchConnection != null) {
+            mBootPrefetchConnection.dispose();
+            wakeHomeWalk();
+            NetPath.log("home-prefetch dropped reason=" + reason);
+        }
+        mBootPrefetch = null;
+        mBootPrefetchConnection = null;
+    }
+
+    private static void wakeHomeWalk() {
+        HomeSectionPacer pacer = sHomePacer;
+        if (pacer != null) {
+            pacer.wake();
+        }
+    }
+
+    /**
+     * The paced Home walk ran out of pages (or its last continuation failed). A scroll-end that was waiting
+     * for one becomes the ordinary last-shelf continuation - the view only re-triggers when the
+     * grid grows, so without this the end of the feed would stay put.
+     */
+    private void onHomeWalkCompleted() {
+        mHomeWalkActive = false;
+        Video pending = mPendingScrollEndItem;
+        mPendingScrollEndItem = null;
+        if (pending != null && isHomeSection()) {
+            if (getShelfTail() != null) {
+                mTailDemanded = true; // onSectionWalkCompleted asks the shelf tail instead
+            } else {
+                continueGroup(pending.getGroup());
+            }
+        }
+    }
+
+    /**
+     * NEWTUBE(shelf-tail): the section's own load is done. A grid that ran short meanwhile gets its
+     * next page from the tail now - it will not ask again by itself: with nothing new at the bottom
+     * it cannot scroll, and without a scroll it never reports the end.
+     */
+    private void onSectionWalkCompleted(@Nullable ShelfTail<VideoGroup> tail) {
+        mSectionWalkActive = false;
+        boolean demanded = mTailDemanded;
+        mTailDemanded = false;
+        if (tail != null && tail == getShelfTail()) {
+            NetPath.log("shelf-tail ready section=" + mCurrentSection.getId() + " shelves=" + tail.size()
+                    + " demanded=" + (demanded ? "y" : "n"));
+            if (demanded) {
+                requestShelfPage(tail, mTailDemandGridSize);
+            }
+        }
+    }
+
+    /** The current section's shelf tail: a row or grid section on the phone, loaded in this process. */
+    @Nullable
+    private ShelfTail<VideoGroup> getShelfTail() {
+        if (!sShelfTailEnabled || mCurrentSection == null || !isTailSection(mCurrentSection)) {
+            return null;
+        }
+        return mShelfTails.get(mCurrentSection.getId());
+    }
+
+    /**
+     * Sections the tail pages: row sections (their shelves) and plain grid sections (their one group:
+     * Subscriptions, History, playlists...). Not the Shorts grid, the multi-column channels grid, or
+     * the local grids (no continuation at all).
+     */
+    private static boolean isTailSection(BrowseSection section) {
+        return section.getType() == BrowseSection.TYPE_ROW || section.getType() == BrowseSection.TYPE_GRID;
+    }
+
+    /** NEWTUBE(shelf-tail): the grid is short - fetch the next shelf page, if one is due. */
+    private void requestShelfPage(ShelfTail<VideoGroup> tail, int gridSize) {
+        if (getView() == null || mCurrentSection == null) {
+            return;
+        }
+
+        VideoGroup shelf = tail.next(gridSize);
+
+        if (shelf == null) {
+            if (tail.isFetching()) {
+                return;
+            }
+
+            // Every shelf is spent: fetch the section again and append what is new - what the
+            // reader used to do by hand (back to the top, pull to refresh). Signed in, every fetch
+            // of Home is a fresh mix; a round that adds too few cards ends the feed.
+            // A grid section is one list: fetching it again would only repeat its first page.
+            Observable<List<MediaGroup>> groups = mCurrentSection.getType() == BrowseSection.TYPE_ROW
+                    ? mRowMapping.get(mCurrentSection.getId()) : null;
+            String reason = tail.isStopped() ? "empty-pages" : "no-more-pages";
+            if (groups != null && tail.startRound(gridSize)) {
+                NetPath.log("shelf-tail round=" + tail.rounds() + " section=" + mCurrentSection.getId()
+                        + " grid=" + gridSize + " after=" + reason);
+                getView().showProgressBar(true);
+                walkRows(mCurrentSection, groups, tail, true);
+            } else if (tail.consumeEndNotice()) {
+                NetPath.log("shelf-tail end section=" + mCurrentSection.getId() + " grid=" + gridSize
+                        + " rounds=" + tail.rounds() + " reason=" + reason);
+            }
+            return;
+        }
+
+        NetPath.log("shelf-tail page section=" + mCurrentSection.getId() + " shelf=" + NetPath.trunc(shelf.getTitle(), 32)
+                + " grid=" + gridSize + " queued=" + tail.size() + " emptyRun=" + tail.emptyPages());
+
+        getView().showProgressBar(true);
+
+        final boolean[] landed = {false};
+        Disposable action = getContentService().continueGroupObserve(shelf.getMediaGroup())
+                .subscribe(
+                        continued -> {
+                            landed[0] = true;
+                            tail.onLanded(shelf);
+
+                            if (getView() == null) {
+                                return;
+                            }
+
+                            getView().showProgressBar(false);
+
+                            VideoGroup videoGroup = VideoGroup.from(shelf, continued);
+                            getView().updateSection(videoGroup); // the view's runway check asks again if still short
+                            mBrowseProcessor.process(videoGroup);
+                        },
+                        error -> {
+                            if (getView() != null) {
+                                getView().showProgressBar(false);
+                            }
+
+                            if (Helpers.containsAny(error.getMessage(), "fromNullable result is null")) {
+                                // No page at all (a stale key, an HTTP error without a body, or a
+                                // refused connection): no grid update follows, so ask for the next
+                                // shelf now - a couple of times in a row at most (ShelfTail.onNothing).
+                                if (tail.onNothing(shelf)) {
+                                    requestShelfPage(tail, tail.lastGridSize());
+                                }
+                            } else {
+                                Log.e(TAG, "shelf-tail error: %s", error.getMessage());
+                                tail.onFailed(shelf);
+                            }
+                        },
+                        () -> {
+                            if (getView() != null) {
+                                getView().showProgressBar(false);
+                            }
+                            if (!landed[0] && tail.onNothing(shelf)) {
+                                requestShelfPage(tail, tail.lastGridSize());
+                            }
+                        }
+                );
+
+        mActions.add(action);
+    }
+
+    private void updateVideoGrid(BrowseSection section, Observable<MediaGroup> group, int column) {
+        disposeActions();
+
+        if (getView() == null) {
+            Log.e(TAG, "Browse view has been unloaded from the memory. Low RAM?");
+            getViewManager().startView(BrowseView.class);
+            return;
+        }
+
+        Log.d(TAG, "updateGridHeader: Start loading section: " + section.getTitle());
+
+        getView().showProgressBar(true);
+
+        // Stay on the same group in case of multiple subscribe calls
+        VideoGroup baseGroup = VideoGroup.from(section, column);
+        baseGroup.setAction(VideoGroup.ACTION_REPLACE);
+        getView().updateSection(baseGroup);
+
+        if (group == null) {
+            // No group. Maybe just clear.
+            getView().showProgressBar(false);
+            return;
+        }
+
+        // NEWTUBE(shelf-tail): the grid's one group, paged whenever the grid runs short - also after
+        // a page the grid filtered away entirely (all Shorts), which used to stall the section: no
+        // new card, no scroll, no scroll-end. It replaces the size-based top-up below
+        // (continueGroupIfNeeded), which counted the page's raw items, Shorts included.
+        ShelfTail<VideoGroup> pageTail = sShelfTailEnabled && isTailSection(section)
+                ? new ShelfTail<>(shelf -> shelf.getNextPageKey() != null, false) : null;
+        if (pageTail != null) {
+            mShelfTails.put(section.getId(), pageTail);
+            mSectionWalkActive = true;
+            mTailDemanded = false;
+        }
+
+        Disposable updateAction = group
+                .subscribe(
+                        mediaGroup -> {
+                            getView().showProgressBar(false);
+
+                            if (getView() == null) {
+                                Log.e(TAG, "Browse view has been unloaded from the memory. Low RAM?");
+                                getViewManager().startView(BrowseView.class);
+                                return;
+                            }
+
+                            VideoGroup videoGroup = VideoGroup.from(baseGroup, mediaGroup);
+                            appendLocalHistory(videoGroup);
+                            getView().updateSection(videoGroup);
+                            mBrowseProcessor.process(videoGroup);
+                            if (!mediaGroup.isEmpty()) {
+                                markSectionFetched(section.getId());
+                            }
+
+                            if (pageTail != null) {
+                                mTailDemanded = false; // the runway check after this update asks again if short
+                                pageTail.offer(videoGroup);
+                            } else {
+                                continueGroupIfNeeded(videoGroup);
+                            }
+                        },
+                        error -> {
+                            Log.e(TAG, "updateGridHeader error: %s", error.getMessage());
+                            if (pageTail != null) {
+                                mSectionWalkActive = false;
+                                mTailDemanded = false;
+                            }
+                            handleLoadError(error);
+                        }, () -> {
+                            if (pageTail != null) {
+                                onSectionWalkCompleted(pageTail);
+                            }
+                            handleLoadError(null);
+                        });
+
+        mActions.add(updateAction);
+    }
+
+    private void continueGroup(VideoGroup group) {
+        continueGroup(group, true);
+    }
+
+    private void continueGroup(VideoGroup group, boolean showLoading) {
+        if (getView() == null) {
+            Log.e(TAG, "Can't continue group. The view is null.");
+            return;
+        }
+
+        if (group == null) {
+            Log.e(TAG, "Can't continue group. The group is null.");
+            return;
+        }
+
+        MediaGroup mediaGroup = group.getMediaGroup();
+        if (mediaGroup == null || mediaGroup.getNextPageKey() == null) {
+            return;
+        }
+
+        if (getCurrentSection() != null && mLocalGridMappings.containsKey(getCurrentSection().getId())) {
+            Log.d(TAG, "Local grid section doesn't assume a continuation...");
+            return;
+        }
+
+        Log.d(TAG, "continueGroup: start continue group: " + group.getTitle());
+
+        // Small amount of items == small load time. Loading bar are useless?
+        if (showLoading) {
+            getView().showProgressBar(true);
+        }
+
+        Observable<MediaGroup> continuation;
+
+        //if (mediaGroup.getType() == MediaGroup.TYPE_SUGGESTIONS) { // Pinned playlist
+        //    continuation = mItemService.continueGroupObserve(mediaGroup);
+        //} else {
+        //    continuation = getContentService().continueGroupObserve(mediaGroup);
+        //}
+
+        continuation = getContentService().continueGroupObserve(mediaGroup);
+
+        Disposable continueAction = continuation
+                .subscribe(
+                        continueGroup -> {
+                            getView().showProgressBar(false);
+
+                            VideoGroup videoGroup = VideoGroup.from(group, continueGroup);
+                            getView().updateSection(videoGroup);
+                            mBrowseProcessor.process(videoGroup);
+
+                            continueGroupIfNeeded(videoGroup, showLoading);
+                        },
+                        error -> {
+                            Log.e(TAG, "continueGroup error: %s", error.getMessage());
+                            if (getView() != null) {
+                                getView().showProgressBar(false);
+                            }
+                        },
+                        () -> {
+                            if (getView() != null) {
+                                getView().showProgressBar(false);
+                            }
+                        }
+                );
+
+        mActions.add(continueAction);
+    }
+
+    private void authCheck(boolean check, Runnable callback) {
+        if (!check) {
+            callback.run();
+            return;
+        }
+
+        getView().showProgressBar(true);
+
+        if (getSignInService().isSigned()) {
+            callback.run();
+        } else if (getView() != null) {
+            if (isHistorySection() && !VideoStateService.instance(getContext()).isEmpty()) {
+                getView().showProgressBar(false);
+                VideoGroup videoGroup = VideoGroup.from(getCurrentSection());
+                appendLocalHistory(videoGroup);
+                getView().updateSection(videoGroup);
+            } else {
+                getView().showProgressBar(false);
+                getView().showError(new SignInError(getContext()));
+            }
+        }
+    }
+
+    /**
+     * Most tiny ui has 8 cards in a row or 24 in grid.
+     */
+    private void continueGroupIfNeeded(VideoGroup group) {
+        continueGroupIfNeeded(group, true);
+    }
+
+    /**
+     * Most tiny ui has 8 cards in a row or 24 in grid.
+     */
+    private void continueGroupIfNeeded(VideoGroup group, boolean showLoading) {
+        // Row shelves don't exist on the phone (rows flatten into one grid), so padding
+        // short rows to MIN_ROW_GROUP_SIZE is invisible there — scroll-end pagination
+        // still continues groups the normal way. Grid sections keep the fill logic.
+        if (sRowPadContinuationsDisabled && !isGridSection()) {
+            return;
+        }
+
+        if (MediaServiceManager.instance().shouldContinueTheGroup(getContext(), group, isGridSection())) {
+            continueGroup(group, showLoading);
+        }
+    }
+
+    private void disposeActions() {
+        mHomeWalkActive = false;
+        mPendingScrollEndItem = null;
+        mSectionWalkActive = false;
+        mTailDemanded = false;
+        RxHelper.disposeActions(mActions);
+        for (ShelfTail<VideoGroup> tail : mShelfTails.values()) {
+            tail.onCancelled(); // its shelf page (if any) was one of the disposed actions
+        }
+        wakeHomeWalk(); // a parked Home walk notices its disposal now, not at its next poll
+        Utils.removeCallbacks(mRefreshSection);
+        mLastUpdateTimeMs = -1;
+        mBrowseProcessor.dispose();
+    }
+
+    private void updateChannelUploadsMultiGrid(Video item) {
+        if (mCurrentSection == null) {
+            return;
+        }
+
+        updateVideoGrid(mCurrentSection, ChannelUploadsPresenter.instance(getContext()).obtainUploadsObservable(item), 1, false);
+    }
+
+    private boolean belongsToChannelUploadsMultiGrid(Video item) {
+        return isMultiGridChannelUploadsSection() && belongsToChannelUploads(item);
+    }
+
+    private boolean belongsToChannelUploads(Video item) {
+        return item.belongsToChannelUploads() && !item.hasVideo();
+    }
+
+    @Nullable
+    public BrowseSection getCurrentSection() {
+        return mCurrentSection;
+    }
+
+    private BrowseSection findSectionById(int sectionId) {
+        for (BrowseSection section : mErrorSections) {
+            if (section.getId() == sectionId) {
+                return section;
+            }
+        }
+
+        for (BrowseSection section : mSections) {
+            if (section.getId() == sectionId) {
+                return section;
+            }
+        }
+
+        return null;
+    }
+
+    private int findSectionIndex(int sectionId) {
+        if (sectionId == -1) {
+            return -1;
+        }
+
+        int sectionIndex = -1;
+
+        for (BrowseSection section : mErrorSections) {
+            if (section.isEnabled()) {
+                sectionIndex++;
+                if (section.getId() == sectionId) {
+                    return sectionIndex;
+                }
+            }
+        }
+
+        for (BrowseSection section : mSections) {
+            if (section.isEnabled()) {
+                sectionIndex++;
+                if (section.getId() == sectionId) {
+                    return sectionIndex;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private BrowseSection findNearestSection(int sectionId) {
+        BrowseSection result = findNearestSection(mErrorSections, sectionId);
+
+        if (result == null) {
+            result = findNearestSection(mSections, sectionId);
+        }
+
+        return result;
+    }
+
+    private BrowseSection findNearestSection(List<BrowseSection> sections, int sectionId) {
+        BrowseSection result = null;
+        BrowseSection previousSection = null;
+        boolean found = false;
+        for (BrowseSection section : sections) {
+            if (section.getId() == sectionId) {
+                found = true;
+                continue;
+            }
+            if (section.isEnabled()) {
+                if (found) {
+                    result = section;
+                    break;
+                }
+                previousSection = section;
+            }
+        }
+
+        return result != null ? result : previousSection;
+    }
+
+    private void filterHomeIfNeeded(List<MediaGroup> mediaGroups) {
+        if (mediaGroups == null || !isHomeSection()) {
+            return;
+        }
+
+        Helpers.removeIf(mediaGroups, value -> Helpers.containsAny(
+                value.getTitle(),
+                "Primetime", // Free movies and shows row
+                "News", // Top news
+                "news", // Top news
+                "NBA TV", // Sports
+                "The Life of a Showgirl", // Taylor Swift ADS
+                "FIFA World Cup" // Sports
+        ) || Helpers.equalsAny(
+                value.getTitle(),
+                //getContext().getString(R.string.news_row_name),
+                getContext().getString(R.string.breaking_news_row_name),
+                getContext().getString(R.string.covid_news_row_name)
+        ));
+    }
+
+    private int moveToTopIfNeeded(MediaGroup mediaGroup) {
+        if (mediaGroup == null) {
+            return -1;
+        }
+
+        return Helpers.equalsAny(mediaGroup.getTitle(), getContext().getString(R.string.trending_row_name)) ? 0 : -1;
+    }
+
+    private Observable<MediaGroup> createPinnedGridAction(Video item) {
+        if (item.channelGroupId != null) {
+            return getContentService().getRssFeedObserve(ChannelGroupServiceWrapper.instance(getContext()).findChannelIdsForGroup(item.channelGroupId));
+        }
+
+        return ChannelUploadsPresenter.instance(getContext()).obtainUploadsObservable(item);
+    }
+
+    private Observable<List<MediaGroup>> createPinnedRowAction(Video item) {
+        return ChannelPresenter.instance(getContext()).obtainChannelObservable(item.channelId);
+    }
+
+    /**
+     * Is Channels new look enabled?
+     */
+    public boolean isMultiGridChannelUploadsSection() {
+        return mCurrentSection != null && mCurrentSection.getType() == BrowseSection.TYPE_MULTI_GRID && mCurrentSection.getId() == MediaGroup.TYPE_CHANNEL_UPLOADS;
+    }
+
+    public boolean isSettingsSection() {
+        return isSection(MediaGroup.TYPE_SETTINGS);
+    }
+
+    public boolean isPlaylistsSection() {
+        return isSection(MediaGroup.TYPE_USER_PLAYLISTS);
+    }
+
+    public boolean isHomeSection() {
+        return isSection(MediaGroup.TYPE_HOME);
+    }
+
+    public boolean isHistorySection() {
+        return isSection(MediaGroup.TYPE_HISTORY);
+    }
+
+    public boolean isSubscriptionsSection() {
+        return isSection(MediaGroup.TYPE_SUBSCRIPTIONS);
+    }
+    
+    public boolean isPlaybackQueueSection() {
+        return isSection(MediaGroup.TYPE_PLAYBACK_QUEUE);
+    }
+
+    public boolean isPinnedSection() {
+        return mCurrentSection != null && isPinnedId(mCurrentSection.getId());
+    }
+
+    private boolean isPinnedId(int id) {
+        return id > 100;
+    }
+
+    private boolean isSection(int sectionId) {
+        return mCurrentSection != null && mCurrentSection.getId() == sectionId;
+    }
+
+    public void selectSection(int sectionId) {
+        getViewManager().startView(BrowseView.class); // focus view
+
+        if (getView() == null) {
+            mBootstrapSectionId = sectionId;
+            return;
+        }
+
+        int sectionIndex = findSectionIndex(sectionId);
+
+        if (sectionIndex == -1) {
+            enableSection(sectionId, true);
+            sectionIndex = findSectionIndex(sectionId);
+            getSidebarService().enableSection(sectionId, false); // enable temporally (till restart)
+        }
+
+        if (sectionIndex != -1) {
+            getView().selectSection(sectionIndex, true);
+        }
+    }
+
+    public boolean inForeground() {
+        return getViewManager().getTopView() == BrowseView.class;
+    }
+
+    private boolean isGridSection() {
+        return mCurrentSection != null && mCurrentSection.getType() != BrowseSection.TYPE_ROW;
+    }
+
+    @Override
+    public void onAccountChanged(Account account) {
+        Log.d(TAG, "On account changed");
+
+        mSectionFetchTimeMs.clear(); // feeds are per-account
+        mShelfTails.clear(); // so are their shelves
+        dropBootPrefetch("account-change");
+
+        // An in-flight load belongs to the PREVIOUS account; without this the refocus guard
+        // (onSectionFocused) would see it running and skip the new account's reload.
+        if (sSkipRedundantRefocusLoad) {
+            disposeActions();
+        }
+
+        if (getView() == null) {
+            return;
+        }
+
+        initSectionMappings();
+        updateChannelSorting();
+        updatePlaylistsStyle();
+        updateSections();
+    }
+
+    public Video getCurrentVideo() {
+        return mCurrentVideo;
+    }
+
+    private void initPasswordSection() {
+        AccountsData accountsData = AccountsData.instance(getContext());
+        if (accountsData.getAccountPassword() == null || accountsData.isPasswordAccepted()) {
+            return;
+        }
+
+        mSections.clear();
+        appendToSections(getContext().getString(R.string.header_notifications), R.drawable.icon_notification, new PasswordError(getContext()));
+    }
+
+    private void createPinnedMapping(Video item) {
+        if (enableRows(item)) {
+            mRowMapping.put(item.getId(), createPinnedRowAction(item));
+        } else {
+            mGridMapping.put(item.getId(), createPinnedGridAction(item));
+        }
+    }
+
+    private BrowseSection createPinnedSection(Video item) {
+        return new BrowseSection(
+                item.getId(), item.getTitle(), enableRows(item) ? BrowseSection.TYPE_ROW : BrowseSection.TYPE_GRID, R.drawable.icon_pin, item.getCardImageUrl(), false, item);
+    }
+
+    private boolean enableRows(Video item) {
+        return getMainUIData().isPinnedChannelRowsEnabled() && item.hasChannel() && !item.isPlaylistAsChannel();
+    }
+
+    private void handleLoadError(Throwable error) {
+        if (getView() == null) {
+            return;
+        }
+
+        getView().showProgressBar(false);
+
+        if (getView().isEmpty() || error != null) {
+            ErrorFragmentData errorFragmentData;
+            if (error != null && !Helpers.containsAny(error.getMessage(), "fromNullable result is null")) {
+                errorFragmentData = new CategoryEmptyError(getContext(), error);
+            } else if (getSignInService().isSigned()) {
+                errorFragmentData = new CategoryEmptyError(getContext(), null);
+            } else {
+                errorFragmentData = new SignInError(getContext());
+            }
+
+            // TODO: should we find a better place e.g. RetrofitHelper
+            // java.net.UnknownHostException: Unable to resolve host "www.youtube.com": No address associated with hostname
+            if (error != null && Helpers.contains(error.getMessage(), "No address associated with hostname")) {
+                PlayerTweaksData playerTweaksData = PlayerTweaksData.instance(getContext());
+                if (playerTweaksData.getPreferredDnsType() != PlayerTweaksData.DNS_TYPE_IPV4) {
+                    playerTweaksData.setPreferredDnsType(PlayerTweaksData.DNS_TYPE_IPV4);
+                    // Restart app to reinit okhttp internal objects
+                    Utils.restartTheApp(getContext());
+                }
+            }
+
+            getView().showError(errorFragmentData);
+            scheduleFeedRetry(error);
+        }
+    }
+
+    /**
+     * NEWTUBE(feed-retry): the failed section re-polls on an escalating delay (30/60/120/300 s,
+     * reset by content arriving), and only while the view is resumed; a failure that lands while
+     * paused waits for {@link #resumeFeedRetry}. Alongside the timer, a default-network callback
+     * retries at once when a validated network appears after an outage - edge-triggered, so an
+     * already-healthy network (the tunnel case, where Android keeps reporting VALIDATED) leaves
+     * the timer in charge.
+     */
+    private void scheduleFeedRetry(Throwable error) {
+        int sectionId = mCurrentSection != null ? mCurrentSection.getId() : FeedRetryBackoff.NO_SECTION;
+        long delayMs = mFeedRetry.onFailure(sectionId, SystemClock.elapsedRealtime());
+        String cause = error != null ? error.getClass().getSimpleName() : "empty";
+
+        if (!mViewResumed) {
+            Utils.removeCallbacks(mRefreshSection);
+            NetPath.log(FEED_RETRY_LOG + " deferred section=" + sectionId + " failures=" + mFeedRetry.getFailures()
+                    + " cause=" + cause + " (view paused)");
+            return;
+        }
+
+        NetPath.log(FEED_RETRY_LOG + " scheduled section=" + sectionId + " in=" + delayMs
+                + " failures=" + mFeedRetry.getFailures() + " cause=" + cause
+                + ' ' + NetPath.networkSnapshot(getContext()));
+        Utils.postDelayed(mRefreshSection, delayMs);
+        armFeedNetworkRetry();
+    }
+
+    private void armFeedNetworkRetry() {
+        mFeedNetworkWatcher.arm(getContext(), network -> {
+            if (!mViewResumed || mCurrentSection == null || !mFeedRetry.isInError(mCurrentSection.getId())) {
+                return;
+            }
+            // A new validated network: failures on the old link say nothing about this one.
+            mFeedRetry.resetEscalation();
+            Utils.removeCallbacks(mRefreshSection);
+            retryFailedSection("network");
+        });
+    }
+
+    /** View paused: no re-poll and no network registration while nobody can see the feed. */
+    private void pauseFeedRetry() {
+        mViewResumed = false;
+        Utils.removeCallbacks(mRefreshSection);
+        mFeedNetworkWatcher.disarm();
+
+        if (mFeedRetry.isInError()) {
+            NetPath.log(FEED_RETRY_LOG + " paused section=" + mFeedRetry.getSectionId()
+                    + " failures=" + mFeedRetry.getFailures());
+        }
+    }
+
+    /** View resumed while its section is still in error: retry it now rather than on the old timer. */
+    private void resumeFeedRetry() {
+        if (getView() == null || mCurrentSection == null || !mFeedRetry.isInError(mCurrentSection.getId())) {
+            return;
+        }
+
+        // If refreshIfNeeded (or a reselect) already started a reload, it removed any posted retry
+        // when it began, and its outcome replaces or clears the one posted here.
+        long delayMs = mFeedRetry.resumeDelayMs(SystemClock.elapsedRealtime());
+        NetPath.log(FEED_RETRY_LOG + " resume section=" + mCurrentSection.getId() + " in=" + delayMs
+                + " failures=" + mFeedRetry.getFailures());
+        Utils.postDelayed(mRefreshSection, delayMs);
+        armFeedNetworkRetry();
+    }
+
+    private void retryFailedSection(String trigger) {
+        if (getView() == null || !mViewResumed || mCurrentSection == null
+                || !mFeedRetry.isInError(mCurrentSection.getId())) {
+            return;
+        }
+
+        // Something is still loading (the section's own reload, or a scroll continuation over a
+        // stale FeedCache grid). Never dispose it; look again shortly - a section reload's outcome
+        // replaces (failure) or clears (success) this recheck anyway.
+        if (RxHelper.isAnyActionRunning(mActions)) {
+            NetPath.log(FEED_RETRY_LOG + " busy trigger=" + trigger + " recheck-in=" + FEED_RETRY_BUSY_RECHECK_MS);
+            Utils.postDelayed(mRefreshSection, FEED_RETRY_BUSY_RECHECK_MS);
+            return;
+        }
+
+        NetPath.log(FEED_RETRY_LOG + " fire trigger=" + trigger + " section=" + mCurrentSection.getId()
+                + " failures=" + mFeedRetry.getFailures() + ' ' + NetPath.networkSnapshot(getContext()));
+        // Same as refresh(false), minus the focus request: this is not the user asking.
+        mForceSectionUpdate = true;
+        updateCurrentSection();
+    }
+
+    private void clearFeedRetry(String reason) {
+        NetPath.log(FEED_RETRY_LOG + " clear reason=" + reason + " section=" + mFeedRetry.getSectionId());
+        mFeedRetry.clear();
+        Utils.removeCallbacks(mRefreshSection);
+        mFeedNetworkWatcher.disarm();
+    }
+
+    private void appendLocalHistory(VideoGroup videoGroup) {
+        if (!isHistorySection()) {
+            return;
+        }
+
+        VideoStateService stateService = VideoStateService.instance(getContext());
+
+        if (stateService.isEmpty() || (!stateService.isHistoryBroken() && !videoGroup.isEmpty())) {
+            return;
+        }
+
+        Video lastHistoryItem = videoGroup.isEmpty() ? null : videoGroup.get(0);
+        State lastState = stateService.getLastState();
+
+        if (lastState == null || Helpers.equals(lastHistoryItem, lastState.video)) {
+            return;
+        }
+
+        for (State state : stateService.getStates()) {
+            if (lastHistoryItem == null || state.timestamp > stateService.getSessionStartTimeMs()) {
+                videoGroup.add(0, state.video);
+            }
+        }
+    }
+}

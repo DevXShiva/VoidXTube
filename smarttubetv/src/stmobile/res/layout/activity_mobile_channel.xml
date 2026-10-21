@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Touch Channel page (Wave 4a; tabbed 2026-07-09).
+
+  YouTube-style but pure Material: the channel's sections (Videos / Live / Playlists /
+  Shorts / ...) are Material TABS, and the selected section renders below as the standard
+  full-width card feed (same VideoCardAdapter as Home/Search). No nested horizontal
+  carousels (TV MultipleRowsFragment) and no interleaved mega-list (the pre-tab design).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_channel_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/mobile_color_background"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/mobile_channel_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mobile_title_bar_height"
+        android:background="@color/mobile_color_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/mobile_channel_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_back"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_back_arrow" />
+
+        <TextView
+            android:id="@+id/mobile_channel_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingEnd="16dp"
+            android:text="@string/header_channels"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Some Channel" />
+
+        <!-- VOIDXDEV(channel sort, issue #5): Latest / Popular / Oldest for the open tab. -->
+        <ImageButton
+            android:id="@+id/mobile_channel_sort"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/search_sorting"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_tune" />
+
+    </LinearLayout>
+
+    <!-- VOIDXDEV(channel header, issue #10): the header scrolls away with the cards; the tabs stay. -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/mobile_channel_appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mobile_color_background"
+        android:stateListAnimator="@null"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
+
+        <include layout="@layout/mobile_channel_header" />
+
+        <!-- One tab per channel section, in delivery order. Hidden until sections arrive.
+             tabMaxWidth=0 lifts Material's 264dp cap (it wrapped long section names such as
+             "WING IT! Production Logs (Pet Projects)" onto two lines); with 0 a scrollable tab
+             takes its text's width, up to the screen width minus 56dp, like YouTube's tabs. -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/mobile_channel_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mobile_color_background"
+            android:visibility="gone"
+            app:tabIndicatorColor="@color/mobile_color_on_surface"
+            app:tabMaxWidth="0dp"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="@color/mobile_color_on_surface"
+            app:tabTextColor="@color/mobile_color_on_surface_secondary"
+            tools:visibility="visible" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Pull-to-refresh reloads the channel (ChannelPresenter.reload), like Home; the rows on
+             screen stay until fresh ones land. Also the retry gesture over the failure state,
+             which doesn't consume touches. -->
+        <com.newtube.mobile.ui.common.HapticSwipeRefreshLayout
+            android:id="@+id/mobile_channel_swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mobile_channel_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/mobile_card_spacing"
+                android:paddingBottom="@dimen/mobile_card_spacing"
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_video_card" />
+
+        </com.newtube.mobile.ui.common.HapticSwipeRefreshLayout>
+
+        <!-- Sideways swipe: the neighbouring tab's cards, slid in beside the grid (opaque, so it
+             also covers the grid while the grid swaps to that tab). -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mobile_channel_peek"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mobile_color_background"
+            android:clipToPadding="false"
+            android:importantForAccessibility="noHideDescendants"
+            android:paddingHorizontal="@dimen/mobile_card_spacing"
+            android:paddingBottom="@dimen/mobile_card_spacing"
+            android:visibility="gone" />
+
+        <!-- First page failed / came back empty: message + Try again (PageLoadState). -->
+        <include layout="@layout/mobile_page_load_state" />
+
+        <ProgressBar
+            android:id="@+id/mobile_channel_progress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateTint="@color/mobile_color_primary"
+            android:indeterminateTintMode="src_in" />
+
+    </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </LinearLayout>
+
+    <!-- Channel navigation from the watch page keeps playback alive in this overlay. -->
+    <include layout="@layout/mobile_mini_player_overlay" />
+
+</FrameLayout>

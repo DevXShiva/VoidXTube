@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Floating live-video card used when an in-app player is minimized over a detail screen. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_mini_player"
+    android:contentDescription="@string/mobile_mini_expand"
+    android:layout_width="@dimen/voidx_mini_width"
+    android:layout_height="@dimen/voidx_mini_height"
+    android:layout_gravity="bottom|end"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone"
+    app:cardBackgroundColor="@android:color/black"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="8dp"
+    app:strokeColor="@color/voidx_glass_stroke"
+    app:strokeWidth="1dp"
+    tools:visibility="visible">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- NEWTUBE(issue #9): an AspectRatioFrameLayout (FIT), given the video's shape by
+             MiniPlayerBridge.fitToVideo: other shapes are letterboxed, not stretched. -->
+        <androidx.media3.ui.AspectRatioFrameLayout
+            android:id="@+id/mobile_mini_player_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/mobile_mini_freeze"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+
+        </androidx.media3.ui.AspectRatioFrameLayout>
+
+        <ImageButton
+            android:id="@+id/mobile_mini_play_pause"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_mini_scrim_circle"
+            android:contentDescription="@string/mobile_mini_play_pause"
+            android:padding="9dp"
+            android:src="@drawable/ic_player_pause" />
+
+        <ImageButton
+            android:id="@+id/mobile_mini_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="0dp"
+            android:background="@drawable/bg_mini_scrim_circle_touch"
+            android:contentDescription="@string/mobile_mini_close"
+            android:padding="15dp"
+            android:src="@drawable/ic_sheet_close"
+            android:tint="@color/mobile_player_on_video" />
+
+        <ImageButton
+            android:id="@+id/mobile_mini_audio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|start"
+            android:background="@drawable/bg_mini_scrim_circle_touch"
+            android:contentDescription="@string/mobile_player_audio_only"
+            android:padding="14dp"
+            android:src="@drawable/ic_player_headphones"
+            android:tint="@color/mobile_player_on_video" />
+
+        <ProgressBar
+            android:id="@+id/mobile_mini_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="bottom"
+            android:max="1000"
+            android:progressBackgroundTint="@color/mobile_color_progress_track"
+            android:progressTint="@color/mobile_color_progress"
+            tools:progress="400" />
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

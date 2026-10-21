@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row in the cast picker, doing double duty: a merged device row (icon + name + short
+     plain-words subtitle) AND a mode-chooser option (icon hidden, title + explanatory subtitle).
+     CastPickerSheet fills both. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="12dp">
+
+    <ImageView
+        android:id="@+id/cast_target_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_mobile_cast"
+        android:tint="@color/mobile_color_on_surface" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/cast_target_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="15sp"
+            tools:text="Living room TV" />
+
+        <TextView
+            android:id="@+id/cast_target_badge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="13sp"
+            tools:text="Quality controls on your phone" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/cast_target_progress"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:indeterminateTint="@color/mobile_color_primary"
+        android:indeterminateTintMode="src_in"
+        android:visibility="gone" />
+
+    <!-- Cast-device rows only: opens the explicit mode chooser (row tap itself one-tap connects). -->
+    <ImageView
+        android:id="@+id/cast_target_more"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/mobile_cast_choose_method"
+        android:padding="8dp"
+        android:src="@drawable/ic_mobile_more_vert"
+        android:tint="@color/mobile_color_on_surface_secondary"
+        android:visibility="gone" />
+
+</LinearLayout>

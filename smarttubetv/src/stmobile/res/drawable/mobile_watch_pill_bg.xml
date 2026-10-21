@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rounded pill background for the Like / Dislike / Share action buttons. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- VOIDXDEV(glass): glass pill (tint + hairline). -->
+    <solid android:color="@color/voidx_glass_fill" />
+    <stroke android:width="0.5dp" android:color="@color/voidx_glass_stroke" />
+    <corners android:radius="22dp" />
+</shape>

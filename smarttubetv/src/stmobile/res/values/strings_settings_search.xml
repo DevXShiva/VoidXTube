@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Search in the phone Settings (SettingsSearch, SettingsSearchController). -->
+<resources>
+    <string name="mobile_settings_search_hint">Search settings</string>
+    <string name="mobile_settings_search_none">No settings match “%1$s”</string>
+
+    <!-- Words people search with that a setting's title doesn't contain. Space-separated; each
+         word matches as a word start. Translate them as the words people would type. -->
+    <string name="mobile_settings_search_kw_account">sign in log in sign out google profile switch</string>
+    <string name="mobile_settings_search_kw_theme">dark mode light mode night appearance colors colours</string>
+    <string name="mobile_settings_search_kw_customize">customise personalize personalise appearance look style layout</string>
+    <string name="mobile_settings_search_kw_country">country region</string>
+    <string name="mobile_settings_search_kw_start_screen">launch startup opens on default tab home page</string>
+    <string name="mobile_settings_search_kw_interface_size">ui scale zoom font text size density bigger smaller</string>
+    <string name="mobile_settings_search_kw_tabs">bottom bar sections navigation explore</string>
+    <string name="mobile_settings_search_kw_hidden">hide watched filter upcoming premieres live</string>
+    <string name="mobile_settings_search_kw_video_menu">context menu three dots long press options</string>
+    <string name="mobile_settings_search_kw_channels_order">subscriptions sort channels</string>
+    <string name="mobile_settings_search_kw_watch_history">pause history incognito</string>
+    <string name="mobile_settings_search_kw_video_ends">autoplay repeat loop shuffle next video</string>
+    <string name="mobile_settings_search_kw_background">background play picture in picture pip audio only minimize</string>
+    <string name="mobile_settings_search_kw_natural_voice">pitch time stretching chipmunk</string>
+    <string name="mobile_settings_search_kw_audio_focus">calls notifications other apps interruptions</string>
+    <string name="mobile_settings_search_kw_hide_related">suggestions related recommendations</string>
+    <string name="mobile_settings_search_kw_dislikes">return youtube dislike ryd</string>
+    <string name="mobile_settings_search_kw_home_layout">rows shelves carousel feed grid smarttube</string>
+    <string name="mobile_settings_search_kw_app_icon">launcher logo home screen old classic fantasy white</string>
+    <string name="mobile_settings_search_kw_quality">resolution 4k 1080p 720p hd data saver mobile data</string>
+    <string name="mobile_settings_search_kw_loudness">volume normalization auto volume quiet loud</string>
+    <string name="mobile_settings_search_kw_player_volume">quiet loud sound</string>
+    <string name="mobile_settings_search_kw_captions">subtitles cc closed captions</string>
+    <string name="mobile_settings_search_kw_sponsorblock">skip sponsors ads segments intros</string>
+    <string name="mobile_settings_search_kw_dearrow">clickbait titles thumbnails</string>
+    <string name="mobile_settings_search_kw_backup">export import save settings</string>
+    <string name="mobile_settings_search_kw_video_format">codec vp9 av1 h264 avc hdr 60fps</string>
+    <string name="mobile_settings_search_kw_buffer">buffering cache memory</string>
+    <string name="mobile_settings_search_kw_dns">dns ipv4 ipv6 servers</string>
+    <string name="mobile_settings_search_kw_conscrypt">ssl tls certificates security censorship blocked byebyedpi</string>
+    <string name="mobile_settings_search_kw_multi_profiles">profiles per account own different</string>
+    <string name="mobile_settings_search_kw_updates">update version new release</string>
+    <string name="mobile_settings_search_kw_diagnostic_log">bug report logs debug</string>
+    <string name="mobile_settings_search_kw_gesture_levels">gestures brightness volume</string>
+    <string name="mobile_settings_search_kw_gesture_seek">gestures scrub skip forward rewind</string>
+    <string name="mobile_settings_search_kw_double_tap_seek">double tap seek skip forward rewind seconds jump interval</string>
+</resources>

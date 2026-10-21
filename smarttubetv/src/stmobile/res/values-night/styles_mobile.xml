@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NEWTUBE(theme): the dark theme needs no dark overlay on the player; empty on purpose, so
+         the player chrome resolves exactly as it did before the light theme existed. -->
+    <style name="ThemeOverlay.NewTube.PlayerChrome" parent="" />
+</resources>

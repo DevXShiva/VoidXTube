@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(theme): mobile_watch_pill_bg for pills drawn over the video (the "Playing on TV"
+     panel): the same translucent white in both themes, since the player stays dark. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/mobile_player_pill" />
+    <corners android:radius="20dp" />
+</shape>

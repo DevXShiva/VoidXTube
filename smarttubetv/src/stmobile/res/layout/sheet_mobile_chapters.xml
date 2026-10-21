@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Chapters sheet, opened from the current-chapter button above the seek bar (YouTube's Chapters
+  panel): the same plain title + hairline family as the speed and captions sheets, then every
+  chapter as item_mobile_chapter (thumbnail, title, start time; the one playing is highlighted).
+  Filled by ChaptersSheet; its height is capped from code so in portrait it stops under the video.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_mobile_sheet"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_mobile_sheet_handle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="12dp"
+        android:text="@string/chapters"
+        android:textColor="@color/mobile_color_on_surface"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/mobile_color_divider" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chapters_sheet_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingVertical="6dp" />
+
+</LinearLayout>

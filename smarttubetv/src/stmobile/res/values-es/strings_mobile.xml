@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spanish overrides for user-visible mobile strings. The bottom-nav tab labels come from
+     the (already localized) shared header_* strings; "You" is ours, so it needs a
+     translation or the bar reads "Inicio / Suscripciones / Historial / You". -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="mobile_nav_you">Tú</string>
+    <string name="mobile_you_explore">Explorar</string>
+
+    <!-- Upstream es translation says "REGISTRARSE" (= create an account) on every sign-in
+         button - wrong action. App-module resources override the library's, so fix it here
+         (the en default "SIGN IN" is overridden in values/strings_mobile.xml too). -->
+    <string name="action_signin" tools:ignore="ExtraTranslation">Iniciar sesión</string>
+
+    <!-- The search field's hint (was the Leanback sample's search_hint in smarttubetv/src/main,
+         which has no locale folders; now a phone string so Weblate offers it). -->
+    <string name="mobile_search_hint">Buscar vídeos</string>
+
+    <!-- Signed-out empty states -->
+    <string name="mobile_empty_signin_section">Inicia sesión para ver %1$s</string>
+    <string name="mobile_empty_signin_generic">Inicia sesión para ver este contenido</string>
+    <string name="mobile_empty_signin_subscriptions">Inicia sesión para ver tus suscripciones</string>
+    <string name="mobile_empty_signin_channels">Inicia sesión para ver los canales que sigues</string>
+    <string name="mobile_empty_signin_playlists">Inicia sesión para ver tus listas</string>
+    <string name="mobile_empty_signin_my_videos">Inicia sesión para ver tus vídeos</string>
+    <string name="mobile_empty_signin_history">Inicia sesión para ver tu historial</string>
+    <string name="mobile_empty_signin_notifications">Inicia sesión para ver tus notificaciones</string>
+
+    <!-- Sign-in screen -->
+    <string name="mobile_signin_title">Iniciar sesión</string>
+    <string name="mobile_signin_lead">Conecta tu cuenta de Google para ver tus suscripciones, listas e historial.</string>
+    <string name="mobile_signin_step1_title">Toca “Continuar con Google”</string>
+    <string name="mobile_signin_step1_caption">La página de Google se abre aquí mismo.</string>
+    <string name="mobile_signin_step2_title">Elige tu cuenta y permite el acceso</string>
+    <string name="mobile_signin_step2_caption">La página puede mencionar una TV u otro dispositivo — es normal: VoidTube inicia sesión igual que una TV, así tu contraseña nunca pasa por la app.</string>
+    <string name="mobile_signin_step3_title">Vuelve a VoidTube</string>
+    <string name="mobile_signin_step3_caption">La sesión se completa sola — no hay que hacer nada más.</string>
+    <string name="mobile_signin_code_label">Google mostrará este código — comprueba que coincide:</string>
+    <string name="mobile_signin_copy_hint">Toca el código para copiarlo</string>
+    <string name="mobile_signin_code_copied">Código copiado</string>
+    <string name="mobile_signin_open_button">Continuar con Google</string>
+    <string name="mobile_signin_manual_hint">¿No funciona el botón? Abre esta dirección en cualquier navegador e introduce el código:</string>
+    <string name="mobile_signin_notification">Iniciando sesión con Google…</string>
+    <string name="mobile_signin_waiting_title">Esperando a Google…</string>
+    <string name="mobile_signin_waiting_caption">Termina en la página de Google: elige tu cuenta y permite el acceso. La sesión se iniciará aquí automáticamente.</string>
+    <string name="mobile_signin_reopen_button">Volver a abrir la página</string>
+    <string name="mobile_signin_success">¡Sesión iniciada!</string>
+    <string name="mobile_signin_error">No se pudo completar el inicio de sesión. Comprueba tu conexión y vuelve a intentarlo — recibirás un código nuevo.</string>
+    <string name="mobile_signin_retry_button">Reintentar</string>
+
+    <!-- Captions sheet + CC toggle snackbar -->
+    <string name="mobile_player_subtitles">Subtítulos</string>
+    <string name="mobile_captions_off">Desactivar subtítulos</string>
+    <string name="mobile_captions_empty">Este vídeo no tiene subtítulos</string>
+    <string name="mobile_captions_style">Estilo y tamaño de los subtítulos</string>
+    <string name="mobile_captions_on_toast">Subtítulos activados (%1$s)</string>
+    <string name="mobile_captions_off_toast">Subtítulos desactivados</string>
+
+    <string name="mobile_player_chapter_button">Capítulo: %1$s. Ver todos los capítulos</string>
+    <string name="mobile_player_release_to_cancel">Suelta para cancelar</string>
+    <!-- Speed sheet -->
+    <string name="mobile_player_speed">Velocidad de reproducción</string>
+    <string name="mobile_speed_normal">Normal</string>
+    <string name="mobile_speed_more">Más velocidades</string>
+    <string name="mobile_speed_toast">Velocidad de reproducción: %1$s</string>
+
+    <!-- Accounts sheet -->
+    <string name="mobile_accounts_title">Cuentas</string>
+    <string name="mobile_accounts_signed_out">Usar sin cuenta</string>
+    <string name="mobile_accounts_sign_out">Cerrar sesión</string>
+    <string name="mobile_accounts_sign_out_title">¿Cerrar sesión?</string>
+    <string name="mobile_accounts_sign_out_confirm">%1$s se eliminará de este dispositivo. Puedes volver a iniciar sesión cuando quieras.</string>
+    <!-- Playlist page header -->
+    <string name="mobile_playlist_play_all">Reproducir todo</string>
+    <string name="mobile_playlist_shuffle">Aleatorio</string>
+
+    <!-- Watch-page Save action -->
+    <string name="mobile_watch_save">Guardar</string>
+    <string name="mobile_watch_saved">Guardado</string>
+
+    <!-- Watch page. Untranslated, these read as English islands in a Spanish UI: the queue
+         card, "Up next" and the action row sit together on the first screen of every video. -->
+    <string name="mobile_watch_like">Me gusta</string>
+    <string name="mobile_watch_dislike">No me gusta</string>
+    <string name="mobile_watch_share">Compartir</string>
+    <string name="mobile_lyrics">Letra</string>
+    <string name="mobile_lyrics_none">La letra de esta canción no está disponible</string>
+    <string name="mobile_lyrics_source">Fuente: %1$s</string>
+    <string name="mobile_lyrics_provider_description">Proveedor de letras: %1$s</string>
+    <string name="mobile_lyrics_provider_choose">Elegir proveedor de letras</string>
+    <string name="mobile_lyrics_provider_current">Proveedor actual</string>
+    <string name="mobile_lyrics_provider_found">Letra encontrada · Toca para usarla</string>
+    <string name="mobile_lyrics_provider_fetching">Buscando la letra&#8230;</string>
+    <string name="mobile_lyrics_provider_not_fetched">Toca para buscar</string>
+    <string name="mobile_lyrics_provider_not_found">Letra no encontrada</string>
+    <string name="mobile_watch_share_subject">Mira este vídeo</string>
+    <string name="mobile_watch_subscribe">Suscribirse</string>
+    <string name="mobile_watch_subscribed">Suscrito</string>
+    <string name="mobile_watch_related">A continuación</string>
+    <string name="mobile_watch_offline">Sin conexión</string>
+    <string name="mobile_watch_description">Descripción</string>
+    <string name="mobile_watch_queue_from">Reproduciendo de %1$s</string>
+    <string name="mobile_watch_queue_fallback">la cola</string>
+    <string name="mobile_watch_queue_now_playing">Reproduciendo ahora</string>
+
+    <!-- Player controls (most are content descriptions read out by TalkBack) -->
+    <string name="mobile_player_back">Atrás</string>
+    <string name="mobile_player_minimize">Minimizar</string>
+    <string name="mobile_player_audio_only">Solo audio</string>
+    <string name="mobile_player_audio_off">Vídeo activado</string>
+    <string name="mobile_player_play">Reproducir</string>
+    <string name="mobile_player_pause">Pausar</string>
+    <string name="mobile_player_replay">Volver a reproducir</string>
+    <string name="mobile_player_fullscreen">Pantalla completa</string>
+    <string name="mobile_player_quality">Calidad</string>
+    <string name="mobile_player_audio_track">Pista de audio</string>
+    <string name="mobile_player_pip">Imagen en imagen</string>
+    <string name="mobile_player_previous">Anterior</string>
+    <string name="mobile_player_next">Siguiente</string>
+    <string name="mobile_player_zoom_fill">Ampliado para llenar</string>
+    <string name="mobile_player_zoom_original">Original</string>
+    <string name="mobile_player_more">Más opciones</string>
+    <string name="mobile_mini_play_pause">Reproducir o pausar</string>
+    <string name="mobile_mini_expand">Ampliar reproductor</string>
+    <string name="pin_playlist">Fijar lista en Tú</string>
+    <string name="pin_channel">Fijar canal en Tú</string>
+    <string name="pinned_to_sidebar">Fijado en Tú</string>
+    <string name="unpin_from_sidebar">Quitar de Tú</string>
+    <string name="unpinned_from_sidebar">Quitado de Tú</string>
+    <string name="subscribe_to_channel">Suscribirse</string>
+    <string name="unsubscribe_from_channel">Cancelar suscripción</string>
+    <string name="subscribe_unsubscribe_from_channel">Suscribirse o cancelar suscripción</string>
+    <string name="share_link">Compartir</string>
+    <string name="mobile_you_pinned">Fijados</string>
+    <string name="pin_unpin_from_sidebar">Fijar en Tú</string>
+    <string name="mobile_settings_experimental">Experimental</string>
+    <string name="mobile_settings_gestures">Gestos</string>
+    <string name="mobile_settings_gesture_levels">Deslizar para el brillo y el volumen</string>
+    <string name="mobile_settings_gesture_levels_summary">Arriba y abajo a la izquierda o a la derecha del vídeo a pantalla completa</string>
+    <string name="mobile_settings_gesture_seek">Deslizar para avanzar o retroceder</string>
+    <string name="mobile_settings_gesture_seek_summary">De lado sobre el vídeo</string>
+    <string name="subscribed_to_channel">Suscripción añadida</string>
+    <string name="unsubscribed_from_channel">Suscripción cancelada</string>
+    <string name="mobile_player_settings">Ajustes</string>
+    <string name="mobile_more_options_for">Más opciones para %1$s</string>
+    <string name="mobile_comment_likes">%1$s me gusta</string>
+    <string name="mobile_mini_close">Cerrar el reproductor</string>
+
+    <!-- Player menu -->
+    <string name="mobile_menu_more">Más</string>
+    <string name="mobile_menu_repeat">Modo de repetición</string>
+    <string name="mobile_menu_shuffle">Aleatorio</string>
+    <string name="mobile_menu_zoom">Zoom</string>
+    <string name="mobile_menu_background">Reproducir en segundo plano</string>
+    <string name="mobile_menu_stats">Estadísticas para nerds</string>
+    <!-- Same wording as the card menu and the Save sheet title (dialog_add_to_playlist). -->
+    <string name="mobile_menu_playlist_add">Guardar en una lista</string>
+    <string name="mobile_menu_queue">Cola de reproducción</string>
+    <string name="mobile_menu_on">Activado</string>
+    <string name="mobile_menu_off">Desactivado</string>
+
+    <!-- Quality / audio sheets -->
+    <string name="mobile_quality_title">Calidad</string>
+    <string name="mobile_quality_auto">Automática (recomendada)</string>
+    <string name="mobile_quality_auto_current">Automática (%1$s)</string>
+    <string name="mobile_quality_auto_short">Automática</string>
+    <string name="mobile_audio_default">Predeterminado</string>
+    <string name="mobile_audio_role_original">original</string>
+    <string name="mobile_audio_role_dubbed">doblado</string>
+    <string name="mobile_audio_role_auto_dubbed">doblaje automático</string>
+    <string name="mobile_audio_role_descriptive">audiodescripción</string>
+    <string name="mobile_audio_track_toast">Pista de audio: %1$s</string>
+
+    <!-- Comments -->
+    <string name="mobile_comments_entry">Comentarios</string>
+    <string name="mobile_comments_title">Comentarios</string>
+    <string name="mobile_comments_replies_title">Respuestas</string>
+    <string name="mobile_comments_none">Aún no hay comentarios</string>
+    <string name="mobile_comments_load_error">No se han podido cargar los comentarios.</string>
+    <string name="mobile_comments_replies_load_error">No se han podido cargar las respuestas.</string>
+    <string name="mobile_comments_sort_top">Destacados</string>
+    <string name="mobile_comments_sort_top_hint">Los que más gustan primero</string>
+    <string name="mobile_comments_sort_newest">Más recientes</string>
+    <string name="mobile_comments_sort_newest_hint">Puede incluir spam</string>
+    <string name="mobile_comments_sort_description">Ordenar comentarios: %1$s</string>
+    <string name="mobile_comments_close">Cerrar comentarios</string>
+    <string name="mobile_comments_back">Volver a los comentarios</string>
+    <string name="mobile_comments_read_more">Leer más</string>
+    <string name="mobile_comments_show_less">Mostrar menos</string>
+    <string name="mobile_comments_open_replies">Abrir respuestas</string>
+    <string name="mobile_comments_copy">Copiar comentario</string>
+    <string name="mobile_comments_copied">Comentario copiado</string>
+    <string name="mobile_comments_like">Me gusta el comentario</string>
+    <string name="mobile_comments_unlike">Quitar me gusta</string>
+    <string name="mobile_comments_liked">Te gusta</string>
+    <string name="mobile_comments_sign_in_to_like">Inicia sesión para dar me gusta a los comentarios</string>
+    <!-- NEWTUBE(write-comments) -->
+    <string name="mobile_comments_add_hint">Añade un comentario&#8230;</string>
+    <string name="mobile_comments_reply_hint">Añade una respuesta&#8230;</string>
+    <string name="mobile_comments_reply">Responder</string>
+    <string name="mobile_comments_post">Publicar</string>
+    <string name="mobile_comments_posted">Comentario publicado</string>
+    <string name="mobile_comments_reply_posted">Respuesta publicada</string>
+    <string name="mobile_comments_view_reply">Ver</string>
+    <string name="mobile_comments_post_failed">No se ha podido publicar el comentario</string>
+    <string name="mobile_comments_post_failed_reason">No se ha podido publicar: %1$s</string>
+    <string name="mobile_comments_try_again">Reintentar</string>
+    <string name="mobile_comments_sign_in_to_comment">Inicia sesión para comentar</string>
+    <string name="mobile_comments_more">Más acciones</string>
+    <string name="mobile_comments_delete">Eliminar</string>
+    <string name="mobile_comments_delete_title">¿Eliminar el comentario?</string>
+    <string name="mobile_comments_delete_reply_title">¿Eliminar la respuesta?</string>
+    <string name="mobile_comments_delete_message">Se eliminará para todos.</string>
+    <string name="mobile_comments_delete_cancel">Cancelar</string>
+    <string name="mobile_comments_deleted">Comentario eliminado</string>
+    <string name="mobile_comments_delete_failed">No se ha podido eliminar el comentario</string>
+    <plurals name="mobile_comments_replies">
+        <item quantity="one">%1$d respuesta</item>
+        <item quantity="many">%1$d respuestas</item>
+        <item quantity="other">%1$d respuestas</item>
+    </plurals>
+
+    <!-- Live chat -->
+    <string name="mobile_live_chat_entry">Chat en directo</string>
+    <string name="mobile_live_chat_title">Chat en directo</string>
+    <string name="mobile_live_chat_empty">Esperando mensajes…</string>
+
+    <!-- Search -->
+    <string name="mobile_search_button">Buscar</string>
+    <string name="mobile_search_voice">Búsqueda por voz</string>
+    <string name="mobile_search_insert">Afinar esta búsqueda</string>
+    <string name="mobile_search_clear">Borrar la búsqueda</string>
+    <string name="mobile_search_filters">Filtros de búsqueda</string>
+    <string name="mobile_search_filter_type">Tipo</string>
+    <string name="mobile_search_filter_all">Todo</string>
+    <string name="mobile_search_filter_videos">Vídeos</string>
+    <string name="mobile_search_filter_channels">Canales</string>
+    <string name="mobile_search_filter_playlists">Listas de reproducción</string>
+    <string name="mobile_search_filter_movies">Películas</string>
+    <string name="mobile_search_filter_duration">Duración</string>
+    <string name="mobile_search_filter_any">Cualquiera</string>
+    <string name="mobile_search_filter_under_3">Menos de 3 minutos</string>
+    <string name="mobile_search_filter_3_20">3 - 20 minutos</string>
+    <string name="mobile_search_filter_over_20">Más de 20 minutos</string>
+    <string name="mobile_search_filter_upload_date">Fecha de subida</string>
+    <string name="mobile_search_filter_anytime">Cualquier fecha</string>
+    <string name="mobile_search_filter_today">Hoy</string>
+    <string name="mobile_search_filter_this_week">Esta semana</string>
+    <string name="mobile_search_filter_this_month">Este mes</string>
+    <string name="mobile_search_filter_this_year">Este año</string>
+    <string name="mobile_search_filter_prioritize">Priorizar</string>
+    <string name="mobile_search_filter_relevance">Relevancia</string>
+    <string name="mobile_search_filter_popularity">Popularidad</string>
+    <string name="mobile_search_filter_features">Características</string>
+    <string name="mobile_search_filter_live">En directo</string>
+    <string name="mobile_search_filter_subtitles">Subtítulos</string>
+    <string name="mobile_search_filter_creative_commons">Creative Commons</string>
+    <string name="mobile_search_filter_location">Ubicación</string>
+    <string name="mobile_search_filter_purchased">Comprado</string>
+    <string name="mobile_search_filter_apply">Aplicar</string>
+    <string name="mobile_search_no_results">No hay resultados para «%1$s»</string>
+    <string name="mobile_search_error">No se pudieron cargar los resultados.</string>
+
+    <!-- Navigation, sheets and empty states -->
+    <string name="mobile_back">Atrás</string>
+    <string name="mobile_dialog_back">Atrás</string>
+    <string name="mobile_sheet_close">Cerrar</string>
+    <string name="mobile_dialog_unavailable">Todavía no está disponible en el móvil.</string>
+    <string name="mobile_empty_generic">Todavía no hay nada que mostrar</string>
+    <string name="mobile_empty_subscriptions">Aquí aparecen los vídeos de los canales a los que te suscribes</string>
+    <string name="mobile_empty_no_connection">Sin conexión. Comprueba tu red y vuelve a intentarlo.</string>
+    <string name="mobile_page_load_error">No se ha podido cargar esta página.</string>
+    <string name="mobile_load_more_error">No se ha podido cargar más.</string>
+    <string name="mobile_refresh_error">No se ha podido actualizar.</string>
+    <string name="mobile_channel_tab_videos">Vídeos</string>
+    <string name="mobile_channel_tab_more">Más</string>
+    <string name="mobile_no_browser">No hay ninguna aplicación para abrir este enlace</string>
+    <string name="mobile_first_run_setup">Configuración inicial: preparando YouTube…</string>
+
+    <!-- Notification channels -->
+    <string name="mobile_playback_channel_name">Reproducción</string>
+    <string name="mobile_playback_channel_desc">Controles multimedia para la reproducción en segundo plano</string>
+    <string name="mobile_cast_channel_name">Envío a la TV</string>
+    <string name="mobile_cast_channel_desc">Controles de la sesión de envío a la TV</string>
+
+    <!-- Device pairing -->
+    <string name="mobile_add_device_title">Vincular un dispositivo</string>
+    <string name="mobile_add_device_done">Hecho</string>
+
+    <!-- Cast: picker and method chooser -->
+    <string name="mobile_cast_button">Enviar a la TV</string>
+    <string name="mobile_cast_picker_title">Enviar a</string>
+    <string name="mobile_cast_searching">Buscando dispositivos…</string>
+    <string name="mobile_cast_empty">No se ha encontrado ningún dispositivo en esta red Wi-Fi</string>
+    <string name="mobile_cast_subtitle_no_ads">Calidad desde el móvil</string>
+    <string name="mobile_cast_subtitle_youtube_app">YouTube o SmartTube en la TV</string>
+    <string name="mobile_cast_chooser_title">Enviar a %1$s</string>
+    <string name="mobile_cast_choose_method">Elige el método de envío</string>
+    <string name="mobile_cast_option_direct_title">Envío directo</string>
+    <string name="mobile_cast_option_direct_subtitle">Calidad desde el móvil · sin subtítulos</string>
+    <string name="mobile_cast_option_app_title">Reproducir con la app de la TV</string>
+    <string name="mobile_cast_option_app_subtitle">Necesario para directos y subtítulos · calidad con el mando de la TV</string>
+
+    <!-- Cast: TV-code linking -->
+    <string name="mobile_cast_link_code">Vincular con el código de la TV</string>
+    <string name="mobile_cast_link_code_subtitle">Funciona con YouTube y SmartTube</string>
+    <string name="mobile_cast_code_hint">Código de 12 dígitos</string>
+    <string name="mobile_cast_code_title">Vincular TV</string>
+    <string name="mobile_cast_code_app_label">App de la TV</string>
+    <string name="mobile_cast_code_choose_app">Elige la app que tienes abierta en la TV.</string>
+    <string name="mobile_cast_code_open_smarttube">En SmartTube de la TV, abre:</string>
+    <string name="mobile_cast_code_open_youtube">En YouTube de la TV, abre:</string>
+    <string name="mobile_cast_code_find">Encuentra el código en cualquiera de las dos apps de TV:</string>
+    <string name="mobile_cast_code_youtube_path">Ajustes → Vincular con el código de TV</string>
+    <string name="mobile_cast_code_smarttube_path">Ajustes → Control remoto</string>
+    <string name="mobile_cast_code_helper">Puedes incluir guiones y espacios</string>
+    <string name="mobile_cast_code_smarttube_benefit">Consejo: con SmartTube controlas la calidad y los subtítulos en la TV.</string>
+    <string name="mobile_cast_code_positive">Vincular</string>
+    <string name="mobile_cast_code_invalid">El código debe tener 12 dígitos</string>
+    <string name="mobile_cast_pairing">Vinculando con la TV…</string>
+    <string name="mobile_cast_pair_failed">No se ha podido vincular con ese código. Compruébalo y vuelve a intentarlo.</string>
+
+    <!-- Cast: session state -->
+    <string name="mobile_cast_connecting">Conectando con %1$s…</string>
+    <string name="mobile_cast_connecting_youtube_app">Conectando con la app de YouTube de la TV…</string>
+    <string name="mobile_cast_switching_tv_app">Abriendo los controles de YouTube en la TV…</string>
+    <string name="mobile_cast_fallback_switching">Probando YouTube en la TV…</string>
+    <string name="mobile_cast_trying_smarttube">Probando SmartTube en la TV…</string>
+    <string name="mobile_cast_trying_direct">Probando el envío directo…</string>
+    <string name="mobile_cast_trying_saved">Probando la app de TV guardada…</string>
+    <string name="mobile_cast_checking_ad_free">Comprobando la TV…</string>
+    <string name="mobile_cast_smarttube_title">SmartTube</string>
+    <string name="mobile_cast_smarttube_subtitle">SmartTube · puedes llevarte el móvil</string>
+    <string name="mobile_cast_youtube_title">YouTube</string>
+    <string name="mobile_cast_youtube_subtitle">YouTube · alternativa</string>
+    <string name="mobile_cast_unknown_title">App de TV guardada</string>
+    <string name="mobile_cast_unknown_subtitle">App sin identificar · pulsa ⋮ para indicarla</string>
+    <string name="mobile_cast_identify_app">¿De qué app de TV es este código?</string>
+    <string name="mobile_cast_onboarding_title">¿Tienes SmartTube en la TV?</string>
+    <string name="mobile_cast_onboarding_body">Vincúlalo una vez y los vídeos que envíes se abrirán en SmartTube.</string>
+    <string name="mobile_cast_pair_smarttube">Vincular SmartTube</string>
+    <string name="mobile_cast_receiver_no_playback">La app de la TV no ha empezado a reproducir</string>
+    <string name="mobile_cast_playing_on">Reproduciendo en %1$s</string>
+    <string name="mobile_cast_disconnect">Desconectar</string>
+    <string name="mobile_cast_launch_failed">No se ha podido acceder a la app de YouTube de la TV. Prueba con “Vincular con el código de la TV”.</string>
+    <string name="mobile_cast_unavailable">El envío a la TV todavía no está disponible en esta versión</string>
+
+    <!-- Cast: direct-cast limits -->
+    <string name="mobile_cast_direct_live_unsupported">Los directos necesitan YouTube o SmartTube en la TV</string>
+    <string name="mobile_cast_direct_incompatible">Este vídeo no se puede enviar directamente (no hay ningún formato que la TV pueda reproducir)</string>
+    <string name="mobile_cast_direct_load_failed">No se ha podido preparar este vídeo para el envío directo</string>
+    <string name="mobile_cast_direct_no_wifi">El envío directo necesita el móvil y la TV en la misma red Wi-Fi</string>
+
+    <!-- Cast: TV playback options -->
+    <string name="mobile_cast_more_options">Opciones de reproducción en la TV</string>
+    <string name="mobile_cast_controls_title">Opciones de reproducción en la TV</string>
+    <string name="mobile_cast_direct_summary">Envío directo · calidad desde este móvil · los subtítulos necesitan la app de la TV</string>
+    <string name="mobile_cast_app_summary">App de TV · subtítulos desde este móvil · calidad con el mando de la TV</string>
+    <string name="mobile_cast_quality_auto_1080">Automática (hasta 1080p)</string>
+    <string name="mobile_cast_quality_cap">Hasta %1$dp</string>
+    <string name="mobile_cast_quality_tv_remote">Usar el mando de la TV</string>
+    <string name="mobile_cast_quality_receiver_help">Elige la calidad en los ajustes del reproductor de tu TV.</string>
+    <string name="mobile_cast_tv_volume_label">Volumen de la TV</string>
+    <string name="mobile_cast_subtitles_sent">Selección de subtítulos enviada a la TV</string>
+    <string name="mobile_cast_subtitles_failed">No se han podido cambiar los subtítulos en este receptor</string>
+    <string name="mobile_cast_subtitles_need_tv_app">Cambiar a la app de la TV</string>
+    <string name="mobile_cast_switch_subtitles_title">¿Usar la app de la TV para los subtítulos?</string>
+    <string name="mobile_cast_switch_subtitles_message">La app de la TV permite usar subtítulos y elegir la calidad con el mando. Probamos primero SmartTube vinculado y después YouTube.</string>
+    <string name="mobile_cast_switch_subtitles_positive">Cambiar</string>
+
+    <!-- Descargas -->
+    <string name="mobile_sign_in_to_rate">Inicia sesión para indicar si te gusta un vídeo</string>
+    <string name="mobile_subscribed_to">Te has suscrito a %1$s</string>
+    <string name="mobile_unsubscribed_from">Has cancelado la suscripción a %1$s</string>
+    <string name="mobile_subscribed">Suscripción añadida</string>
+    <string name="mobile_unsubscribed">Suscripción cancelada</string>
+    <string name="mobile_undo">Deshacer</string>
+    <string name="mobile_liked">Añadido a Vídeos que me gustan</string>
+    <string name="mobile_like_removed">Quitado de Vídeos que me gustan</string>
+    <string name="mobile_disliked">Has indicado que no te gusta este vídeo</string>
+    <string name="mobile_dislike_removed">Se ha quitado el «No me gusta»</string>
+    <string name="mobile_rate_not_ready">El vídeo aún se está cargando. Vuelve a intentarlo en un momento.</string>
+    <string name="mobile_rating_not_saved">No se ha podido guardar tu valoración. Comprueba la conexión y vuelve a intentarlo.</string>
+    <string name="mobile_download_started">Descarga iniciada</string>
+    <string name="mobile_download_started_size">Descarga iniciada • %1$s</string>
+    <string name="mobile_download_done">Descargado</string>
+    <string name="mobile_download_done_size">Descargado • %1$s</string>
+    <string name="mobile_download_already_here">Ya está descargado</string>
+    <string name="mobile_download_view">Ver</string>
+    <string name="mobile_download_preparing">Preparando la descarga…</string>
+    <string name="mobile_download_unavailable">Este vídeo no se puede descargar</string>
+    <string name="mobile_download_unavailable_live">Los directos no se pueden descargar</string>
+    <string name="mobile_download_audio_only">Solo audio</string>
+    <string name="mobile_download_already">ya descargado</string>
+    <string name="mobile_download_state_queued">Esperando para descargar</string>
+    <string name="mobile_download_state_downloading">Descargando · %1$d%% · %2$s de %3$s</string>
+    <string name="mobile_download_state_downloading_bytes">Descargando · %1$s</string>
+    <string name="mobile_download_state_processing">Terminando…</string>
+    <string name="mobile_download_error_generic">La descarga ha fallado. Toca para reintentar.</string>
+    <string name="mobile_download_error_link">El enlace de descarga ha caducado. Toca para reintentar.</string>
+    <string name="mobile_download_done_title">Descarga completada</string>
+    <string name="mobile_download_play">Reproducir</string>
+    <string name="mobile_download_retry">Reintentar la descarga</string>
+    <string name="mobile_download_cancel">Cancelar la descarga</string>
+    <string name="mobile_download_delete">Eliminar la descarga</string>
+    <string name="mobile_download_file_missing">El archivo descargado ya no está en este dispositivo</string>
+    <string name="mobile_download_pill_downloaded">Descargado</string>
+    <string name="mobile_downloads_empty">Los vídeos que descargues aparecerán aquí.\nUsa Descargar en el menú de un vídeo o en la página de reproducción.</string>
+    <string name="mobile_download_badge_queued">En cola</string>
+    <string name="mobile_download_badge_downloading">Descargando</string>
+    <string name="mobile_download_badge_failed">Error</string>
+    <string name="mobile_download_channel_name">Descargas</string>
+    <string name="mobile_download_channel_desc">Progreso de las descargas de vídeo</string>
+
+    <!-- NEWTUBE(update-flow) -->
+    <string name="mobile_update_checking">Buscando actualizaciones…</string>
+    <string name="mobile_update_up_to_date">VoidTube está actualizado</string>
+    <string name="mobile_update_version">Versión %1$s</string>
+    <string name="mobile_update_check_failed_title">No se han podido buscar actualizaciones</string>
+    <string name="mobile_update_check_failed_body">Comprueba la conexión y vuelve a intentarlo.</string>
+    <string name="mobile_update_available_title">Actualización disponible</string>
+    <string name="mobile_update_app_version">VoidTube %1$s</string>
+    <string name="mobile_update_app_version_size">VoidTube %1$s · %2$s</string>
+    <string name="mobile_update_metered">Estás usando datos móviles.</string>
+    <string name="mobile_update_whats_new_in">Novedades de la %1$s</string>
+    <string name="mobile_update_release_notes">Notas completas de la versión</string>
+    <string name="mobile_update_later">Más tarde</string>
+    <string name="mobile_update_update">Actualizar</string>
+    <string name="mobile_update_downloading_title">Descargando la actualización</string>
+    <string name="mobile_update_progress">%1$s de %2$s</string>
+    <string name="mobile_update_cancel">Cancelar</string>
+    <string name="mobile_update_download_failed_title">La descarga no ha terminado</string>
+    <string name="mobile_update_download_failed_body">Vuelve a intentarlo o descarga VoidTube %1$s desde GitHub.</string>
+    <string name="mobile_update_install_failed_title">No se ha podido abrir el instalador</string>
+    <string name="mobile_update_github">Abrir GitHub</string>
+    <string name="mobile_update_try_again">Volver a intentarlo</string>
+    <string name="mobile_update_ready_title">Lista para instalar</string>
+    <string name="mobile_update_install">Instalar</string>
+    <string name="mobile_update_permission_title">Permite que VoidTube instale actualizaciones</string>
+    <string name="mobile_update_permission_body">Android lo pregunta una sola vez. En la siguiente pantalla, activa «Permitir desde esta fuente» y vuelve: la actualización se instala al momento.</string>
+    <string name="mobile_update_open_settings">Abrir ajustes</string>
+    <string name="mobile_update_not_now">Ahora no</string>
+    <string name="mobile_update_done">Listo</string>
+    <string name="mobile_update_whats_new">Novedades</string>
+    <string name="mobile_update_updated">Actualizado a VoidTube %1$s</string>
+    <string name="mobile_update_downloaded">Actualización descargada</string>
+    <string name="mobile_update_row_available">Actualización disponible</string>
+    <string name="mobile_update_row_downloading">Descargando la actualización</string>
+    <string name="mobile_update_row_downloading_percent">VoidTube %1$s · %2$d%%</string>
+    <string name="mobile_update_row_ready">Actualización lista para instalar</string>
+    <string name="mobile_update_channel_name">Actualizaciones de la app</string>
+    <string name="mobile_update_channel_desc">Descarga de una actualización de VoidTube</string>
+    <string name="mobile_theme">Tema</string>
+    <string name="mobile_theme_system">Predeterminado del sistema</string>
+    <string name="mobile_theme_light">Claro</string>
+    <string name="mobile_theme_dark">Oscuro</string>
+
+    <string name="mobile_about_star">Dale una estrella a VoidTube en GitHub</string>
+    <string name="mobile_about_star_desc">Libre y de código abierto. Una estrella ayuda a que otros lo encuentren</string>
+    <string name="mobile_about_share">Compartir VoidTube</string>
+    <string name="mobile_about_share_desc">Envía el enlace a quien le pueda gustar</string>
+    <string name="mobile_about_share_text">VoidTube, un cliente de YouTube para móviles basado en SmartTube: %1$s</string>
+    <string name="mobile_about_telegram_title">Canal de Telegram</string>
+    <string name="mobile_about_telegram_summary">Novedades, versiones y soporte</string>
+    <string name="sabr_vod_option">Preferir SABR aunque haya enlaces (experimental; próximo vídeo)</string>
+    <string name="sabr_vod_stopped">Se ha detenido la reproducción SABR experimental. Pulsa reproducir para reintentar o desactiva SABR en Ajustes.</string>
+    <string name="mobile_next_in">A continuación en %1$d</string>
+    <string name="mobile_next_play">Reproducir</string>
+    <string name="mobile_next_cancel">Cancelar</string>
+</resources>

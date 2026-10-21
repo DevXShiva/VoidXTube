@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(glass): the lit tab inside the nav pill. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <inset android:insetLeft="2dp" android:insetRight="2dp">
+            <shape android:shape="rectangle">
+                <solid android:color="@color/voidx_glass_selected" />
+                <corners android:radius="28dp" />
+            </shape>
+        </inset>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

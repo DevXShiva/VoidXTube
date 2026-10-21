@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(loader): the app's loading indicator - the icon's coral cookie, turning while it
+     morphs between the nine-lobe cookie and a four-leaf clover (Material 3 expressive's shape
+     loader). Both shapes are the same 96-point polar outline (tools/: r = R(1 + a cos k0)), so
+     the path morph is a straight point-for-point blend. Used by every circular ProgressBar via
+     the theme (Widget.VoidTube.Loader). -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="48dp"
+            android:height="48dp"
+            android:viewportWidth="48"
+            android:viewportHeight="48">
+            <group
+                android:name="spin"
+                android:pivotX="24"
+                android:pivotY="24">
+                <path
+                    android:name="shape"
+                    android:fillColor="@color/mobile_color_primary"
+                    android:pathData="M24.00,7.11 L25.09,7.38 L26.09,8.10 L26.97,9.06 L27.76,9.98 L28.54,10.62 L29.44,10.87 L30.51,10.79 L31.75,10.58 L33.04,10.47 L34.22,10.68 L35.12,11.32 L35.66,12.34 L35.86,13.60 L35.87,14.89 L35.92,16.03 L36.22,16.95 L36.86,17.66 L37.83,18.27 L38.94,18.93 L39.92,19.73 L40.54,20.71 L40.65,21.81 L40.24,22.94 L39.50,24.00 L38.69,24.96 L38.09,25.85 L37.86,26.76 L38.02,27.76 L38.42,28.89 L38.81,30.14 L38.94,31.37 L38.63,32.45 L37.85,33.26 L36.72,33.76 L35.45,34.04 L34.26,34.26 L33.32,34.62 L32.65,35.27 L32.18,36.24 L31.75,37.42 L31.20,38.60 L30.42,39.51 L29.42,39.97 L28.27,39.92 L27.08,39.47 L25.95,38.84 L24.94,38.31 L24.00,38.11 L23.06,38.31 L22.05,38.84 L20.92,39.47 L19.73,39.92 L18.58,39.97 L17.58,39.51 L16.80,38.60 L16.25,37.42 L15.82,36.24 L15.35,35.27 L14.68,34.62 L13.74,34.26 L12.55,34.04 L11.28,33.76 L10.15,33.26 L9.37,32.45 L9.06,31.37 L9.19,30.14 L9.58,28.89 L9.98,27.76 L10.14,26.76 L9.91,25.85 L9.31,24.96 L8.50,24.00 L7.76,22.94 L7.35,21.81 L7.46,20.71 L8.08,19.73 L9.06,18.93 L10.17,18.27 L11.14,17.66 L11.78,16.95 L12.08,16.03 L12.13,14.89 L12.14,13.60 L12.34,12.34 L12.88,11.32 L13.78,10.68 L14.96,10.47 L16.25,10.58 L17.49,10.79 L18.56,10.87 L19.46,10.62 L20.24,9.98 L21.03,9.06 L21.91,8.10 L22.91,7.38 Z" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="spin">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="1400"
+                android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="0"
+                android:valueTo="360"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="shape">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="700"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="pathData"
+                android:repeatCount="infinite"
+                android:repeatMode="reverse"
+                android:valueFrom="M24.00,7.11 L25.09,7.38 L26.09,8.10 L26.97,9.06 L27.76,9.98 L28.54,10.62 L29.44,10.87 L30.51,10.79 L31.75,10.58 L33.04,10.47 L34.22,10.68 L35.12,11.32 L35.66,12.34 L35.86,13.60 L35.87,14.89 L35.92,16.03 L36.22,16.95 L36.86,17.66 L37.83,18.27 L38.94,18.93 L39.92,19.73 L40.54,20.71 L40.65,21.81 L40.24,22.94 L39.50,24.00 L38.69,24.96 L38.09,25.85 L37.86,26.76 L38.02,27.76 L38.42,28.89 L38.81,30.14 L38.94,31.37 L38.63,32.45 L37.85,33.26 L36.72,33.76 L35.45,34.04 L34.26,34.26 L33.32,34.62 L32.65,35.27 L32.18,36.24 L31.75,37.42 L31.20,38.60 L30.42,39.51 L29.42,39.97 L28.27,39.92 L27.08,39.47 L25.95,38.84 L24.94,38.31 L24.00,38.11 L23.06,38.31 L22.05,38.84 L20.92,39.47 L19.73,39.92 L18.58,39.97 L17.58,39.51 L16.80,38.60 L16.25,37.42 L15.82,36.24 L15.35,35.27 L14.68,34.62 L13.74,34.26 L12.55,34.04 L11.28,33.76 L10.15,33.26 L9.37,32.45 L9.06,31.37 L9.19,30.14 L9.58,28.89 L9.98,27.76 L10.14,26.76 L9.91,25.85 L9.31,24.96 L8.50,24.00 L7.76,22.94 L7.35,21.81 L7.46,20.71 L8.08,19.73 L9.06,18.93 L10.17,18.27 L11.14,17.66 L11.78,16.95 L12.08,16.03 L12.13,14.89 L12.14,13.60 L12.34,12.34 L12.88,11.32 L13.78,10.68 L14.96,10.47 L16.25,10.58 L17.49,10.79 L18.56,10.87 L19.46,10.62 L20.24,9.98 L21.03,9.06 L21.91,8.10 L22.91,7.38 Z"
+                android:valueTo="M24.00,7.04 L25.10,7.16 L26.17,7.51 L27.17,8.07 L28.07,8.80 L28.87,9.67 L29.55,10.60 L30.13,11.57 L30.63,12.51 L31.09,13.39 L31.53,14.19 L31.99,14.89 L32.51,15.49 L33.11,16.01 L33.81,16.47 L34.61,16.91 L35.49,17.37 L36.43,17.87 L37.40,18.45 L38.33,19.13 L39.20,19.93 L39.93,20.83 L40.49,21.83 L40.84,22.90 L40.97,24.00 L40.84,25.10 L40.49,26.17 L39.93,27.17 L39.20,28.07 L38.33,28.87 L37.40,29.55 L36.43,30.13 L35.49,30.63 L34.61,31.09 L33.81,31.53 L33.11,31.99 L32.51,32.51 L31.99,33.11 L31.53,33.81 L31.09,34.61 L30.63,35.49 L30.13,36.43 L29.55,37.40 L28.87,38.33 L28.07,39.20 L27.17,39.93 L26.17,40.49 L25.10,40.84 L24.00,40.97 L22.90,40.84 L21.83,40.49 L20.83,39.93 L19.93,39.20 L19.13,38.33 L18.45,37.40 L17.87,36.43 L17.37,35.49 L16.91,34.61 L16.47,33.81 L16.01,33.11 L15.49,32.51 L14.89,31.99 L14.19,31.53 L13.39,31.09 L12.51,30.63 L11.57,30.13 L10.60,29.55 L9.67,28.87 L8.80,28.07 L8.07,27.17 L7.51,26.17 L7.16,25.10 L7.04,24.00 L7.16,22.90 L7.51,21.83 L8.07,20.83 L8.80,19.93 L9.67,19.13 L10.60,18.45 L11.57,17.87 L12.51,17.37 L13.39,16.91 L14.19,16.47 L14.89,16.01 L15.49,15.49 L16.01,14.89 L16.47,14.19 L16.91,13.39 L17.37,12.51 L17.87,11.57 L18.45,10.60 L19.13,9.67 L19.93,8.80 L20.83,8.07 L21.83,7.51 L22.90,7.16 Z"
+                android:valueType="pathType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

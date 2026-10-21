@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Touch UI theme for the stmobile flavor.
+
+      Deliberately Theme.MaterialComponents (NOT a Theme.AppCompat fallback): Material
+      Components 1.5.0 (`materialVersion` in SharedModules/constants.gradle) is already
+      pulled into this exact Gradle module graph at runtime via the `chatkit` library
+      dependency (smarttubetv/build.gradle -> implementation project(':chatkit') ->
+      com.google.android.material:material:1.5.0), and `filepicker-lib` (a dependency
+      of `common`) depends on the same artifact/version. So Material Components was
+      already proven to resolve cleanly against this project's pinned
+      appcompat/fragment/leanback versions before this change - no fallback to
+      AppCompat + cardview was needed.
+
+      NEWTUBE(theme): DayNight, with a palette for each side - values/colors_mobile.xml is the
+      light one, values-night/ the dark one the app always had. In Material 1.14
+      DayNight.NoActionBar under values-night IS Theme.MaterialComponents.NoActionBar (the parent
+      this theme had while it was dark-only), so the dark theme is exactly what it was. The light
+      side needs its own palette, not just the parent: with a DayNight parent under the old dark
+      palette, unchecked radio rings and checkbox outlines came out #060606 on #0F0F0F.
+      Which side a screen gets is the Theme setting (System default / Light / Dark, ThemeMode),
+      applied as a night-mode override when each screen is created (MotherActivity) - the player
+      stays dark in both, like YouTube's: its chrome uses the fixed mobile_player_* colours.
+    -->
+    <style name="Theme.NewTube" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- VOIDXDEV(loader): every circular spinner is the morphing cookie (voidx_loader). -->
+        <item name="android:progressBarStyle">@style/Widget.VoidTube.Loader</item>
+        <item name="android:progressBarStyleLarge">@style/Widget.VoidTube.Loader.Large</item>
+        <item name="android:progressBarStyleSmall">@style/Widget.VoidTube.Loader.Small</item>
+        <item name="colorPrimary">@color/mobile_color_primary</item>
+        <item name="colorPrimaryDark">@color/mobile_color_primary_dark</item>
+        <!-- Selection controls (checkbox, radio, switch, text caret) and any untinted
+             indeterminate ProgressBar read the accent. Left at the framework default this
+             was Material pink on a black-and-red app: the whole settings screen - section
+             headers, ticks, radio dots - came out #FF4081. Monochrome instead, per the
+             "subtle states, no tints" rule; red stays the brand/playback colour and the
+             one accent tint left is the cast-connected icon. -->
+        <item name="colorAccent">@color/mobile_color_on_surface</item>
+        <item name="colorSecondary">@color/mobile_color_on_surface</item>
+        <item name="colorControlActivated">@color/mobile_color_on_surface</item>
+        <item name="android:colorBackground">@color/mobile_color_background</item>
+        <item name="colorSurface">@color/mobile_color_surface</item>
+        <item name="colorOnSurface">@color/mobile_color_on_surface</item>
+        <item name="android:windowBackground">@color/mobile_color_background</item>
+        <!-- Solid app-colored system bars from the first frame (otherwise colorPrimaryDark red
+             flashes in the status bar until the runtime chrome in MobileActivity lands). -->
+        <item name="android:statusBarColor">@color/mobile_color_background</item>
+        <item name="android:navigationBarColor">@color/mobile_color_navigation_bar</item>
+        <item name="android:windowLightStatusBar">@bool/mobile_light_system_bars</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">@bool/mobile_light_system_bars</item>
+        <!-- Edge-to-edge (transparent bars, content underneath) is forced from targetSdk 35 on,
+             which no-ops the fitted opaque #0F0F0F bars painted above. This attr opts out - but
+             ONLY on Android 15 and below; from Android 16 the platform ignores it and the app is
+             edge-to-edge whatever this says. Verified rather than assumed, by reading the private
+             window flags of the same build on two devices (dumpsys window windows, pfl= line):
+
+               Android 15 / API 35 (Mi 8): NO_MOVE_ANIMATION FORCE_DRAW_STATUS_BAR_BACKGROUND ...
+               Android 17 / API 37 (Pixel 9): NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED ...
+
+             - and a neighbouring app on the SAME Android 15 device does carry
+             EDGE_TO_EDGE_ENFORCED, so the flag's absence is this opt-out working, not the OS
+             lacking the feature. So keep it: down at minSdk 24 it is still what separates the
+             bars. What keeps modern devices right is MobileActivity.installContentInsets().
+             Same split applies to statusBarColor/navigationBarColor above. -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+        <!-- Bottom sheets. Without this, a BottomSheetDialog falls back to Material's
+             Theme.Design.Light.BottomSheetDialog - a WHITE sheet frame under our dark
+             content (hence the old "paint the frame transparent" workaround), and on the
+             fragment path an elevation overlay lightened the surface to #3F3F3F. Either
+             way the wrong colour showed through the navigation-inset padding Material adds
+             to the frame: a pale band between the sheet and the display edge. Style the
+             frame properly instead - Material paints it itself, on every layout, so a
+             background assigned in code never sticks. -->
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.NewTube.BottomSheetDialog</item>
+        <item name="android:windowAnimationStyle">@style/BrowseWindowAnimation</item>
+        <!-- NEWTUBE(buttons): sentence case everywhere. Material's default button text is
+             ALL CAPS with 0.09em tracking ("SIGN IN", "TRY AGAIN", "CONTINUE WITH GOOGLE") and
+             TabLayout reads the same attribute (channel tabs "NEW HERE? TRY THESE!"), next to
+             the app's own sentence-case pills ("Play all", "Subscribe"). Changing the text
+             appearance - not materialButtonStyle - keeps every button's own shape/colour. -->
+        <item name="textAppearanceButton">@style/TextAppearance.NewTube.Button</item>
+        <!-- NEWTUBE(snackbar): the action on the Snackbar (light on the dark theme, dark on the
+             light one) in the app's ink, not red - "Sign in" / "Undo" / "View" are choices,
+             not alarms. -->
+        <item name="snackbarButtonStyle">@style/Widget.NewTube.Snackbar.Action</item>
+        <!-- VOIDXDEV: no sharp corners - snackbars are rounded like the rest of the glass UI. -->
+        <item name="snackbarStyle">@style/Widget.VoidTube.Snackbar</item>
+        <!-- VOIDXDEV: modern capsule switches everywhere (Settings rows, dialog rows). -->
+        <item name="switchStyle">@style/Widget.VoidTube.Switch</item>
+    </style>
+
+    <style name="Widget.VoidTube.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="shapeAppearance">@style/ShapeAppearance.VoidTube.Round</item>
+    </style>
+
+    <style name="ShapeAppearance.VoidTube.Round" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="Widget.NewTube.Snackbar.Action" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/mobile_color_background</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.NewTube.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!--
+      NEWTUBE(buttons): the app's one main-action button - a white pill with black sentence-case
+      text (near-black with white text in the light theme, mobile_color_inverse_*), the look
+      "Play all", "Subscribe" and the cast sheet's "Link TV" already had inline.
+      Used for the plain buttons that used to fall back to Material's default (red box, all caps):
+      the feed/page error actions ("Sign in", "Try again"), sign-in and add-device. The visible
+      pill is 40dp tall; the 4dp insets keep the touch target at 48dp.
+    -->
+    <style name="Widget.NewTube.Button.Pill" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/mobile_color_on_inverse_surface</item>
+        <item name="backgroundTint">@color/mobile_color_inverse_surface</item>
+        <item name="rippleColor">@color/mobile_color_inverse_ripple</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="cornerRadius">22dp</item>
+    </style>
+
+    <style name="ThemeOverlay.NewTube.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.NewTube.BottomSheet</item>
+        <!-- ElevationOverlayProvider reads this off the THEME, not off the widget style.
+             Left on, the sheet's 16dp elevation blended 14.75% white into colorSurface -
+             #1E1E1E came out as exactly #3F3F3F, which is the pale band that showed under
+             the sheet in the first place. -->
+        <item name="elevationOverlayEnabled">false</item>
+    </style>
+
+    <!--
+      The sheet surface itself: our flat #1E1E1E (no elevation overlay) with the same top-only
+      16dp corners as bg_mobile_sheet, so the frame and the content it wraps line up exactly and
+      the colour runs under the gesture bar to the display edge.
+    -->
+    <style name="Widget.NewTube.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@color/voidx_sheet_glass</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.NewTube.BottomSheet</item>
+        <!-- VOIDXDEV: Material squares the top corners off once a sheet is expanded; keep them round. -->
+        <item name="shouldRemoveExpandedCorners">false</item>
+    </style>
+
+    <style name="ShapeAppearance.NewTube.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">28dp</item>
+        <item name="cornerSizeTopRight">28dp</item>
+        <item name="cornerSizeBottomLeft">28dp</item>
+        <item name="cornerSizeBottomRight">28dp</item>
+    </style>
+
+    <!--
+      Player window transitions. A card launch suppresses OPEN and animates the tapped thumbnail
+      itself; applying a second whole-window transform would make that morph feel like a route
+      transition. The alpha-only OPEN below is the fallback for deep links or clipped thumbnails,
+      where there is no source geometry. CLOSE keeps the small fade/slide used by explicit Back.
+    -->
+    <style name="PlayerWindowAnimation">
+        <item name="android:activityOpenEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/mobile_stay</item>
+        <item name="android:activityCloseEnterAnimation">@anim/player_close_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/player_close_exit</item>
+        <!-- Task slots are defensive fallbacks for external/deep-link launches. Normal mobile
+             navigation is in one task; if OEM routing intervenes, keep the fallback alpha-only
+             so no spatial movement competes with the geometry-driven view animation. -->
+        <item name="android:taskOpenEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:taskOpenExitAnimation">@anim/mobile_stay</item>
+        <item name="android:taskToFrontEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:taskToFrontExitAnimation">@anim/mobile_stay</item>
+        <item name="android:taskToBackEnterAnimation">@anim/player_close_enter</item>
+        <item name="android:taskToBackExitAnimation">@anim/player_close_exit</item>
+    </style>
+
+    <!--
+      Browse window animations. With every touch activity in ONE shared task (manifest note),
+      these quick fades replace the stock sideways slide for ordinary Search/Channel/etc.
+      navigation. Interactive player minimize explicitly disables the window transition: Browse
+      is already visible through the translucent player and the final reorder only transfers the
+      live video into its matching mini-card rectangle. task* slots remain as a fallback for any
+      residual cross-task switch (e.g. external deep links).
+    -->
+    <style name="BrowseWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/mobile_stay</item>
+        <item name="android:activityCloseEnterAnimation">@anim/mobile_stay</item>
+        <item name="android:activityCloseExitAnimation">@anim/mobile_fade_out</item>
+        <item name="android:taskOpenEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:taskOpenExitAnimation">@anim/mobile_stay</item>
+        <item name="android:taskToFrontEnterAnimation">@anim/browse_to_front_enter</item>
+        <item name="android:taskToFrontExitAnimation">@anim/mobile_stay</item>
+    </style>
+
+    <!--
+      Keep the player window translucent (but undimmed) so the Activity immediately below it in
+      the shared mobile task remains the live backdrop. The watch page's own video/content children
+      are fully opaque at rest; during the interactive minimize they fade/move independently and
+      reveal that already-rendered screen instead of exposing an opaque black window until Browse
+      is reordered to the front.
+
+      This is window translucency, not a translucent status bar. Runtime system-bar handling still
+      chooses normal fitted bars in portrait and immersive video in landscape.
+    -->
+    <style name="Theme.NewTube.Player" parent="Theme.NewTube">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@style/PlayerWindowAnimation</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@color/mobile_color_background</item>
+        <item name="android:navigationBarColor">@color/mobile_color_navigation_bar</item>
+        <!-- NEWTUBE(theme): the status bar sits over the black video band in both themes
+             (applySystemBarsForOrientation), so its icons stay light; so do those of the sheets
+             opened over the video. The navigation bar follows the page (Theme.NewTube). -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.NewTube.BottomSheetDialog.Player</item>
+    </style>
+
+    <style name="ThemeOverlay.NewTube.BottomSheetDialog.Player">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- NEWTUBE(theme): android:theme of the player's video area (and the mini player), so the
+         ripples and default control colours over the video are the dark theme's in both themes.
+         values-night/ redefines it empty: there the whole app is already dark, and the player
+         stays exactly as it was. -->
+    <style name="ThemeOverlay.NewTube.PlayerChrome" parent="ThemeOverlay.MaterialComponents.Dark" />
+
+    <!--
+      Translucent theme for MobileAppDialogActivity (context menus, player option pickers,
+      settings). Mirrors the proven TV overlay theme (App.Theme.Leanback.Preferences:
+      windowIsTranslucent + transparent windowBackground + backgroundDimEnabled=false):
+
+        * No black flash - the window starts transparent, so the caller (Home / the player)
+          shows through until the dialog content is laid out.
+        * No force-rotate - a translucent activity defers screen orientation to the opaque
+          activity behind it, so opening a picker from the LANDSCAPE player no longer snaps to
+          portrait (the manifest keeps screenOrientation="unspecified"; a translucent window must
+          NOT request a fixed orientation - "Only fullscreen opaque activities can request
+          orientation" on API 26).
+        * The activity draws its own scrim + bottom sheet (or an opaque full-screen surface),
+          so backgroundDimEnabled is left off and window animations are handled per-mode in code.
+    -->
+    <style name="Theme.NewTube.Dialog" parent="Theme.NewTube">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <!--
+      App-styled MaterialAlertDialog (accounts sign-out confirm etc.): sheet-colored rounded
+      surface, white title, secondary body, sentence-case buttons - red reserved for the
+      destructive action. The stock look (grey box + all-caps red pair) read as foreign
+      next to the bottom sheets (user feedback).
+    -->
+    <style name="MobileAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/mobile_color_surface</item>
+        <!-- Same trap as the sheets: the dialog's 24dp elevation blended white into colorSurface,
+             so in the dark theme every dialog came out grey (#3F3F3F-ish) instead of the
+             #1E1E1E of the sheets beside it. -->
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="android:textColorPrimary">@color/mobile_color_on_surface</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MobileAlertDialogBody</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MobileAlertDialogButtonDestructive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MobileAlertDialogButton</item>
+        <item name="shapeAppearanceMediumComponent">@style/MobileAlertDialogShape</item>
+    </style>
+
+    <style name="MobileAlertDialogShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerSize">28dp</item>
+    </style>
+
+    <style name="MobileAlertDialogBody" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textColor">@color/mobile_color_on_surface_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MobileAlertDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/mobile_color_on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="MobileAlertDialogButtonDestructive" parent="MobileAlertDialogButton">
+        <item name="android:textColor">@color/mobile_color_primary</item>
+    </style>
+
+    <!-- Pairing is a neutral action, with the same surface and typography as the cast sheet. -->
+    <style name="MobileCastCodeDialog" parent="MobileAlertDialog">
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+        <item name="colorPrimary">@color/mobile_color_on_surface</item>
+        <item name="colorOnPrimary">@color/mobile_color_background</item>
+        <item name="colorSecondary">@color/mobile_color_on_surface</item>
+        <item name="colorAccent">@color/mobile_color_on_surface</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MobileCastCodeDialogTitle</item>
+        <item name="buttonBarStyle">@style/MobileCastCodeDialogButtonBar</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MobileCastCodeDialogPrimaryButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MobileCastCodeDialogSecondaryButton</item>
+    </style>
+
+    <style name="MobileCastCodeDialogButtonBar" parent="Widget.AppCompat.ButtonBar">
+        <!-- The Material actions layout supplies another 8dp horizontally and 2dp vertically. -->
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">18dp</item>
+    </style>
+
+    <style name="MobileCastCodeDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/mobile_color_on_surface</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="MobileCastCodeDialogSecondaryButton" parent="MobileAlertDialogButton">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="MobileCastCodeDialogPrimaryButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">96dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:textColor">@color/mobile_cast_button_text</item>
+        <item name="backgroundTint">@color/mobile_cast_button_background</item>
+        <item name="cornerRadius">22dp</item>
+    </style>
+
+    <!-- Regular weight at 11sp tracks the YouTube bar labels (medium/bold read heavier than
+         theirs side-by-side; the old 10sp-medium choice predates dropping the long
+         "Listas de reproducción" label from the bar). -->
+    <style name="MobileBottomNavText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">10sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Watch-page loading skeleton (alpha-pulsed from code while related videos load). -->
+    <!-- NEWTUBE(seek bar): a pill over the video (the seek bar's time/chapter, "Release to cancel",
+         "2x"). -->
+    <style name="MobilePlayerPill">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_mobile_player_pill</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MobileSkeletonRelatedRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+    </style>
+    <style name="MobileSkeletonRelatedThumb">
+        <item name="android:layout_width">@dimen/mobile_watch_related_thumb_width</item>
+        <item name="android:layout_height">@dimen/mobile_watch_related_thumb_height</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+    <style name="MobileSkeletonRelatedTextColumn">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="MobileSkeletonRelatedLineWide">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">14dp</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+    <style name="MobileSkeletonRelatedLineNarrow">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+
+    <!-- NEWTUBE(write-comments): the comment composer (CommentComposer). A floating window at the
+         bottom that the keyboard pushes up (adjustResize still moves floating windows; where the
+         platform draws them edge to edge anyway, the composer pads itself by the keyboard's
+         inset). It slides in and out with the keyboard's own animation. No dim: like YouTube's,
+         the comments stay readable above it (and on the emulator a dim came and went as the
+         keyboard moved the window). A tap outside still closes it. -->
+    <style name="MobileCommentComposer" parent="Theme.NewTube">
+        <item name="android:windowIsFloating">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowSoftInputMode">adjustResize|stateAlwaysVisible</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.InputMethod</item>
+    </style>
+
+    <!-- NEWTUBE(comments-panel): rows of the Top / Newest menu (mobile_comments_sort_menu). -->
+    <style name="MobileCommentsSortRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="MobileCommentsSortCheck">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:src">@drawable/ic_mobile_check</item>
+        <item name="android:contentDescription">@null</item>
+    </style>
+    <style name="MobileCommentsSortText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="MobileCommentsSortTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/mobile_color_on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="MobileCommentsSortHint">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/mobile_color_on_surface_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- NEWTUBE(comments-panel): comment loading rows (item_mobile_comment_skeleton). A line is a
+         weighted bar + spacer so the bars keep their share of the column at any width. -->
+    <style name="MobileSkeletonCommentLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">10dp</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="MobileSkeletonCommentBar">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+
+    <!-- Feed first-load skeleton (alpha-pulsed from code) - ghosts of the full-width video cards. -->
+    <style name="MobileSkeletonFeedCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginBottom">20dp</item>
+    </style>
+    <style name="MobileSkeletonFeedThumb">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">204dp</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+    <style name="MobileSkeletonFeedLineWide">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">15dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginEnd">48dp</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+    <style name="MobileSkeletonFeedLineNarrow">
+        <item name="android:layout_width">180dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/bg_skeleton_block</item>
+    </style>
+
+    <!-- VOIDXDEV(shorts): the vertical player's action column (mobile_shorts_overlay). -->
+    <style name="VoidTubeShortsAction">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:tint">@android:color/white</item>
+    </style>
+    <style name="VoidTubeShortsActionLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:shadowColor">#B3000000</item>
+        <item name="android:shadowRadius">4</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Widget.VoidTube.Loader" parent="android:Widget.Material.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/voidx_loader</item>
+    </style>
+    <style name="Widget.VoidTube.Loader.Large" parent="android:Widget.Material.ProgressBar.Large">
+        <item name="android:indeterminateDrawable">@drawable/voidx_loader</item>
+    </style>
+    <style name="Widget.VoidTube.Loader.Small" parent="android:Widget.Material.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/voidx_loader</item>
+    </style>
+
+    <style name="Widget.VoidTube.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="useMaterialThemeColors">false</item>
+        <item name="android:thumb">@drawable/voidx_switch_thumb</item>
+        <item name="track">@drawable/voidx_switch_track</item>
+        <item name="thumbTint">@null</item>
+        <item name="trackTint">@null</item>
+        <item name="android:background">@null</item>
+    </style>
+    <!-- VOIDXDEV(up-next): the countdown card's three pills. -->
+    <style name="VoidTubeNextButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+</resources>

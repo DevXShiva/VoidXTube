@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One option in a settings choice dialog: radio, label, optional one-line description. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="52dp"
+    android:orientation="horizontal"
+    android:paddingStart="20dp"
+    android:paddingEnd="24dp">
+
+    <RadioButton
+        android:id="@+id/settings_choice_radio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/voidx_radio"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
+
+    <!-- VOIDXDEV(app icon): a preview of the option, when it has one. -->
+    <ImageView
+        android:id="@+id/settings_choice_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/settings_choice_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="16sp"
+            tools:text="Auto (recommended)" />
+
+        <TextView
+            android:id="@+id/settings_choice_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:text="Adjusts to give you the best experience"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

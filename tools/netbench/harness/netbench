@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""netbench entry point. See README.md."""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from nb.cli import main  # noqa: E402
+
+sys.exit(main())

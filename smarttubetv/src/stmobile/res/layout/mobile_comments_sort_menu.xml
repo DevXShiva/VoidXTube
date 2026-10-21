@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(comments-panel): the Top / Newest menu under the panel's sort button (CommentsPanel).
+     Leading check gutter, like the app's other pickers; the chosen order carries the check. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="196dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_comments_menu"
+    android:elevation="8dp"
+    android:orientation="vertical"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <LinearLayout
+        android:id="@+id/comments_sort_top"
+        style="@style/MobileCommentsSortRow">
+
+        <ImageView
+            android:id="@+id/comments_sort_top_check"
+            style="@style/MobileCommentsSortCheck" />
+
+        <LinearLayout style="@style/MobileCommentsSortText">
+
+            <TextView
+                style="@style/MobileCommentsSortTitle"
+                android:text="@string/mobile_comments_sort_top" />
+
+            <TextView
+                style="@style/MobileCommentsSortHint"
+                android:text="@string/mobile_comments_sort_top_hint" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/comments_sort_newest"
+        style="@style/MobileCommentsSortRow">
+
+        <ImageView
+            android:id="@+id/comments_sort_newest_check"
+            style="@style/MobileCommentsSortCheck" />
+
+        <LinearLayout style="@style/MobileCommentsSortText">
+
+            <TextView
+                style="@style/MobileCommentsSortTitle"
+                android:text="@string/mobile_comments_sort_newest" />
+
+            <TextView
+                style="@style/MobileCommentsSortHint"
+                android:text="@string/mobile_comments_sort_newest_hint" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

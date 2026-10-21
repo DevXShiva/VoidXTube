@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NEWTUBE(theme): dark status/navigation-bar icons over the light theme's white bars
+         (values-night: false, the light icons the dark theme always had). -->
+    <bool name="mobile_light_system_bars">true</bool>
+</resources>

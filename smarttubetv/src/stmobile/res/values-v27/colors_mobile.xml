@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NEWTUBE(theme): Android 8.1+ draws dark navigation buttons (windowLightNavigationBar), so
+         the light theme's navigation bar can take the page's white. values-night wins over this. -->
+    <color name="mobile_color_navigation_bar">#FFFFFF</color>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Semi-transparent circle behind the floating mini-player's overlay buttons so the white
+     glyphs stay readable on any video frame. NEWTUBE(motion): with a ripple inside the circle -
+     play/pause and close had no press feedback. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#8A000000" />
+        </shape>
+    </item>
+</ripple>

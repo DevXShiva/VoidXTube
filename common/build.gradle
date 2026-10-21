@@ -1,0 +1,80 @@
+apply from: gradle.ext.sharedModulesConstants
+apply plugin: 'com.android.library'
+
+android {
+    namespace = 'com.liskovsoft.smartyoutubetv2.common'
+
+    // FIX: Default interface methods are only supported starting with Android N (--min-api 24)
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    compileSdk = project.ext.compileSdkVersion
+    testOptions.unitTests.includeAndroidResources = true
+
+    defaultConfig {
+        minSdk = project.ext.minSdkVersion
+        targetSdk = project.ext.targetSdkVersion
+        versionCode 10
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lint {
+        abortOnError = true
+        disable 'MissingTranslation'
+        disable 'MissingQuantity'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:' + appCompatXVersion
+    testImplementation 'junit:junit:' + junitVersion
+    testImplementation 'org.robolectric:robolectric:' + robolectricVersion
+
+    implementation dependencies.project(':sharedutils')
+    implementation dependencies.project(':mediaserviceinterfaces')
+    implementation dependencies.project(':youtubeapi')
+    implementation dependencies.project(':filepicker-lib')
+
+    implementation 'io.reactivex.rxjava3:rxandroid:' + rxAndroidVersion
+    implementation 'io.reactivex.rxjava3:rxjava:' + rxJavaVersion
+
+    // WebProxyDialog's URL tests use okhttp directly. This used to arrive transitively via the
+    // vendored exoplayer-extension-okhttp project (deleted in the phone-only port).
+    implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+
+    implementation 'androidx.media:media:' + mediaXVersion // exoplayer fix
+
+    implementation 'com.github.bumptech.glide:glide:' + glideVersion
+
+    implementation 'androidx.work:work-runtime:' + workVersion
+    implementation 'com.google.guava:guava:' + guavaVersion // Work library deps
+
+    implementation 'androidx.browser:browser:' + browserXVersion
+
+    implementation 'androidx.core:core-ktx:' + kotlinCoreXVersion
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + kotlinxVersion
+
+    implementation 'com.jakewharton:process-phoenix:' + phoenixVersion
+
+    implementation dependencies.project(':appupdatechecker2')
+
+    implementation dependencies.project(':slidableactivity') // https://github.com/r0adkll/Slidr
+}
