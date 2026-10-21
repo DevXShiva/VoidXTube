@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(comments-panel): the Top / Newest menu that grows from the panel's sort button. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/mobile_color_menu_surface" />
+    <corners android:radius="18dp" />
+</shape>

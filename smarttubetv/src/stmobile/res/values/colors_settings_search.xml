@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The search field at the top of Settings (YouTube's light search field). -->
+    <color name="mobile_settings_search_bar">#F2F2F2</color>
+    <!-- The glow over the row a search result opened. -->
+    <color name="mobile_settings_search_highlight">#1F000000</color>
+</resources>

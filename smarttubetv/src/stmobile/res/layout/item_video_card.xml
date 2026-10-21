@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Home-grid video card, YouTube-style: a flat (no box, no elevation) cell whose thumbnail is
+  clipped to rounded corners by the inner MaterialCardView, with title/channel text sitting
+  directly on the window background. The outer card is only the click/ripple container.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/video_card_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/mobile_card_spacing"
+    android:checkable="false"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="@dimen/mobile_card_corner_radius"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- MaterialCardView (a FrameLayout) clips the thumbnail + badge + progress to rounded
+             corners; the watched-progress bar stays inside the rounded shape like YouTube. -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/video_thumbnail_frame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:cardBackgroundColor="@color/mobile_color_placeholder"
+            app:cardCornerRadius="@dimen/mobile_card_corner_radius"
+            app:cardElevation="0dp"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/video_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop" />
+
+            <!-- VOIDXDEV(shorts): a search Short's title sits on its thumbnail, as on YouTube. -->
+            <TextView
+                android:id="@+id/video_short_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@drawable/mobile_player_bottom_scrim"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="2"
+                android:paddingHorizontal="10dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/video_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_video_badge"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="2dp"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="12:34" />
+
+            <ProgressBar
+                android:id="@+id/video_watch_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_gravity="bottom"
+                android:max="100"
+                android:progressBackgroundTint="@color/mobile_color_progress_track"
+                android:progressTint="@color/mobile_color_progress"
+                android:visibility="gone"
+                tools:progress="40"
+                tools:visibility="visible" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- VOIDXDEV(card avatars, issue #6): the channel, like YouTube; a tap opens it. Shown only
+             where the adapter asks for it (feeds and search, not a channel's own page). -->
+        <ImageView
+            android:id="@+id/video_avatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/video_thumbnail_frame" />
+        <!-- VOIDXDEV(collab avatars): a collab's second channel, overlapping the first (shrunk). -->
+        <ImageView
+            android:id="@+id/video_avatar_2"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_collab_avatar_ring"
+            android:padding="2dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/video_avatar"
+            app:layout_constraintTop_toTopOf="@id/video_avatar" />
+        <TextView
+            android:id="@+id/video_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:lineSpacingExtra="2sp"
+            android:maxLines="2"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/video_overflow"
+            app:layout_constraintStart_toEndOf="@id/video_avatar"
+            app:layout_constraintTop_toBottomOf="@id/video_thumbnail_frame"
+            app:layout_goneMarginStart="4dp"
+            tools:text="A great video title that may wrap to two lines" />
+
+        <!-- Overflow = same context menu as card long-press (VideoMenuPresenter: Not interested,
+             Open channel, playlists, ...). Low-contrast so full-width cards stay calm. -->
+        <ImageButton
+            android:id="@+id/video_overflow"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_player_more"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_more_vert"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/video_thumbnail_frame" />
+
+        <!-- One quiet meta line: "Channel · 1.2M views · 3 weeks ago" (falls back to channel). -->
+        <TextView
+            android:id="@+id/video_meta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/video_overflow"
+            app:layout_constraintStart_toEndOf="@id/video_avatar"
+            app:layout_constraintTop_toBottomOf="@id/video_title"
+            app:layout_goneMarginStart="4dp"
+            tools:text="Channel name · 1.2M views · 3 weeks ago" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

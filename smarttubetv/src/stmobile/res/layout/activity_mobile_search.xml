@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Touch Search screen (Wave 4b).
+
+  Toolbar = back arrow + a rounded EditText (IME action = search) + a mic button for
+  voice input. Below the toolbar, a horizontally-scrolling strip of tag SUGGESTION chips
+  (fed live as the user types, via SearchPresenter's MediaServiceSearchTagProvider), and
+  under that a single Material RecyclerView GRID of results (reuses VideoCardAdapter and
+  the same runtime span-count math + onScrollEnd pagination as the Home/Channel grids).
+
+  Drives the unchanged SearchPresenter via the standard MVP seam; this is the touch
+  replacement for the Leanback SearchTagsFragment/SearchTagsActivity.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:id="@+id/mobile_search_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mobile_color_background"
+    android:orientation="vertical">
+
+    <!-- VOIDXDEV(glass): the results scroll under the floating search pill, which frosts them. -->
+    <com.newtube.mobile.ui.common.GlassSource
+        android:id="@+id/mobile_search_glass_source"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mobile_search_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/mobile_title_bar_height"
+            android:paddingHorizontal="@dimen/mobile_card_spacing"
+            android:paddingBottom="@dimen/mobile_card_spacing"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_video_card" />
+
+        <!-- NEWTUBE(motion): results load under card ghosts (the feed's shimmering skeleton), not
+             a centered spinner; only over an empty list (MobileSearchActivity.showProgressBar). -->
+        <include
+            layout="@layout/mobile_feed_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/mobile_title_bar_height"
+            android:visibility="gone" />
+
+        <!-- A search that ends with zero rows used to just... stop (spinner gone, screen
+             blank). Shown by showProgressBar(false) when the grid is empty, worded by
+             SearchLoadState: no connection / couldn't load (both with Try again) / no results. -->
+        <include
+            android:id="@+id/mobile_search_message"
+            layout="@layout/mobile_page_load_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/mobile_title_bar_height" />
+
+        <!-- Suggestions/history: a full-height vertical list OVER the results while the user
+             is editing the query (YouTube-style; was a one-line horizontal chip strip).
+             Empty query = search history (clock rows), typed query = live suggestions. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mobile_search_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mobile_color_background"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/mobile_title_bar_height"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_mobile_search_suggestion"
+            tools:visibility="visible" />
+
+    </FrameLayout>
+
+    </com.newtube.mobile.ui.common.GlassSource>
+
+</LinearLayout>
+
+    <!-- VOIDXDEV(glass): back + a floating liquid-glass search pill (the query, clear and voice
+         inside it) + filters. The results and suggestions scroll under it. -->
+    <LinearLayout
+        android:id="@+id/mobile_search_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mobile_title_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="4dp">
+
+        <ImageButton
+            android:id="@+id/mobile_search_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_back"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_back_arrow" />
+
+        <com.newtube.mobile.ui.common.GlassView
+            android:id="@+id/mobile_search_glass"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:elevation="6dp"
+            app:glassCornerRadius="22dp"
+            app:glassTint="@color/voidx_search_glass_tint">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.newtube.mobile.ui.search.GlowEditText
+                    android:id="@+id/mobile_search_input"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/mobile_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="4dp"
+                    android:singleLine="true"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textColorHint="@color/mobile_color_on_surface_secondary"
+                    android:textCursorDrawable="@drawable/voidx_search_cursor"
+                    android:textSize="18sp" />
+
+                <!-- Clear the query; visible only while the field has text. -->
+                <ImageButton
+                    android:id="@+id/mobile_search_clear"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/mobile_search_clear"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_sheet_close"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <ImageButton
+                    android:id="@+id/mobile_search_mic"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/mobile_search_voice"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_mobile_mic" />
+
+            </LinearLayout>
+
+        </com.newtube.mobile.ui.common.GlassView>
+
+        <!-- VOIDXDEV(search filters): upload date, duration, type, features, sort. -->
+        <ImageButton
+            android:id="@+id/mobile_search_filters"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_search_filters"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_tune" />
+
+    </LinearLayout>
+
+    <!-- Minimizing a video opened from these results keeps playback alive in this overlay. -->
+    <include layout="@layout/mobile_mini_player_overlay" />
+
+</FrameLayout>

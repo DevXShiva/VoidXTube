@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(glass): a glass pill that never has content scrolling under it (header actions, chips,
+     watch-page action buttons), so a tint + hairline reads the same as a live blur. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/voidx_glass_fill" />
+    <stroke android:width="0.5dp" android:color="@color/voidx_glass_stroke" />
+    <corners android:radius="23dp" />
+</shape>

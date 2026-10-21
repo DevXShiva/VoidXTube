@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(seek bar): the pills drawn over the video while it is being sought ("2:10:42  Title",
+     "Release to cancel", "2x"): dark and rounded like YouTube's, the same in both themes since the
+     player stays dark. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#B3000000" />
+    <corners android:radius="100dp" />
+</shape>

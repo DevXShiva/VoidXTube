@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VOIDXDEV(launch): the routing screen's theme; Android 12+ gives it the beating heart
+         (values-v31). -->
+    <style name="Theme.VoidTube.Splash" parent="Theme.NewTube" />
+    <!-- VOIDXDEV(app icon): the splash for the Classic icon (AppIcon.syncSplash, Android 13+). -->
+    <style name="Theme.VoidTube.Splash.Classic" />
+    <style name="Theme.VoidTube.Splash.Fantasy" />
+</resources>

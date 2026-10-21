@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(up-next): the countdown card - dark glass over the video (tint + hairline). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#D9161618" />
+    <stroke android:width="0.5dp" android:color="#33FFFFFF" />
+    <corners android:radius="18dp" />
+</shape>

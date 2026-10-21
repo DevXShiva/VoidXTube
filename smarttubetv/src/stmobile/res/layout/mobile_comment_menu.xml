@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(write-comments): the ⋮ menu of the person's own comment (CommentsPanel), in the look of
+     the Top / Newest menu. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_comments_menu"
+    android:elevation="8dp"
+    android:minWidth="168dp"
+    android:orientation="vertical"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <LinearLayout
+        android:id="@+id/comment_menu_delete"
+        style="@style/MobileCommentsSortRow">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_comment_delete" />
+
+        <TextView
+            style="@style/MobileCommentsSortTitle"
+            android:text="@string/mobile_comments_delete" />
+
+    </LinearLayout>
+
+</LinearLayout>

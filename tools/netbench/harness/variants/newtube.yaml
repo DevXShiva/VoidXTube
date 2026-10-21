@@ -1,0 +1,458 @@
+# NewTube's CURRENT /player request shapes, one per AppClient (MediaServiceCore fork, working tree
+# of 2026-09-28 INCLUDING the uncommitted web-embed-identity changes: WEB_EMBED uses the embed
+# page's visitor + encryptedHostFlags and the Safari UA; supportXhr=false for TV* and embedded).
+#
+# Sources (read-only):
+#   common/helpers/AppClient.kt      client names/versions/UAs/postData, browserName/Version (derived
+#                                    from the UA by extractBrowserInfo - precomputed below)
+#   innertube/utils/Constants.kt     CLIENTS.* and CLIENT_NAME_IDS (note TVHTML5_SIMPLY = 74 here,
+#                                    yt-dlp says 75; the app's value is used)
+#   common/helpers/QueryBuilder.kt   body layout: context{client,user,thirdParty}, playbackContext,
+#                                    racyCheckOk, contentCheckOk, videoId, cpn (Reel wraps the last four
+#                                    in playerRequest); utcOffsetMinutes is a STRING; sts on every client
+#   videoinfo/V2/VideoInfoApiHelper  visitor per client (embed identity for WEB_EMBED)
+#   videoinfo/V2/VideoInfoApi.java   headers: Content-Type, Origin, X-Goog-Visitor-Id, User-Agent,
+#                                    X-Youtube-Client-Name/Version (Reel: no Origin)
+#   RetrofitOkHttpHelper.kt          keyless /player + prettyPrint=false, no Referer on /player;
+#                                    Reel (not a /player path): key + prettyPrint + t, Referer .../tv
+#   DefaultHeaders.kt                UAs; phone sets brotli -> Accept-Encoding "gzip, deflate, br"
+#   Media3SourceFactory (app)        media: Cronet, UA below, Range HEADER (GOOGLEVIDEO_RANGE_QUERY=false)
+#
+# What the host CANNOT reproduce (recorded per attempt, see README "Known gaps"):
+#   * PO tokens. The app sends serviceIntegrityDimensions.poToken (BotGuard, WebView) for WEB, WEB_SAFARI,
+#     MWEB, GEO (and to ANDROID_VR's /player when the player-pot gate is on) and appends pot= to their
+#     media URLs. Here po_token is always none -> WEB-family media 403s are EXPECTED and are not
+#     evidence against those clients on the phone.
+#   * The visitor: the app's Web visitor is the /tv page visitor it persisted (PoTokenProviderImpl reuses
+#     AppService.visitorData). Reproduced as a fresh /tv page fetch (session nt-app, one per trial).
+#   * TLS: the app's InnerTube calls ride OkHttp over Android's Conscrypt; curl_cffi 0.15 has no
+#     OkHttp/Android target. `chrome` is used; pass transport.ja3/akamai captured from the phone to
+#     get closer. Media rides Cronet (= Chrome's stack): media.impersonate chrome is faithful-ish.
+#   * Locale: acceptLanguage/acceptRegion/utcOffsetMinutes come from the device. Fixed here to
+#     en / US / "120" (a phone in Spain in CEST).
+#   * INITIAL is InitialResponseService (watch page ytInitialPlayerResponse), modelled as
+#     endpoint.kind=watch_page; TV_LEGACY is byte-identical to TV on /player (only browse differs), so
+#     it is not repeated.
+#
+# Phone ring today (signed out, MobileMainApplication gates): VISIONOS first, then Web-family
+# fallback WEB, WEB_SAFARI, GEO, MWEB, then ANDROID_VR, ANDROID_REEL, TV, IOS, WEB_EMBED LAST.
+# TV_LEGACY/TV_DOWNGRADED/TV_EMBED/TV_SIMPLY are skipped on the phone (TV fallback trim).
+# tags.ring records that.
+
+x-ua:
+  cobalt_current: &UA_COBALT_CURRENT "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/25.lts.30.1034943-gold (unlike Gecko), Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)"
+  cobalt_downgraded: &UA_COBALT_DOWNGRADED "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version"
+  fire_tv: &UA_FIRE_TV "Mozilla/5.0 (Linux armeabi-v7a; Android 7.1.2; Fire OS 6.0) Cobalt/22.lts.3.306369-gold (unlike Gecko) v8/8.8.278.8-jit gles Starboard/13, Amazon_ATV_mediatek8695_2019/NS6294 (Amazon, AFTMM, Wireless) com.amazon.firetv.youtube/22.3.r2.v66.0"
+  chrome: &UA_CHROME "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+  mobile_chrome: &UA_MOBILE_CHROME "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Mobile Safari/537.36"
+  safari: &UA_SAFARI "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)"
+  visionos: &UA_VISIONOS "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15"
+  tizen: &UA_TIZEN "Mozilla/5.0 (SMART-TV; Linux; Tizen 2.4.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/2.4.0 TV Safari/538.1"
+  android: &UA_ANDROID "com.google.android.youtube/21.26.364 (Linux; U; Android 11) gzip"
+  android_vr: &UA_ANDROID_VR "com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip"
+  ios: &UA_IOS "com.google.ios.youtube/21.26.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)"
+  media: &UA_MEDIA "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+
+defaults:
+  tags:
+    # Explicit cookie policy (astra x-cookie-contract): the app sends its SOCS consent cookie (plus a
+    # stored VISITOR_INFO1_LIVE, not reproduced) on the /tv page fetch, and NO Cookie on /player or media.
+    cookies: "tv-page:SOCS; player:none"
+  identity:
+    # One app identity per trial: the /tv page the app scrapes AppService.visitorData from
+    # (Fire TV UA + the SOCS consent cookie, AppServiceInt.getAppInfo). Every nt-* variant shares it.
+    session: nt-app
+    scope: run
+    pages: [tv]
+    visitor: tv
+    cookies: false
+    pages_config:
+      tv:
+        ua: *UA_FIRE_TV
+        cookies: {SOCS: CAISEwgDEgk5NTA1MzE4OTQaAmVuIAEaBgiA7frSBg}
+        headers: {Accept: null, Accept-Language: null}
+      embed:
+        # YtCfgService.downloadYtCfg(WEB_EMBED): WEB_EMBED's UA (Safari), Referer reddit, no cookies.
+        ua: *UA_SAFARI
+        cookies: {}
+        referer: https://www.reddit.com/
+        headers: {Accept: null, Accept-Language: null}
+  sts: player
+  transport: {impersonate: chrome, http_version: v2}
+  headers:
+    Accept-Encoding: gzip, deflate, br
+  body:
+    context:
+      user: {enableSafetyMode: false, lockedSafetyMode: false}
+    playbackContext:
+      contentPlaybackContext:
+        html5Preference: HTML5_PREF_WANTS
+        lactMilliseconds: 60000
+        isInlinePlaybackNoAd: true
+        signatureTimestamp: ${sts}
+      devicePlaybackCapabilities:
+        supportsVp9Encoding: true
+        supportXhr: true
+    racyCheckOk: true
+    contentCheckOk: true
+    videoId: ${video_id}
+    cpn: ${cpn}
+  media:
+    headers: {User-Agent: *UA_MEDIA}
+    range_mode: header
+    impersonate: chrome
+
+variants:
+  # ---------------------------------------------------------------- phone ring, in ring order
+  - id: nt-VISIONOS
+    description: AppClient.VISIONOS - PREFERRED_FIRST_CLIENT on the phone (no pot, no cipher)
+    tags: {client: visionos, identity: tv-page, capability: supportXhr=true, context: watch, transport: chrome-tls, ring: phone-1}
+    client_name_id: 101
+    client:
+      clientName: VISIONOS
+      clientVersion: "1.02"
+      clientScreen: WATCH
+      userAgent: *UA_VISIONOS
+      browserName: Safari
+      browserVersion: "605.1.15"
+      deviceMake: Apple
+      deviceModel: RealityDevice17,1
+      osName: visionOS
+      osVersion: 26.5.23O471
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+
+  - id: nt-WEB
+    description: AppClient.WEB (the app adds a BotGuard PO token - not reproducible here)
+    tags: {client: web, identity: tv-page, capability: supportXhr=true, context: watch, transport: chrome-tls, ring: phone-2, pot: app-sends}
+    client_name_id: 1
+    client:
+      clientName: WEB
+      clientVersion: 2.20260708.00.00
+      clientScreen: WATCH
+      userAgent: *UA_CHROME
+      browserName: Chrome
+      browserVersion: 147.0.0.0
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+
+  - id: nt-WEB_SAFARI
+    extends: nt-WEB
+    description: AppClient.WEB_SAFARI - WEB with the Safari UA (app adds a PO token)
+    tags: {client: web_safari, ring: phone-3}
+    client:
+      userAgent: *UA_SAFARI
+      browserName: Safari
+      browserVersion: "605.1.15"
+
+  - id: nt-GEO
+    extends: nt-WEB
+    description: AppClient.GEO - WEB + the geo-bypass params (GEO_PARAMS, sent URL-encoded as the app does)
+    tags: {client: web, context: geo-params, ring: phone-4}
+    body:
+      params: CgIQBg%3D%3D
+
+  - id: nt-MWEB
+    description: AppClient.MWEB (app adds a PO token)
+    tags: {client: mweb, identity: tv-page, capability: supportXhr=true, context: watch, transport: chrome-tls, ring: phone-5, pot: app-sends}
+    client_name_id: 2
+    client:
+      clientName: MWEB
+      clientVersion: 2.20260708.05.00
+      clientScreen: WATCH
+      userAgent: *UA_MOBILE_CHROME
+      browserName: Chrome
+      browserVersion: 147.0.0.0
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+
+  - id: nt-ANDROID_VR
+    description: AppClient.ANDROID_VR (Web visitor; the app may add a player PO token when the gate is on)
+    tags: {client: android_vr, identity: tv-page, capability: supportXhr=true, context: watch, transport: chrome-tls, ring: phone-6}
+    client_name_id: 28
+    client:
+      clientName: ANDROID_VR
+      clientVersion: 1.65.10
+      clientScreen: WATCH
+      userAgent: *UA_ANDROID_VR
+      androidSdkVersion: "32"
+      osName: Android
+      osVersion: 12L
+      deviceModel: Quest 3
+      deviceMake: Oculus
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+
+  - id: nt-ANDROID_REEL
+    description: AppClient.ANDROID_REEL - reel_item_watch on youtubei.googleapis.com (keyed, t param, Referer /tv)
+    tags: {client: android, identity: tv-page, capability: supportXhr=true, context: reel, transport: chrome-tls, ring: phone-7}
+    client_name_id: 3
+    client:
+      clientName: ANDROID
+      clientVersion: 21.26.364
+      clientScreen: WATCH
+      userAgent: *UA_ANDROID
+      androidSdkVersion: "30"
+      osName: Android
+      osVersion: "11"
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+    endpoint:
+      host: youtubei.googleapis.com
+      path: /youtubei/v1/reel/reel_item_watch
+      query: {key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8, prettyPrint: "false", t: "${t}"}
+      response_path: playerResponse
+    headers:
+      Origin: null
+      Referer: https://www.youtube.com/tv
+    body:
+      racyCheckOk: null
+      contentCheckOk: null
+      videoId: null
+      cpn: null
+      playerRequest: {racyCheckOk: true, contentCheckOk: true, videoId: "${video_id}", cpn: "${cpn}"}
+
+  - id: nt-TV
+    description: AppClient.TV - TVHTML5 7.x, Cobalt UA, TV-form sts (five digits + 001), supportXhr=false
+    tags: {client: tv, identity: tv-page, capability: supportXhr=false, context: watch, transport: chrome-tls, ring: phone-8}
+    client_name_id: 7
+    sts: player+001
+    client:
+      clientName: TVHTML5
+      clientVersion: 7.20260707.07.00
+      clientScreen: WATCH
+      userAgent: *UA_COBALT_CURRENT
+      browserName: Cobalt
+      browserVersion: 25.lts.30.1034943-gold
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+    body:
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  - id: nt-IOS
+    description: AppClient.IOS (clientName is "iOS" in the app's CLIENTS table; no osName/deviceMake)
+    tags: {client: ios, identity: tv-page, capability: supportXhr=true, context: watch, transport: chrome-tls, ring: phone-9}
+    client_name_id: 5
+    client:
+      clientName: iOS
+      clientVersion: 21.26.4
+      clientScreen: WATCH
+      userAgent: *UA_IOS
+      deviceModel: iPhone16,2
+      osVersion: 18.3.2.22D82
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+
+  - id: nt-WEB_EMBED
+    description: AppClient.WEB_EMBED with the embed identity (working tree) - embed page visitor + its encryptedHostFlags, Safari UA, supportXhr=false, thirdParty reddit
+    tags: {client: web_embedded, identity: embed-page, capability: supportXhr=false, context: embed, transport: chrome-tls, ring: phone-last, cookies: "none"}
+    client_name_id: 56
+    identity:
+      pages: [embed]
+      visitor: embed
+      flags: embed
+    client:
+      clientName: WEB_EMBEDDED_PLAYER
+      clientVersion: 2.20260708.00.00
+      clientScreen: WATCH
+      userAgent: *UA_SAFARI
+      browserName: Safari
+      browserVersion: "605.1.15"
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+    body:
+      context:
+        thirdParty: {embedUrl: https://www.reddit.com/}
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  # ---------------------------------------------------------------- controls / off-ring
+  - id: nt-WEB_EMBED_HEAD
+    extends: nt-WEB_EMBED
+    description: CONTROL - WEB_EMBED as committed at HEAD (before the fix) - Chrome UA, the app visitor with flags from a separately fetched embed page, supportXhr=true. Expected 152-18.
+    tags: {identity: tv-page+embed-flags, capability: supportXhr=true, ring: pre-fix-control}
+    identity:
+      pages: [tv, embed]
+      visitor: tv
+      flags: embed
+    client:
+      userAgent: *UA_CHROME
+      browserName: Chrome
+      browserVersion: 147.0.0.0
+    body:
+      playbackContext.devicePlaybackCapabilities.supportXhr: true
+
+  - id: nt-TV_DOWNGRADED
+    extends: nt-TV
+    description: AppClient.TV_DOWNGRADED - TVHTML5 5.x, Cobalt/Version UA (skipped on the phone; the signed-in head)
+    tags: {client: tv_downgraded, ring: skipped-on-phone}
+    client:
+      clientVersion: "5.20260707"
+      userAgent: *UA_COBALT_DOWNGRADED
+      browserVersion: Version
+
+  - id: nt-TV_TIZEN
+    extends: nt-TV
+    description: AppClient.TV_TIZEN - TVHTML5 5.x as a Samsung Tizen TV, REAL five-digit sts (the app's signed-in bot-wall route; anonymous here)
+    tags: {client: tv_tizen, ring: auth-botwall-route}
+    sts: player
+    client:
+      clientVersion: "5.20260707"
+      userAgent: *UA_TIZEN
+      browserName: Safari
+      browserVersion: "538.1"
+      deviceMake: Samsung
+      deviceModel: SmartTV
+      osName: Tizen
+      osVersion: 2.4.0
+
+  - id: nt-TV_EMBED
+    description: AppClient.TV_EMBED - TVHTML5_SIMPLY_EMBEDDED_PLAYER 2.0, clientScreen EMBED, app visitor + flags from the embed page (upstream lookup), supportXhr=false
+    tags: {client: tv_embedded, identity: tv-page+embed-flags, capability: supportXhr=false, context: embed, transport: chrome-tls, ring: skipped-on-phone}
+    client_name_id: 85
+    identity:
+      pages: [tv, embed]
+      visitor: tv
+      flags: embed
+    client:
+      clientName: TVHTML5_SIMPLY_EMBEDDED_PLAYER
+      clientVersion: "2.0"
+      clientScreen: EMBED
+      userAgent: *UA_FIRE_TV
+      browserName: Cobalt
+      browserVersion: 22.lts.3.306369-gold
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+    body:
+      context:
+        thirdParty: {embedUrl: https://www.reddit.com/}
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  - id: nt-TV_SIMPLY
+    description: AppClient.TV_SIMPLY - TVHTML5_SIMPLY 1.0 (client id 74 in the app's table), real sts, supportXhr=false
+    tags: {client: tv_simply, identity: tv-page, capability: supportXhr=false, context: watch, transport: chrome-tls, ring: skipped-on-phone}
+    client_name_id: 74
+    client:
+      clientName: TVHTML5_SIMPLY
+      clientVersion: "1.0"
+      clientScreen: WATCH
+      userAgent: *UA_FIRE_TV
+      browserName: Cobalt
+      browserVersion: 22.lts.3.306369-gold
+      acceptLanguage: en
+      acceptRegion: US
+      utcOffsetMinutes: "120"
+    body:
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  - id: nt-TV_KIDS
+    extends: nt-TV_SIMPLY
+    description: AppClient.TV_KIDS - TVHTML5_KIDS; the app has no numeric id for it, so no X-YouTube-Client-Name header
+    tags: {client: tv_kids, ring: "off"}
+    client_name_id: null
+    client:
+      clientName: TVHTML5_KIDS
+      clientVersion: 3.20231113.03.00
+
+  - id: nt-ANDROID
+    extends: nt-ANDROID_REEL
+    description: AppClient.ANDROID on plain /player (not in the ring; ANDROID_REEL is)
+    tags: {context: watch, ring: "off"}
+    endpoint:
+      host: www.youtube.com
+      path: /youtubei/v1/player
+      query: {key: null, t: null}
+      response_path: null
+    headers:
+      Origin: https://www.youtube.com
+      Referer: null
+    body:
+      playerRequest: null
+      racyCheckOk: true
+      contentCheckOk: true
+      videoId: ${video_id}
+      cpn: ${cpn}
+
+  - id: nt-ANDROID_SDK_LESS
+    extends: nt-ANDROID
+    description: AppClient.ANDROID_SDK_LESS - ANDROID without androidSdkVersion
+    tags: {client: android, context: no-androidSdkVersion, ring: "off"}
+    client:
+      androidSdkVersion: null
+
+  - id: nt-WEB_MUSIC
+    extends: nt-WEB
+    description: AppClient.WEB_MUSIC - WEB_REMIX on www.youtube.com (not in the ring)
+    tags: {client: web_music, ring: "off"}
+    client_name_id: 67
+    client:
+      clientName: WEB_REMIX
+      clientVersion: 1.20250219.01.00
+
+  - id: nt-WEB_CREATOR
+    extends: nt-WEB
+    description: AppClient.WEB_CREATOR (not in the ring; "Request contains an invalid argument" per AppClient.kt)
+    tags: {client: web_creator, ring: "off"}
+    client_name_id: 62
+    client:
+      clientName: WEB_CREATOR
+      clientVersion: 1.20241203.01.00
+
+  - id: nt-INITIAL
+    description: AppClient.INITIAL - InitialResponseService, the watch page's ytInitialPlayerResponse (plain OkHttp GET; UA approximated with Chrome)
+    tags: {client: web, identity: none, capability: none, context: watch-page, transport: chrome-tls, ring: "off", cookies: "none"}
+    identity: {pages: [], visitor: null}
+    endpoint: {kind: watch_page}
+    user_agent: *UA_CHROME
+    client: {clientName: WEB}
+    headers:
+      Accept-Language: null
+
+  # ---------------------------------------------------------------- inventory priority axes (2026-09-28)
+  # 1) supportXhr: every non-TV client except WEB_EMBED sends devicePlaybackCapabilities.supportXhr=true;
+  #    yt-dlp sends no devicePlaybackCapabilities block at all. WEB_EMBED went from SABR-only to direct
+  #    URLs by flipping it. Siblings: ~xhr-false (the flag false) and ~dpc-absent (whole block removed).
+  #    The same switch is available for ANY variant as `--axis xhr=true,false,absent` (variants/axes.yaml).
+  - {id: nt-WEB~xhr-false, extends: nt-WEB, tags: {capability: supportXhr=false},
+     body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}}
+  - {id: nt-WEB~dpc-absent, extends: nt-WEB, tags: {capability: supportXhr=absent},
+     body: {playbackContext.devicePlaybackCapabilities: null}}
+  - {id: nt-WEB_SAFARI~xhr-false, extends: nt-WEB_SAFARI, tags: {capability: supportXhr=false},
+     body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}}
+  - {id: nt-WEB_SAFARI~dpc-absent, extends: nt-WEB_SAFARI, tags: {capability: supportXhr=absent},
+     body: {playbackContext.devicePlaybackCapabilities: null}}
+  - {id: nt-MWEB~xhr-false, extends: nt-MWEB, tags: {capability: supportXhr=false},
+     body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}}
+  - {id: nt-MWEB~dpc-absent, extends: nt-MWEB, tags: {capability: supportXhr=absent},
+     body: {playbackContext.devicePlaybackCapabilities: null}}
+  - {id: nt-IOS~xhr-false, extends: nt-IOS, tags: {capability: supportXhr=false},
+     body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}}
+  - {id: nt-IOS~dpc-absent, extends: nt-IOS, tags: {capability: supportXhr=absent},
+     body: {playbackContext.devicePlaybackCapabilities: null}}
+  - {id: nt-ANDROID_REEL~xhr-false, extends: nt-ANDROID_REEL, tags: {capability: supportXhr=false},
+     body: {playbackContext.devicePlaybackCapabilities.supportXhr: false}}
+  - {id: nt-ANDROID_REEL~dpc-absent, extends: nt-ANDROID_REEL, tags: {capability: supportXhr=absent},
+     body: {playbackContext.devicePlaybackCapabilities: null}}
+
+  # 2) IOS clientName: the app sends "iOS" (its CLIENTS table); yt-dlp sends "IOS" (+ deviceMake Apple,
+  #    osName iPhone). One variable at a time: only the name here.
+  - id: nt-IOS~name-IOS
+    extends: nt-IOS
+    description: nt-IOS with clientName "IOS" (yt-dlp's spelling) instead of the app's "iOS"
+    tags: {context: clientName=IOS}
+    client: {clientName: IOS}
+
+  # 3) GEO params: the app puts the URL-encoded string "CgIQBg%3D%3D" inside the JSON body. Decoded:
+  - id: nt-GEO~params-decoded
+    extends: nt-GEO
+    description: nt-GEO with params decoded ("CgIQBg==") - the app sends it still URL-encoded
+    tags: {context: geo-params-decoded}
+    body: {params: CgIQBg==}

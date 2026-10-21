@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(shorts): nav icon, selected - the frame filled, the play mark cut out. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M9,1.6h6a4.4,4.4 0,0 1,4.4 4.4v12a4.4,4.4 0,0 1,-4.4 4.4h-6a4.4,4.4 0,0 1,-4.4 -4.4v-12a4.4,4.4 0,0 1,4.4 -4.4zM10.5,9.2v5.6l4.6,-2.8z" />
+</vector>

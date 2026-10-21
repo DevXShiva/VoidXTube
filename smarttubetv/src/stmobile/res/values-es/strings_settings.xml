@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared -->
+    <string name="mobile_settings_restart_needed">Reinicia VoidTube para aplicar este cambio</string>
+    <string name="mobile_settings_restart">Reiniciar</string>
+    <string name="mobile_settings_off">Desactivado</string>
+    <string name="mobile_settings_more">Más</string>
+    <string name="mobile_settings_default_value">%1$s (predeterminado)</string>
+    <string name="mobile_settings_clear">Borrar</string>
+    <string name="mobile_settings_cleared">Borrado</string>
+    <string name="mobile_settings_unavailable">No disponible en este teléfono</string>
+    <plurals name="mobile_settings_minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <plurals name="mobile_settings_hours">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+    <string name="mobile_settings_hours_minutes">%1$d h %2$d min</string>
+
+    <!-- Top level -->
+    <string name="mobile_settings_account">Cuenta</string>
+    <string name="mobile_settings_account_signed_out">Sin iniciar sesión · Inicia sesión para ver tus suscripciones</string>
+    <string name="mobile_settings_account_switch">Cambiar o gestionar cuentas</string>
+    <string name="mobile_settings_group_app">Aplicación</string>
+    <string name="mobile_settings_group_video">Vídeo y audio</string>
+    <string name="mobile_settings_group_other">Otros</string>
+    <string name="mobile_settings_general">General</string>
+    <string name="mobile_settings_general_summary">Idioma, país, búsqueda por voz, reloj</string>
+    <string name="mobile_settings_customize">Personalización</string>
+    <string name="mobile_settings_app_icon">Icono de la app</string>
+    <string name="mobile_app_icon_default">VoidTube (predeterminado)</string>
+    <string name="mobile_app_icon_classic">VoidTube (clásico)</string>
+    <string name="mobile_app_icon_fantasy">VoidTube (fantasía)</string>
+    <string name="mobile_app_icon_pending">Reinicia VoidTube para usar el nuevo icono en todas partes, o cambiará cuando salgas de la app</string>
+    <string name="mobile_settings_customize_summary">Tema, pestañas, diseño de inicio, menú de vídeo</string>
+    <string name="mobile_settings_customize_summary_value">Tema %1$s, pestañas, diseño de inicio, menú de vídeo</string>
+    <string name="mobile_settings_theme_system_short">del sistema</string>
+    <string name="mobile_settings_theme_light_short">claro</string>
+    <string name="mobile_settings_theme_dark_short">oscuro</string>
+    <string name="mobile_settings_feeds">Feeds</string>
+    <string name="mobile_settings_feeds_summary">Vídeos ocultos, títulos, orden de canales</string>
+    <string name="mobile_settings_privacy">Historial y privacidad</string>
+    <string name="mobile_settings_privacy_summary">Historial de reproducciones y de búsqueda</string>
+    <string name="mobile_settings_playback">Reproducción</string>
+    <string name="mobile_settings_playback_summary">Reproducción automática, en segundo plano, velocidad</string>
+    <string name="mobile_settings_quality">Calidad de vídeo</string>
+    <string name="mobile_settings_captions">Subtítulos</string>
+    <string name="mobile_settings_captions_summary">Estilo, tamaño y posición</string>
+    <string name="mobile_settings_sponsorblock_on">Activado · salta patrocinios e intros</string>
+    <string name="mobile_settings_dearrow_both">Mejores títulos y miniaturas</string>
+    <string name="mobile_settings_dearrow_titles_only">Mejores títulos</string>
+    <string name="mobile_settings_dearrow_thumbnails_only">Mejores miniaturas</string>
+    <string name="mobile_settings_backup">Copia de seguridad</string>
+    <string name="mobile_settings_backup_summary">Guarda tus ajustes en un archivo</string>
+    <string name="mobile_settings_advanced">Avanzado</string>
+    <string name="mobile_settings_advanced_summary">Streaming, red y correcciones</string>
+    <string name="mobile_settings_about">Acerca de</string>
+
+    <!-- General -->
+    <string name="mobile_settings_language">Idioma</string>
+    <string name="mobile_settings_country">Ubicación</string>
+    <string name="mobile_settings_start_screen">Pantalla de inicio</string>
+    <string name="mobile_settings_interface_size">Tamaño de la interfaz</string>
+    <string name="mobile_settings_voice_search">Buscar por voz al instante</string>
+    <string name="mobile_settings_voice_search_summary">Al abrir Buscar empieza a escuchar</string>
+    <string name="mobile_settings_24_hour">Usar formato de 24 horas</string>
+    <string name="mobile_settings_24_hour_summary">Para la hora de inicio de estrenos y directos</string>
+    <string name="mobile_settings_liquid_glass">Cristal líquido</string>
+    <string name="mobile_settings_liquid_glass_summary">Lente, brillo y grano en las barras de cristal. Desactivado: un desenfoque esmerilado simple que gasta menos batería</string>
+    <string name="mobile_settings_indian_counts">Cifras en lakh y crore</string>
+    <string name="mobile_settings_indian_counts_summary">Vistas y me gusta como 2.5 lakh y 1.2 crore en vez de 250K y 12M</string>
+
+    <!-- Tabs and feeds -->
+    <string name="mobile_settings_tabs">Pestañas</string>
+    <string name="mobile_settings_tabs_before_search">Pestaña antes de Buscar</string>
+    <string name="mobile_settings_tabs_after_search">Pestaña después de Buscar</string>
+    <string name="mobile_settings_tabs_none">Ninguna</string>
+    <string name="mobile_settings_tabs_bar_note">Inicio, Buscar y Tú siempre están en la barra. Elige la opción de la otra pestaña para intercambiarlas.</string>
+    <string name="mobile_settings_tabs_summary">Elige qué aparece en la barra inferior y en Tú</string>
+    <string name="mobile_settings_nav_labels">Nombres de las pestañas</string>
+    <string name="mobile_settings_nav_labels_summary">Mostrar el nombre de cada pestaña bajo su icono en la barra inferior</string>
+    <string name="mobile_settings_tabs_bottom_bar">Barra inferior</string>
+    <string name="mobile_settings_tabs_you">Tú</string>
+    <string name="mobile_settings_tabs_note">También puedes mantener pulsada una pestaña o una fila de Tú para moverla, renombrarla u ocultarla.</string>
+    <string name="mobile_settings_hidden">Vídeos ocultos</string>
+    <string name="mobile_settings_hidden_none">Nada oculto</string>
+    <plurals name="mobile_settings_hidden_count">
+        <item quantity="one">%d tipo de vídeo oculto</item>
+        <item quantity="other">%d tipos de vídeo ocultos</item>
+    </plurals>
+    <string name="mobile_settings_hidden_watched">Vídeos vistos</string>
+    <string name="mobile_settings_hidden_watched_home">Ocultar vídeos vistos en Inicio</string>
+    <string name="mobile_settings_hidden_watched_subscriptions">Ocultar vídeos vistos en Suscripciones</string>
+    <string name="mobile_settings_hidden_watched_later">Quitar de Ver más tarde los vídeos vistos</string>
+    <string name="mobile_settings_hidden_watched_later_summary">Saca un vídeo de tu lista Ver más tarde cuando lo terminas</string>
+    <string name="mobile_settings_hidden_watched_note">Usa tu historial de YouTube, así que necesita que hayas iniciado sesión.</string>
+    <string name="mobile_settings_hidden_upcoming">Próximos estrenos y directos</string>
+    <string name="mobile_settings_hidden_upcoming_home">Ocultar en Inicio</string>
+    <string name="mobile_settings_hidden_upcoming_subscriptions">Ocultar en Suscripciones</string>
+    <string name="mobile_settings_hidden_upcoming_channels">Ocultar en las páginas de canal</string>
+    <string name="mobile_settings_hidden_live">Directos</string>
+    <string name="mobile_settings_hidden_live_subscriptions">Ocultar directos en Suscripciones</string>
+    <string name="mobile_settings_video_menu">Menú de vídeo</string>
+    <string name="mobile_settings_video_menu_summary">Elige qué ofrece el menú ⋮</string>
+    <string name="mobile_settings_video_menu_note">Lo que ofrece el menú ⋮ de un vídeo y el menú que sale al mantener pulsada una pestaña. Cada opción solo aparece donde tiene sentido.</string>
+    <string name="mobile_settings_menu_play">Reproducir</string>
+    <string name="mobile_settings_menu_queue_add">Añadir a la cola</string>
+    <string name="mobile_settings_menu_save">Guardar</string>
+    <string name="mobile_settings_menu_recent_playlist">Guardar en la última lista usada</string>
+    <string name="mobile_settings_menu_save_playlist">Guardar o quitar la lista</string>
+    <string name="mobile_settings_menu_channel">Canal y recomendaciones</string>
+    <string name="mobile_settings_menu_hide_subscriptions">Ocultar de Suscripciones</string>
+    <string name="mobile_settings_menu_share">Compartir y detalles</string>
+    <string name="mobile_settings_menu_playlists">Listas de reproducción</string>
+    <string name="mobile_settings_menu_tabs">Menú de pestaña</string>
+    <string name="mobile_settings_menu_move_section">Subir y bajar</string>
+    <string name="mobile_settings_menu_usual_order">Orden habitual</string>
+    <string name="mobile_settings_menu_usual_order_summary">Devuelve los elementos del menú a su sitio habitual</string>
+    <string name="mobile_settings_menu_usual_order_done">Orden del menú restaurado</string>
+    <string name="mobile_settings_thumbnails">Miniaturas</string>
+    <string name="mobile_settings_thumbnails_default">La miniatura del autor</string>
+    <string name="mobile_settings_thumbnails_start">Un fotograma del principio del vídeo</string>
+    <string name="mobile_settings_thumbnails_middle">Un fotograma de la mitad del vídeo</string>
+    <string name="mobile_settings_thumbnails_end">Un fotograma del final del vídeo</string>
+    <string name="mobile_settings_original_titles">Títulos originales</string>
+    <string name="mobile_settings_original_titles_summary">Muestra los títulos en su idioma original, no traducidos por YouTube</string>
+    <string name="mobile_settings_channels_order">Orden de Canales en Tú</string>
+    <string name="mobile_settings_channels_order_recent">Vistos recientemente primero</string>
+    <string name="mobile_settings_channels_order_name">De la A a la Z</string>
+    <string name="mobile_settings_channels_order_new">Vídeos nuevos primero</string>
+    <string name="mobile_settings_pinned_channels">Los canales fijados muestran</string>
+    <string name="mobile_settings_pinned_channels_all">La página principal del canal</string>
+    <string name="mobile_settings_pinned_channels_uploads">Solo sus vídeos</string>
+    <string name="mobile_settings_playlists_style">Listas en Tú</string>
+    <string name="mobile_settings_playlists_style_grid">Cada lista</string>
+    <string name="mobile_settings_playlists_style_rows">Todos sus vídeos, uno tras otro</string>
+
+    <!-- History and privacy -->
+    <string name="mobile_settings_watch_history">Historial de reproducciones</string>
+    <string name="mobile_settings_watch_history_auto">Seguir mi ajuste de YouTube</string>
+    <string name="mobile_settings_watch_history_auto_desc">Se guarda si tu cuenta de YouTube guarda el historial</string>
+    <string name="mobile_settings_watch_history_on">Guardar siempre</string>
+    <string name="mobile_settings_watch_history_on_desc">Vuelve a activar tu historial de YouTube cada vez que abres VoidTube</string>
+    <string name="mobile_settings_watch_history_off">No guardar</string>
+    <string name="mobile_settings_watch_history_off_desc">VoidTube deja de contarle a YouTube lo que ves</string>
+    <string name="mobile_settings_clear_watch_history">Borrar historial de reproducciones</string>
+    <string name="mobile_settings_clear_watch_history_summary">Borra de tu historial de YouTube los vídeos que has visto</string>
+    <string name="mobile_settings_clear_watch_history_confirm">¿Borrar el historial de reproducciones?</string>
+    <string name="mobile_settings_clear_watch_history_body">Se borran todos los vídeos de tu historial de YouTube. No se puede deshacer.</string>
+    <string name="mobile_settings_search_history_off">No guardar el historial de búsqueda</string>
+    <string name="mobile_settings_search_history_off_summary">No se guardan ni se sugieren las búsquedas anteriores</string>
+    <string name="mobile_settings_clear_search_history">Borrar historial de búsqueda</string>
+    <string name="mobile_settings_clear_search_history_summary">Borra las búsquedas guardadas en este teléfono</string>
+    <string name="mobile_settings_clear_search_history_confirm">¿Borrar el historial de búsqueda?</string>
+    <string name="mobile_settings_clear_search_history_body">Se borran las búsquedas que VoidTube guardó en este teléfono. No se puede deshacer.</string>
+
+    <!-- Backup -->
+    <string name="mobile_settings_backup_now">Hacer copia ahora</string>
+    <string name="mobile_settings_backup_now_summary">Guarda tus ajustes en %1$s</string>
+    <string name="mobile_settings_backup_done">Copia guardada</string>
+    <string name="mobile_settings_restore">Restaurar</string>
+    <string name="mobile_settings_restore_summary">Desde una copia en %1$s</string>
+    <string name="mobile_settings_auto_backup">Copia automática</string>
+    <string name="mobile_settings_auto_backup_off">Nunca</string>
+    <string name="mobile_settings_backup_note">Una copia guarda todo lo que has configurado en VoidTube. Lo que es de tu cuenta de YouTube, como suscripciones e historial, se queda allí.</string>
+
+    <!-- Playback -->
+    <string name="mobile_settings_video_ends">Al terminar un vídeo</string>
+    <string name="mobile_settings_video_ends_next">Reproducir el siguiente</string>
+    <string name="mobile_settings_video_ends_repeat">Repetir el vídeo</string>
+    <string name="mobile_settings_video_ends_shuffle">Reproducir la lista en orden aleatorio</string>
+    <string name="mobile_settings_video_ends_list">Terminar la lista y parar</string>
+    <string name="mobile_settings_video_ends_reverse">Reproducir la lista al revés</string>
+    <string name="mobile_settings_video_ends_pause">Pausar</string>
+    <string name="mobile_settings_video_ends_close">Cerrar el reproductor</string>
+    <string name="mobile_settings_background">Al salir de la aplicación</string>
+    <string name="mobile_settings_background_pip_desc">El vídeo sigue en una ventana pequeña</string>
+    <string name="mobile_settings_background_audio_desc">Solo sigue sonando el audio</string>
+    <string name="mobile_settings_remember_speed">Recordar la velocidad</string>
+    <string name="mobile_settings_remember_speed_channel">Por canal</string>
+    <string name="mobile_settings_remember_speed_video">Por vídeo</string>
+    <string name="mobile_settings_remember_speed_all">La misma para todos los vídeos</string>
+    <string name="mobile_settings_remember_speed_none">No recordar</string>
+    <string name="mobile_settings_remember_speed_none_desc">Vuelve a 1x cada vez que se inicia VoidTube</string>
+    <string name="mobile_settings_speed_list">Velocidades en Más velocidades</string>
+    <string name="mobile_settings_speed_list_basic">Una lista corta</string>
+    <string name="mobile_settings_speed_list_fine">Pasos finos</string>
+    <string name="mobile_settings_speed_list_finest">Cada 0,05x</string>
+    <string name="mobile_settings_natural_voice">Voz natural a otras velocidades</string>
+    <string name="mobile_settings_natural_voice_summary">Mantiene el tono normal de las voces al acelerar o ralentizar</string>
+    <string name="mobile_settings_sleep_timer">Temporizador</string>
+    <string name="mobile_settings_sleep_timer_summary">Pausa %1$s después de abrir un vídeo</string>
+    <string name="mobile_settings_audio_focus">Pausar con otros sonidos</string>
+    <string name="mobile_settings_audio_focus_summary">Pausa con las llamadas y el audio de otras apps. Se aplica al próximo vídeo que abras</string>
+    <string name="mobile_settings_resume">Continuar</string>
+    <string name="mobile_settings_resume_short">Continuar vídeos cortos</string>
+    <string name="mobile_settings_resume_short_summary">Los vídeos de menos de 6 minutos empiezan desde el principio salvo que esto esté activado</string>
+    <string name="mobile_settings_resume_live">Continuar directos</string>
+    <string name="mobile_settings_resume_live_summary">Retoma un directo donde lo dejaste, no en el punto en directo</string>
+    <string name="mobile_settings_watch_page">Bajo el vídeo</string>
+    <string name="mobile_settings_ambient">Modo ambiente</string>
+    <string name="mobile_settings_ambient_summary">Los colores del vídeo brillan bajo el reproductor y llenan las franjas negras en pantalla completa vertical</string>
+    <string name="mobile_settings_hide_related">Ocultar A continuación</string>
+    <string name="mobile_settings_hide_related_summary">Quita los vídeos relacionados bajo el reproductor</string>
+    <string name="mobile_settings_dislikes">Mostrar los «no me gusta»</string>
+    <string name="mobile_settings_dislikes_summary">De Return YouTube Dislike, que recibe el ID del vídeo</string>
+    <string name="mobile_settings_paid_promotion">Avisarme de promociones pagadas</string>
+    <string name="mobile_settings_paid_promotion_summary">Un aviso breve cuando un vídeo dice que incluye una promoción pagada</string>
+
+    <!-- Video quality -->
+    <string name="mobile_settings_quality_intro">La calidad con la que empiezan los vídeos. Puedes cambiarla para un vídeo desde los ajustes del reproductor.</string>
+    <string name="mobile_settings_default_quality">Calidad predeterminada</string>
+    <string name="mobile_settings_quality_auto">Automática (hasta %1$dp)</string>
+    <string name="mobile_settings_quality_auto_desc">Recomendada. La mejor que permita tu conexión</string>
+    <string name="mobile_settings_quality_up_to">Hasta %1$s</string>
+    <string name="mobile_settings_quality_more_data">Usa más datos</string>
+    <string name="mobile_settings_quality_less_data">Usa menos datos</string>
+    <string name="mobile_settings_quality_data_saver">Ahorra datos</string>
+    <string name="mobile_settings_audio">Audio</string>
+    <string name="mobile_settings_loudness">Igualar el volumen</string>
+    <string name="mobile_settings_loudness_summary">Baja los vídeos muy altos al nivel normal de YouTube</string>
+    <string name="mobile_settings_player_volume">Volumen del reproductor</string>
+    <string name="mobile_settings_quality_data_saver_note">Con el Ahorro de datos de Android activado, VoidTube carga menos por adelantado con datos móviles.</string>
+
+    <!-- Captions -->
+    <string name="mobile_settings_caption_style">Estilo</string>
+    <string name="mobile_settings_caption_size">Tamaño</string>
+    <string name="mobile_settings_caption_position">Distancia desde abajo</string>
+    <string name="mobile_settings_caption_per_channel">Recordar los subtítulos por canal</string>
+    <string name="mobile_settings_caption_per_channel_summary">Los subtítulos que actives vuelven solo en ese canal. Desactivado: tu último idioma de subtítulos te sigue a todos los vídeos</string>
+    <string name="mobile_settings_caption_system">Ajustes de subtítulos de Android</string>
+    <string name="mobile_settings_caption_system_summary">Los usa el estilo Sistema</string>
+    <string name="mobile_settings_captions_note">Activa los subtítulos o elige su idioma con el botón CC del reproductor.</string>
+
+    <!-- SponsorBlock -->
+    <string name="mobile_settings_sponsorblock_summary">Salta las partes de los vídeos que la comunidad ha marcado</string>
+    <string name="mobile_settings_sponsorblock_segments">Cuando empieza una parte</string>
+    <string name="mobile_settings_segment_skip">Saltar</string>
+    <string name="mobile_settings_segment_skip_notify">Saltar y avisar</string>
+    <string name="mobile_settings_segment_ask">Preguntarme</string>
+    <string name="mobile_settings_segment_nothing">No saltar</string>
+    <string name="mobile_settings_segment_marks">Marcas en la barra</string>
+    <string name="mobile_settings_segment_marks_summary">%1$d de %2$d tipos marcados</string>
+    <string name="mobile_settings_segment_marks_note">Las marcas de color en la barra de progreso muestran dónde está cada tipo de parte, aunque no se salte.</string>
+    <string name="mobile_settings_segment_min">No saltar partes de menos de</string>
+    <string name="mobile_settings_segment_once">Saltar cada parte una sola vez</string>
+    <string name="mobile_settings_segment_once_summary">Si vuelves a una parte que se saltó, se reproduce</string>
+    <string name="mobile_settings_segment_alt_server_summary">Pruébalo si dejan de cargarse las partes</string>
+    <string name="mobile_settings_segment_alt_server">Usar el servidor alternativo</string>
+
+    <!-- DeArrow -->
+    <string name="mobile_settings_dearrow_titles">Mejores títulos</string>
+    <string name="mobile_settings_dearrow_titles_summary">Cambia los títulos clickbait por otros que escribió la comunidad</string>
+    <string name="mobile_settings_dearrow_thumbnails">Mejores miniaturas</string>
+    <string name="mobile_settings_dearrow_thumbnails_summary">Cambia las miniaturas por fotogramas que eligió la comunidad</string>
+    <string name="mobile_settings_dearrow_note">DeArrow recibe los ID de los vídeos que ves en las listas.</string>
+
+    <!-- Advanced -->
+    <string name="mobile_settings_advanced_note">La mayoría nunca los necesita. Cambian cómo VoidTube reproduce y se conecta.</string>
+    <string name="mobile_settings_streaming">Streaming</string>
+    <string name="mobile_settings_video_format">Formato de vídeo</string>
+    <string name="mobile_settings_buffer">Búfer</string>
+    <string name="mobile_settings_buffer_low_desc">Unos 25 segundos por adelantado. Usa la menor memoria</string>
+    <string name="mobile_settings_buffer_med_desc">Unos 50 segundos por adelantado</string>
+    <string name="mobile_settings_buffer_high_desc">Hasta 75 segundos por adelantado</string>
+    <string name="mobile_settings_buffer_highest_desc">Hasta 2 minutos por adelantado. Usa la mayor memoria</string>
+    <string name="mobile_settings_stall_quality">Bajar la calidad si no deja de cargar</string>
+    <string name="mobile_settings_stall_quality_summary">Baja un nivel de calidad tras unos 20 segundos cargando. Desactivarlo puede ayudar con una VPN</string>
+    <string name="mobile_settings_high_bitrate">Formatos de alta tasa de bits</string>
+    <string name="mobile_settings_high_bitrate_summary">Añade las versiones 1080p de mayor tasa de bits cuando un vídeo las tiene. Cuesta una petición más</string>
+    <string name="mobile_settings_sabr">Reproducir con SABR (experimental)</string>
+    <string name="mobile_settings_sabr_summary">El protocolo de streaming más nuevo de YouTube, desde el siguiente vídeo. Usa algo menos de datos</string>
+    <string name="mobile_settings_legacy_codecs">Streams de un solo archivo</string>
+    <string name="mobile_settings_legacy_codecs_summary">Reproduce el stream antiguo de un archivo, normalmente 360p, sin cambios de calidad. Solo para teléfonos muy lentos</string>
+    <string name="mobile_settings_live">Directos</string>
+    <string name="mobile_settings_live_edge">Empezar en el punto en directo</string>
+    <string name="mobile_settings_live_edge_summary">Reproduce los directos lo más en vivo posible, sin el margen de 15 segundos</string>
+    <string name="mobile_settings_live_hls">Reproducir directos por HLS</string>
+    <string name="mobile_settings_live_hls_summary">Puede ir más fluido en teléfonos lentos. No puedes retroceder y la calidad llega a 1080p</string>
+    <string name="mobile_settings_player">Reproductor</string>
+    <string name="mobile_settings_controls_on_next">Mostrar los controles en el siguiente vídeo</string>
+    <string name="mobile_settings_controls_on_next_summary">Los controles aparecen cuando empieza el siguiente vídeo</string>
+    <string name="mobile_settings_list_queue">Reproducir la lista desde la que empezaste</string>
+    <string name="mobile_settings_list_queue_summary">Un vídeo abierto desde una lista reproduce el resto tal como la viste</string>
+    <string name="mobile_settings_queue_mode">La cola sigue «Al terminar un vídeo»</string>
+    <string name="mobile_settings_queue_mode_summary">Con Pausar o Cerrar el reproductor, la cola también se para</string>
+    <string name="mobile_settings_chapter_popup">Avisos de capítulo</string>
+    <string name="mobile_settings_chapter_popup_summary">Muestra el nombre de cada capítulo al empezar. Tócalo para pasar al siguiente</string>
+    <string name="mobile_settings_network">Red</string>
+    <string name="mobile_settings_proxy">Proxy web</string>
+    <string name="mobile_settings_proxy_summary">Envía el tráfico de VoidTube a través de un proxy HTTP o SOCKS</string>
+    <string name="mobile_settings_dns">Cómo encontrar los servidores de YouTube</string>
+    <string name="mobile_settings_dns_ipv4">IPv4 primero</string>
+    <string name="mobile_settings_dns_ipv4_desc">La opción predeterminada. Arregla redes con IPv6 roto</string>
+    <string name="mobile_settings_dns_system">El DNS del teléfono</string>
+    <string name="mobile_settings_dns_google">DNS de Google</string>
+    <string name="mobile_settings_conscrypt">Conscrypt</string>
+    <string name="mobile_settings_conscrypt_summary">Una biblioteca de seguridad propia para las conexiones. Puede ayudar donde YouTube está bloqueado, con apps como ByeByeDPI</string>
+    <string name="mobile_settings_accounts">Cuentas</string>
+    <string name="mobile_settings_multi_profiles">Ajustes distintos para cada cuenta</string>
+    <string name="mobile_settings_multi_profiles_summary">Cada cuenta guarda los suyos, empezando por los predeterminados</string>
+    <string name="mobile_settings_legacy_feeds">Feeds antiguos</string>
+    <string name="mobile_settings_legacy_feeds_summary">Carga Suscripciones, canales y listas como la app de YouTube para TV. Pruébalo si salen vacíos</string>
+
+    <!-- About -->
+    <string name="mobile_settings_version">Versión</string>
+    <string name="mobile_settings_update_notify_summary">Te avisa cuando sale una versión nueva</string>
+</resources>

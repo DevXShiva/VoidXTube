@@ -1,0 +1,109 @@
+name: Sync upstream (yashoncode/metube)
+
+# VoidTube tracks its upstream, yashoncode/metube. This workflow checks weekly (and on
+# demand) for new upstream commits and either opens a pull request with them, or — when
+# the histories don't line up (a conflict) — opens an issue asking for a manual merge.
+#
+# It NEVER pushes straight to main, so VoidTube's branding, UI and app id stay under our
+# control and are only changed when a maintainer reviews and merges the PR.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # every Monday, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      UPSTREAM: https://github.com/yashoncode/metube.git
+      UPSTREAM_BRANCH: main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name  "voidtube-bot"
+          git config user.email "voidtube-bot@users.noreply.github.com"
+
+      - name: Fetch upstream and detect changes
+        id: detect
+        run: |
+          git remote add upstream "$UPSTREAM" 2>/dev/null || git remote set-url upstream "$UPSTREAM"
+          git fetch --no-tags upstream "$UPSTREAM_BRANCH"
+          AHEAD=$(git log --oneline HEAD..upstream/$UPSTREAM_BRANCH | wc -l)
+          echo "upstream commits not in HEAD: $AHEAD"
+          echo "ahead=$AHEAD" >> "$GITHUB_OUTPUT"
+          git log --oneline HEAD..upstream/$UPSTREAM_BRANCH > /tmp/upstream-commits.txt || true
+          head -40 /tmp/upstream-commits.txt
+
+      - name: Try to merge upstream
+        id: merge
+        if: steps.detect.outputs.ahead != '0'
+        run: |
+          git checkout -B upstream-sync
+          # --allow-unrelated-histories is needed the first time (this repo was not created
+          # as a GitHub fork of upstream). Later syncs merge normally.
+          if git merge --no-edit --allow-unrelated-histories "upstream/$UPSTREAM_BRANCH"; then
+            echo "clean=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "clean=false" >> "$GITHUB_OUTPUT"
+            git merge --abort || true
+          fi
+
+      - name: Push sync branch
+        if: steps.detect.outputs.ahead != '0' && steps.merge.outputs.clean == 'true'
+        run: git push --force-with-lease origin upstream-sync
+
+      - name: Open / update pull request
+        if: steps.detect.outputs.ahead != '0' && steps.merge.outputs.clean == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base main --head upstream-sync \
+            --title "chore: sync upstream (yashoncode/metube)" \
+            --body "$(cat <<'EOF'
+          Automated sync of new commits from **yashoncode/metube**.
+
+          Please review before merging:
+
+          - Upstream may have changed files we rebranded (strings, colours, icons, README, build config). **Keep VoidTube's branding** — name, app id (`io.github.devxshiva.voidxtube`), the violet theme, the logo, and the Telegram links.
+          - Re-run the branding check / `git diff` on those files if upstream touched them.
+          - The APKs are rebuilt and released only after a `v*` tag.
+          EOF
+          )" \
+          || gh pr comment upstream-sync --body "New upstream commits pushed to this branch." || true
+
+      - name: Open an issue when a manual merge is needed
+        if: steps.detect.outputs.ahead != '0' && steps.merge.outputs.clean == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "Upstream (\`yashoncode/metube\`) has **$(cat /tmp/upstream-commits.txt | wc -l)** new commit(s) that could not be merged automatically (conflict)."
+            echo
+            echo "A maintainer needs to merge them by hand so VoidTube's branding and UI are preserved:"
+            echo
+            echo '```'
+            echo "git remote add upstream https://github.com/yashoncode/metube.git   # once"
+            echo "git fetch upstream main"
+            echo "git merge upstream/main        # resolve conflicts, keeping VoidTube's branding"
+            echo "git push"
+            echo '```'
+            echo
+            echo "Upstream commits:"
+            echo '```'
+            cat /tmp/upstream-commits.txt
+            echo '```'
+          } > /tmp/issue-body.md
+          gh issue create \
+            --title "Upstream sync needs a manual merge ($(date -u +%Y-%m-%d))" \
+            --body-file /tmp/issue-body.md || true

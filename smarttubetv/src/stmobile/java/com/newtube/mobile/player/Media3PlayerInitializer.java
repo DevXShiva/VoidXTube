@@ -1,0 +1,538 @@
+package com.newtube.mobile.player;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.annotation.Nullable;
+import androidx.media3.common.AudioAttributes;
+import androidx.media3.common.C;
+import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.LoadControl;
+import androidx.media3.exoplayer.analytics.PlayerId;
+import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection;
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.upstream.BandwidthMeter;
+
+import com.liskovsoft.sharedutils.helpers.DeviceHelpers;
+import com.liskovsoft.smartyoutubetv2.common.misc.NetPath;
+import com.liskovsoft.smartyoutubetv2.common.prefs.PlayerData;
+import com.liskovsoft.smartyoutubetv2.common.prefs.PlayerTweaksData;
+
+/**
+ * Media3 counterpart of {@code ExoPlayerInitializer} for the touch player. Because this class is
+ * mobile-only, the flavor's tuning (which the legacy initializer received through static overrides
+ * from {@code MobileMainApplication}) is baked in directly:
+ *
+ * <ul>
+ *   <li>steady-state buffer sized by the "Video buffer" setting (see {@link #createPlayer};
+ *       default = the BUFFER_HIGH preset that used to be hardcoded: 50s min / 75s max),</li>
+ *   <li>start gate 0.5s first frame / 1.5s after rebuffer (TTFF fix),</li>
+ *   <li>back-buffer 120s from keyframe with a RAM-clamped byte budget (backward-seek fix),</li>
+ *   <li>ABR up-switch after 5s of stable buffer (the mobile tuning from the legacy round), paired
+ *       with a down-switch window scaled to the chosen buffer preset (see
+ *       {@link #createTrackSelector()}),</li>
+ *   <li>only while saving data (a metered network AND Android Data Saver on for this app, see
+ *       {@link MeteredNetworkMonitor}), a forward-buffer ceiling that grows with watch time
+ *       ({@link MeteredBufferLoadControl}) and a rung cap to the portrait inline box; on any
+ *       network, a small-window rung cap for PiP / the mini card ({@link VideoViewportCap}).</li>
+ * </ul>
+ */
+public class Media3PlayerInitializer {
+
+    // Video-buffer knob (Settings > Player > "Video buffer", PlayerData.getVideoBufferType()),
+    // read at player CREATION - an engine restart applies a change, same semantics as the legacy
+    // engine. ramCap = RAM/18 (196MB fallback), the pre-knob memory backstop.
+    //
+    //   preset    minBuf  maxBuf   byte target
+    //   LOW        20s     30s     min( 48MB, ramCap/4)
+    //   MEDIUM     50s     50s     min( 96MB, ramCap/2)   (min==max: stock ExoPlayer pattern)
+    //   HIGH       50s     75s     min(192MB, ramCap)     <- pre-knob baked values = the default
+    //   HIGHEST    50s    120s     min(288MB, ramCap*1.5 = RAM/12)
+    //
+    // LOW's 30s max sits below the standing 50s min, so its min scales down by the same 2/3
+    // min:max ratio the HIGH pair uses (50/75). Start gate, back-buffer and the time-over-size
+    // priority are shared by all presets.
+    private static final int MIN_BUFFER_MS = 50_000;
+    private static final int MAX_BUFFER_MS = 75_000;
+    private static final int LOW_MIN_BUFFER_MS = 20_000;
+    private static final int LOW_MAX_BUFFER_MS = 30_000;
+    private static final int MEDIUM_MAX_BUFFER_MS = 50_000;
+    private static final int HIGHEST_MAX_BUFFER_MS = 120_000;
+    // TTFF-first startup/seek readiness. Dense-resume ABBA on the Pixel at 1500kbps reduced
+    // visible-picture delay by ~618ms versus 1000ms, with unchanged decoded-first-frame timing.
+    // This spends 500ms of initial cushion; the forward buffer and rebuffer gate stay intact.
+    // 250ms remains a debug comparison until its latency/stability tradeoff is measured.
+    private static final int START_BUFFER_MS = 500;
+    // 1500 beat the old 2500 in every pair of a 5-pair interleaved starve/refill A/B on the
+    // Pixel 9 (pinned 1080p vp9, 800->2400kbps shaping): median stall 3.21s -> 1.71s. The gain
+    // tracks the theoretical refill time of the removed 1000ms of media, so it generalizes.
+    private static final int START_BUFFER_AFTER_REBUFFER_MS = 1_500;
+    /**
+     * VOIDXDEV(oom): 20 s (was 120 s) - two double-tap seeks back stay instant. Further back reads
+     * from the 512 MB disk cache. At 1440p60 (~2.5 MB/s) 120 s alone was ~300 MB of Java heap.
+     */
+    private static final int BACK_BUFFER_MS = 20_000;
+    private static final int MB = 1024 * 1024;
+    private static final int TARGET_BUFFER_BYTES = 192 * MB;
+    private static final int LOW_TARGET_BUFFER_BYTES = 48 * MB;
+    private static final int MEDIUM_TARGET_BUFFER_BYTES = 96 * MB;
+    private static final int HIGHEST_TARGET_BUFFER_BYTES = 288 * MB;
+    private static final int ABR_UP_SWITCH_MS = 5_000;
+
+    // NEWTUBE(buffer-knob): one-time default alignment. Every pre-knob mobile build ran the baked
+    // BUFFER_HIGH preset no matter what the stored pref said, and PlayerData's parse default is
+    // MEDIUM - so an untouched install carries MEDIUM while having always experienced HIGH.
+    // Promote that untouched/dead MEDIUM to HIGH, so wiring the knob changes nothing for existing
+    // installs and the Settings radio finally reflects reality.
+    //   v1 (buffer_default_aligned): the first pass. Until 2026-09 it wrote its flag at once while
+    //      PlayerData persisted HIGH on a 10 s debounce, so a process that died inside that window
+    //      kept MEDIUM with v1 marked done - the owner's Pixel 9 (flag written at first install,
+    //      PlayerData index 12 = 0, "buffer=MEDIUM max=50s") and both test AVDs.
+    //   v2 (buffer_default_aligned_v2): one more pass for everyone still on MEDIUM, since such
+    //      installs cannot be told apart from a deliberate MEDIUM made before the marker below.
+    // From this build on, the Settings / in-player "Video buffer" radio records
+    // PlayerData.KEY_BUFFER_USER_CHOSEN (PlayerData.setVideoBufferTypeByUser): an explicit pick -
+    // including MEDIUM made before the first playback of this build - is never overridden.
+    private static final String PLAYER_PREFS_NAME = PlayerData.NEWTUBE_PLAYER_PREFS;
+    private static final String KEY_BUFFER_DEFAULT_ALIGNED = "buffer_default_aligned";
+    private static final String KEY_BUFFER_DEFAULT_ALIGNED_V2 = "buffer_default_aligned_v2";
+
+    private final Context mContext;
+    private final int mMaxBufferBytes;
+    @Nullable private DefaultPreloadManager.Builder mPreloadManagerBuilder;
+    @Nullable private DefaultTrackSelector mPreloadTrackSelector;
+
+    public Media3PlayerInitializer(Context context) {
+        mContext = context.getApplicationContext();
+
+        long deviceRam = DeviceHelpers.getDeviceRam(mContext);
+        // Same RAM clamp as the legacy initializer (and its negative-overflow guard).
+        long ramCap = deviceRam <= 0 ? 196_000_000 : deviceRam / 18;
+        // VOIDXDEV(oom): media samples live on the JAVA heap (the allocator's byte[]), and that heap
+        // is the app's limit - 512 MB with largeHeap - not the device's RAM: RAM/18 on a 12 GB
+        // phone is 660 MB, which never bound anything, and a 1440p session filled the heap until
+        // the next allocation (returning from PiP) crashed. A third of the heap is the budget.
+        mMaxBufferBytes = (int) Math.min(ramCap, heapBudgetBytes());
+
+        alignBufferDefaultOnce();
+    }
+
+    /** VOIDXDEV(oom): what the media buffers may hold - a third of the Java heap the app may grow to. */
+    static long heapBudgetBytes() {
+        return Runtime.getRuntime().maxMemory() / 3;
+    }
+
+    private void alignBufferDefaultOnce() {
+        SharedPreferences prefs = mContext.getSharedPreferences(PLAYER_PREFS_NAME, Context.MODE_PRIVATE);
+        boolean v1Done = prefs.getBoolean(KEY_BUFFER_DEFAULT_ALIGNED, false);
+        if (v1Done && prefs.getBoolean(KEY_BUFFER_DEFAULT_ALIGNED_V2, false)) {
+            return;
+        }
+        String pass = v1Done ? "v2" : "v1";
+        PlayerData playerData = PlayerData.instance(mContext);
+        if (playerData.getVideoBufferType() != PlayerData.BUFFER_MEDIUM) {
+            markBufferDefaultAligned(prefs);
+            return;
+        }
+        if (prefs.getBoolean(PlayerData.KEY_BUFFER_USER_CHOSEN, false)) {
+            NetPath.log("buffer-default kept=MEDIUM pass=" + pass + " reason=user-chosen");
+            markBufferDefaultAligned(prefs);
+            return;
+        }
+        playerData.setVideoBufferType(PlayerData.BUFFER_HIGH);
+        NetPath.log("buffer-default aligned from=MEDIUM to=HIGH pass=" + pass);
+        // PlayerData persists on a 10 s debounce, so a flag written at once outlives a process that
+        // dies inside that window (a quick first share-link open, a crash) and leaves MEDIUM marked
+        // done - the v1 bug. persistNow() posts the write to this (main) looper; queue the flags
+        // behind it so they can never be saved without the value they vouch for. A lost pair
+        // just retries on the next creation.
+        playerData.persistNow();
+        com.liskovsoft.smartyoutubetv2.common.utils.Utils.post(() -> markBufferDefaultAligned(prefs));
+    }
+
+    /** Both passes at once: a fresh install aligned by v1 has nothing left for v2 to fix. */
+    private static void markBufferDefaultAligned(SharedPreferences prefs) {
+        prefs.edit()
+                .putBoolean(KEY_BUFFER_DEFAULT_ALIGNED, true)
+                .putBoolean(KEY_BUFFER_DEFAULT_ALIGNED_V2, true)
+                .apply();
+    }
+
+    public DefaultTrackSelector createTrackSelector() {
+        // NEWTUBE(abr-window): the DOWN-switch window must scale with the buffer preset. media3
+        // signature (verified against 1.10.1 bytecode - the 4-arg ctor delegates to the 8-arg one
+        // storing minDurationForQualityIncreaseMs, maxDurationForQualityDecreaseMs,
+        // minDurationToRetainAfterDiscardMs, ... in that order):
+        //   Factory(minDurationForQualityIncreaseMs, maxDurationForQualityDecreaseMs,
+        //           minDurationToRetainAfterDiscardMs, bandwidthFraction)
+        // AdaptiveTrackSelection.updateSelectedTrack REFUSES a lower rung while
+        // bufferedDurationUs >= maxDurationForQualityDecreaseUs, so that constant is the point at
+        // which a collapse becomes visible to ABR at all. Leaving it at media3's 25s default while
+        // the presets buffer 50-75s put the threshold BELOW the load control's min buffer: in
+        // steady state (buffer oscillating between min and max) the selector could never consider
+        // a down-switch, and after a bandwidth collapse it stayed blind while the buffer drained.
+        //   HIGH preset, 1080p @2.7Mbps collapsing to a 300kbps link: media drains at
+        //   1 - 0.3/2.7 = 0.89 s of buffer per second, so 75s -> 25s took 50/0.89 = ~56s of blind
+        //   playback (while up-switches stayed eligible after just 5s of buffer).
+        // Scaling it to the MIDPOINT of the preset's own min..max band fixes both ends: the
+        // selector is free to react during normal operation, and the same collapse is seen after
+        // 75s -> 62.5s = 12.5/0.89 = ~14s, with ~70s of buffer still in hand to actually complete
+        // the switch (a down-switch only affects NEWLY loaded chunks - everything already buffered
+        // still plays at the old rung, which is why reacting early matters).
+        //   LOW 20/30s -> 25s (= media3's default), MEDIUM 50/50s -> 50s, HIGH 50/75s -> 62.5s,
+        //   HIGHEST 50/120s -> 85s.
+        BufferPreset preset = resolveBufferPreset();
+
+        // NEWTUBE(viewport): same stock AdaptiveTrackSelection knobs; the subclass only adds the
+        // PiP/mini-card rung cap and the data-saving inline-box cap (VideoViewportCap - a no-op
+        // in fullscreen, or unless metered + Data Saver). The cap is process-wide so it survives
+        // this engine restart's fresh selector.
+        DefaultTrackSelector trackSelector = new DefaultTrackSelector(
+                mContext,
+                new ViewportCappedTrackSelection.Factory(
+                        ABR_UP_SWITCH_MS,
+                        preset.abrDownSwitchWindowMs(),
+                        AdaptiveTrackSelection.DEFAULT_MIN_DURATION_TO_RETAIN_AFTER_DISCARD_MS,
+                        AdaptiveTrackSelection.DEFAULT_BANDWIDTH_FRACTION,
+                        VideoViewportCap.shared()));
+
+        // 1080p Auto ceiling, mobile default; an explicit user pick overrides it (the track
+        // adapter lifts the constraints when pinning a track).
+        trackSelector.setParameters(trackSelector.buildUponParameters()
+                .setMaxVideoSize(1920, 1080)
+                .setExceedVideoConstraintsIfNecessary(true));
+
+        return trackSelector;
+    }
+
+    /**
+     * See the preset table above. Read afresh on every creation so an engine restart (error fix,
+     * in-player buffer pick, next activity open) picks up the current setting - and so the track
+     * selector and the load control of one player are always built from the SAME preset.
+     */
+    private BufferPreset resolveBufferPreset() {
+        int bufferType = PlayerData.instance(mContext).getVideoBufferType();
+        switch (bufferType) {
+            case PlayerData.BUFFER_LOW:
+                return new BufferPreset("LOW", LOW_MIN_BUFFER_MS, LOW_MAX_BUFFER_MS,
+                        Math.min(LOW_TARGET_BUFFER_BYTES, mMaxBufferBytes / 4));
+            case PlayerData.BUFFER_MEDIUM:
+                // min==max, stock ExoPlayer pattern
+                return new BufferPreset("MEDIUM", MEDIUM_MAX_BUFFER_MS, MEDIUM_MAX_BUFFER_MS,
+                        Math.min(MEDIUM_TARGET_BUFFER_BYTES, mMaxBufferBytes / 2));
+            case PlayerData.BUFFER_HIGHEST:
+                // Long math: RAM/12 can exceed Integer.MAX_VALUE on huge-RAM devices; min() first.
+                return new BufferPreset("HIGHEST", MIN_BUFFER_MS, HIGHEST_MAX_BUFFER_MS,
+                        (int) Math.min(HIGHEST_TARGET_BUFFER_BYTES, mMaxBufferBytes * 3L / 2));
+            case PlayerData.BUFFER_HIGH:
+            default: // unknown value -> today's behavior
+                return new BufferPreset("HIGH", MIN_BUFFER_MS, MAX_BUFFER_MS,
+                        Math.min(TARGET_BUFFER_BYTES, mMaxBufferBytes));
+        }
+    }
+
+    /** One row of the preset table: the load-control numbers plus the ABR window derived from them. */
+    private static final class BufferPreset {
+        final String name;
+        final int minBufferMs;
+        final int maxBufferMs;
+        final int targetBufferBytes;
+
+        BufferPreset(String name, int minBufferMs, int maxBufferMs, int targetBufferBytes) {
+            this.name = name;
+            this.minBufferMs = minBufferMs;
+            this.maxBufferMs = maxBufferMs;
+            this.targetBufferBytes = targetBufferBytes;
+        }
+
+        /** See {@link #createTrackSelector()} for why this is the midpoint of the buffer band. */
+        int abrDownSwitchWindowMs() {
+            return (minBufferMs + maxBufferMs) / 2;
+        }
+    }
+
+    /** Build the actual policy separately so readiness/loading boundaries can be tested without a decoder. */
+    DefaultLoadControl createLoadControl() {
+        return createLoadControl(resolveBufferPreset());
+    }
+
+    /**
+     * What the player actually runs: the preset's {@link DefaultLoadControl} behind the
+     * data-saving forward-buffer ceiling (see {@link MeteredBufferLoadControl} - start gate,
+     * rebuffer gate, back buffer and byte budget are pure delegation; unless the network is
+     * metered AND Data Saver is on, the preset runs unchanged). Both halves are built from ONE
+     * preset read.
+     */
+    LoadControl createPlayerLoadControl() {
+        BufferPreset preset = resolveBufferPreset();
+        DefaultLoadControl presetControl = createLoadControl(preset);
+        MeteredNetworkMonitor.start(mContext);
+        NetPath.log("buffer-cap policy " + MeteredNetworkMonitor.describe()
+                + " floor=" + (MeteredBufferLoadControl.PLAYING_FLOOR_US / 1_000_000) + "s+played"
+                + " paused=" + (MeteredBufferLoadControl.PAUSED_TARGET_US / 1_000_000) + "s"
+                + " preset-max=" + (preset.maxBufferMs / 1000) + "s");
+        return new MeteredBufferLoadControl(presetControl, preset.maxBufferMs * 1000L,
+                MeteredNetworkMonitor::shouldSaveData, android.os.SystemClock::elapsedRealtime);
+    }
+
+    private DefaultLoadControl createLoadControl(BufferPreset preset) {
+        int minBufferMs = preset.minBufferMs;
+        int maxBufferMs = preset.maxBufferMs;
+        int targetBufferBytes = preset.targetBufferBytes;
+        String bufferName = preset.name;
+
+        // NEWTUBE(loop-experiment): the post-rebuffer resume gate is runtime-flippable in debug
+        // builds (adb shell setprop debug.arc.rebuffer_gate_ms 1500; engine restart applies it)
+        // so the 2500-vs-1500 A/B runs on ONE build with everything else identical. Release
+        // builds always use the constant.
+        int startBufferMs = START_BUFFER_MS;
+        int startAfterRebufferMs = START_BUFFER_AFTER_REBUFFER_MS;
+        if (com.liskovsoft.smartyoutubetv2.tv.BuildConfig.DEBUG) {
+            // First-frame gate experiments leave the steady-state/outage buffer intact. Bound
+            // accidental property values so debug QA cannot create an invalid load control.
+            startBufferMs = Math.max(250, Math.min(2_000,
+                    DebugMediaShaper.propInt("debug.arc.start_buffer_ms", startBufferMs)));
+            startAfterRebufferMs =
+                    DebugMediaShaper.propInt("debug.arc.rebuffer_gate_ms", startAfterRebufferMs);
+        }
+
+        android.util.Log.d("NetPath", "buffer=" + bufferName + " max=" + (maxBufferMs / 1000) + "s"
+                + " min=" + (minBufferMs / 1000) + "s bytes=" + (targetBufferBytes / MB) + "MB"
+                + " abr-up=" + (ABR_UP_SWITCH_MS / 1000) + "s"
+                + " abr-down=" + (preset.abrDownSwitchWindowMs() / 1000) + "s"
+                + " start-gate=" + startBufferMs + "ms"
+                + (startAfterRebufferMs != START_BUFFER_AFTER_REBUFFER_MS
+                        ? " rebuffer-gate=" + startAfterRebufferMs + "ms" : ""));
+
+        return new DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                        minBufferMs,
+                        maxBufferMs,
+                        startBufferMs,
+                        startAfterRebufferMs)
+                .setBackBuffer(BACK_BUFFER_MS, /* retainBackBufferFromKeyframe= */ true)
+                .setTargetBufferBytes(targetBufferBytes)
+                // Separate from the foreground budget. The sample target is only two seconds;
+                // this is its allocation backstop (an in-flight segment can finish above it).
+                .setPlayerTargetBufferBytes(PlayerId.PRELOAD.name, 4 * MB)
+                // The byte cap above is a memory BACKSTOP only: without this flag the loader stops
+                // at the byte target even below the preset's min (on 2-3GB devices the RAM clamp
+                // binds before the time target -> shorter real buffer -> more rebuffers). With it,
+                // the time thresholds always win; the byte cap only guards pathological memory use.
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build();
+    }
+
+    public ExoPlayer createPlayer(DefaultTrackSelector trackSelector, BandwidthMeter bandwidthMeter) {
+        // VOIDXDEV(shorts): the preloader always exists - a swiped-to short starts from preloaded
+        // samples (Media3PlayerController.prebuildNextSource). Ordinary autoplay-next media stays
+        // the debug experiment it was (preloadEveryNextMedia).
+        return createPlayer(trackSelector, bandwidthMeter, true);
+    }
+
+    /** NewTube's opt-in: every autoplay-next source preloads its media, not only shorts. */
+    static boolean preloadEveryNextMedia() {
+        return (com.liskovsoft.smartyoutubetv2.tv.BuildConfig.DEBUG
+                || com.liskovsoft.smartyoutubetv2.tv.BuildConfig.BENCHMARK)
+                && "1".equals(DebugMediaShaper.prop("debug.arc.next_media_preload"));
+    }
+
+    /** The debug-only offline fixture opts in explicitly without altering any global property. */
+    ExoPlayer createPlayer(DefaultTrackSelector trackSelector, BandwidthMeter bandwidthMeter,
+            boolean enablePreloading) {
+        LoadControl loadControl = createPlayerLoadControl();
+        mPreloadManagerBuilder = null;
+        mPreloadTrackSelector = null;
+
+        DefaultRenderersFactory renderersFactory = new PrerollRenderersFactory(mContext,
+                opusPrerollSkipEnabled())
+                // A blacklisted/failed primary decoder falls back to another instead of erroring
+                // (replaces the legacy BlacklistMediaCodecSelector's job for the common cases).
+                .setEnableDecoderFallback(true);
+
+        // Media3 1.10.1 leaves both parts of deadline-based playback scheduling disabled. The
+        // renderer flag supplies video deadlines on async decoders (the default on API 31+);
+        // the player flag consumes those deadlines instead of polling at a fixed interval.
+        // Keep this a same-build CPU/drop-frame experiment until measured across the Pixel flows.
+        boolean dynamicScheduling = com.liskovsoft.smartyoutubetv2.tv.BuildConfig.DEBUG
+                && "1".equals(DebugMediaShaper.prop("debug.arc.dynamic_scheduling"));
+        renderersFactory.setEnableMediaCodecVideoRendererDurationToProgressUs(dynamicScheduling);
+        NetPath.log("player-scheduling dynamic=" + (dynamicScheduling ? "y" : "n")
+                + " video-deadlines=" + (dynamicScheduling ? "y" : "n"));
+
+        ExoPlayer.Builder playerBuilder = new ExoPlayer.Builder(mContext)
+                .setRenderersFactory(renderersFactory)
+                .setTrackSelector(trackSelector)
+                .setLoadControl(loadControl)
+                .setBandwidthMeter(bandwidthMeter)
+                .experimentalSetDynamicSchedulingEnabled(dynamicScheduling);
+        if (!enablePreloading) {
+            // A disabled prototype must not add a second selector or manager builder to TTFF.
+            ExoPlayer player = playerBuilder.build();
+            setupAudio(player);
+            keepCodecsAcrossOpens(player);
+            return player;
+        }
+
+        // A loaded PreloadMediaSource can transfer its sample queues only on the SAME playback
+        // looper and allocator. Build both owners from one builder, while keeping their mutable
+        // selectors independent: the first factory request creates foreground, the second preload.
+        mPreloadTrackSelector = createTrackSelector();
+        DefaultTrackSelector preloadTrackSelector = mPreloadTrackSelector;
+        boolean[] foregroundSelectorReturned = {false};
+        mPreloadManagerBuilder = new DefaultPreloadManager.Builder(mContext,
+                rank -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(
+                        0, Media3NextPreloader.TARGET_DURATION_MS))
+                .setRenderersFactory(renderersFactory)
+                .setTrackSelectorFactory(context -> {
+                    if (!foregroundSelectorReturned[0]) {
+                        foregroundSelectorReturned[0] = true;
+                        return trackSelector;
+                    }
+                    return preloadTrackSelector;
+                })
+                .setLoadControl(loadControl)
+                .setBandwidthMeter(bandwidthMeter);
+        ExoPlayer player = mPreloadManagerBuilder.buildExoPlayer(playerBuilder);
+
+        setupAudio(player);
+        keepCodecsAcrossOpens(player);
+
+        return player;
+    }
+
+    /**
+     * NEWTUBE(keep-codec): every open on this player - a related tap, autoplay-next, next/previous,
+     * a Home card while the mini player runs, and each 403/transport recovery reload - goes through
+     * {@code Media3PlayerController.resetPlayerState()}: {@code stop()} + {@code clearMediaItems()}
+     * + a new source. With media3's default (foreground mode off), {@code stop()} RESETS the
+     * disabled renderers (ExoPlayerImplInternal.stopInternal: {@code resetRenderers =
+     * forceResetRenderers || !foregroundMode}), which releases the video and audio MediaCodec, so
+     * the next stream creates, configures and starts a new decoder on the playback thread - while
+     * that thread is also the one that must start the first media request after the init segment.
+     *
+     * <p>Foreground mode keeps the disabled renderers' codecs (flushed, on the same persistent
+     * session surface), and the new stream's first format goes through media3's own
+     * {@code canReuseCodec} check: same MIME within the codec's configured max size and color info
+     * reuses it (adaptive reconfiguration), anything else (VP9 -&gt; AV1, a taller portrait video,
+     * HDR) re-creates exactly as before. This is the use media3 documents for the mode: one player,
+     * several items, gaps between a {@code stop()} and the next {@code prepare()}.</p>
+     *
+     * <p>What it does NOT change: fatal renderer errors still force-reset renderers
+     * ({@code stopInternal(true, ...)}), so a broken codec is never carried over; {@code release()}
+     * resets everything. The AudioTrack is still released on every flush (DefaultAudioSink.flush,
+     * media3 1.10.1). Leaving the foreground: background audio disables the video track, and media3
+     * resets every renderer a new selection leaves disabled (ExoPlayerImplInternal.enableRenderers,
+     * not gated by foreground mode), so a playing background-audio player holds no video decoder;
+     * the one leftover - an IDLE player that kept a flushed decoder - is handled by
+     * {@code Media3PlayerController.onBackgroundAudio}.
+     * Proof on the device: {@code decoder reuse +X type=video result=reconfigure|as-is} instead of
+     * {@code decoder init +X type=video initMs=} on the second and later opens of one watch page.
+     * Debug/benchmark A/B switch: {@code debug.arc.keep_codec=0}.</p>
+     */
+    static void keepCodecsAcrossOpens(ExoPlayer player) {
+        boolean keep = keepCodecsEnabled();
+        if (keep) {
+            player.setForegroundMode(true);
+        }
+        NetPath.log("player-codec keep-across-opens=" + (keep ? "y" : "n"));
+    }
+
+    /** Always on in release; debug/benchmark builds can compare with {@code debug.arc.keep_codec=0}. */
+    static boolean keepCodecsEnabled() {
+        return !((com.liskovsoft.smartyoutubetv2.tv.BuildConfig.DEBUG
+                || com.liskovsoft.smartyoutubetv2.tv.BuildConfig.BENCHMARK)
+                && "0".equals(DebugMediaShaper.prop("debug.arc.keep_codec")));
+    }
+
+    /** Always on in release; debug/benchmark builds can compare with {@code debug.arc.opus_preroll=0}. */
+    static boolean opusPrerollSkipEnabled() {
+        return !((com.liskovsoft.smartyoutubetv2.tv.BuildConfig.DEBUG
+                || com.liskovsoft.smartyoutubetv2.tv.BuildConfig.BENCHMARK)
+                && "0".equals(DebugMediaShaper.prop("debug.arc.opus_preroll")));
+    }
+
+    /**
+     * NEWTUBE(opus-preroll): the stock factory, with the stock MediaCodec audio renderer swapped for
+     * {@link OpusPrerollAudioRenderer} (same constructor arguments, same position in the list), so a
+     * seek/resume into an Opus segment stops decoding every packet up to the target. Extension
+     * renderers (none are bundled) keep their stock placement.
+     */
+    static final class PrerollRenderersFactory extends DefaultRenderersFactory {
+        private final boolean mSkipOpusPreroll;
+
+        PrerollRenderersFactory(Context context, boolean skipOpusPreroll) {
+            super(context);
+            mSkipOpusPreroll = skipOpusPreroll;
+        }
+
+        @Override
+        protected void buildAudioRenderers(Context context, int extensionRendererMode,
+                androidx.media3.exoplayer.mediacodec.MediaCodecSelector mediaCodecSelector,
+                boolean enableDecoderFallback, androidx.media3.exoplayer.audio.AudioSink audioSink,
+                android.os.Handler eventHandler,
+                androidx.media3.exoplayer.audio.AudioRendererEventListener eventListener,
+                java.util.ArrayList<androidx.media3.exoplayer.Renderer> out) {
+            if (mSkipOpusPreroll && extensionRendererMode == EXTENSION_RENDERER_MODE_OFF) {
+                // Exactly what the stock method adds in this mode: one MediaCodec audio renderer.
+                out.add(new OpusPrerollAudioRenderer(context, getCodecAdapterFactory(),
+                        mediaCodecSelector, enableDecoderFallback, eventHandler, eventListener,
+                        audioSink));
+                return;
+            }
+            int first = out.size();
+            super.buildAudioRenderers(context, extensionRendererMode, mediaCodecSelector,
+                    enableDecoderFallback, audioSink, eventHandler, eventListener, out);
+            if (!mSkipOpusPreroll) {
+                return;
+            }
+            for (int i = first; i < out.size(); i++) {
+                // Exact class: the stock instance was never enabled, so nothing is registered on the
+                // shared AudioSink yet (MediaCodecAudioRenderer sets its sink listener on enable).
+                if (out.get(i).getClass() == androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.class) {
+                    out.set(i, new OpusPrerollAudioRenderer(context, getCodecAdapterFactory(),
+                            mediaCodecSelector, enableDecoderFallback, eventHandler, eventListener,
+                            audioSink));
+                }
+            }
+        }
+    }
+
+    /** Valid after createPlayer; the controller owns and releases the built manager. */
+    @Nullable
+    public DefaultPreloadManager.Builder getPreloadManagerBuilder() {
+        return mPreloadManagerBuilder;
+    }
+
+    /** Independent mutable parameters, using the same adaptive-selection factory as foreground. */
+    @Nullable
+    public DefaultTrackSelector getPreloadTrackSelector() {
+        return mPreloadTrackSelector;
+    }
+
+    private void setupAudio(ExoPlayer player) {
+        if (PlayerTweaksData.instance(mContext).isAudioFocusEnabled()) {
+            try {
+                player.setAudioAttributes(
+                        new AudioAttributes.Builder()
+                                .setUsage(C.USAGE_MEDIA)
+                                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                                .build(),
+                        /* handleAudioFocus= */ true);
+            } catch (SecurityException e) { // uid not allowed to perform TAKE_AUDIO_FOCUS
+                e.printStackTrace();
+            }
+        }
+
+        // Pause when headphones unplug / bluetooth drops - standard phone behavior.
+        player.setHandleAudioBecomingNoisy(true);
+
+        // VOIDXDEV(background): a partial wake lock + Wi-Fi lock, held by media3 only while playing.
+        // Without them a screen-off stream lost the CPU/Wi-Fi between chunks, ran dry, and the
+        // stalled app was then frozen or killed by the phone's battery manager (realme, 2.9.8).
+        player.setWakeMode(C.WAKE_MODE_NETWORK);
+    }
+}

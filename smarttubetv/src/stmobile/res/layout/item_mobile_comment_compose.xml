@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NEWTUBE(write-comments): the "Add a comment…" row at the top of the comments list (and "Add a
+  reply…" under a replies page's comment). The signed-in person's avatar where a comment's is, and
+  a pill that opens the composer (CommentComposer); signed out, the tap asks to sign in.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="4dp">
+
+    <ImageView
+        android:id="@+id/comment_compose_avatar"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_watch_channel_placeholder" />
+
+    <!-- VOIDXDEV(glass): a liquid-glass pill (see-through tint, grain, specular rim) on the comments
+         sheet's frosted glass, which shows through it. -->
+    <com.newtube.mobile.ui.common.GlassView
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        app:glassCornerRadius="22dp"
+        app:glassOnGlass="true"
+        app:glassTint="@color/voidx_glass_pill_tint">
+
+        <TextView
+            android:id="@+id/comment_compose_field"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:text="@string/mobile_comments_add_hint"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="15sp" />
+
+    </com.newtube.mobile.ui.common.GlassView>
+
+</LinearLayout>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  NEWTUBE(comments-panel): the comments panel (CommentsPanel + CommentsPanelLayout). It covers
+  only the watch page under the video, so the video keeps playing and stays usable while you read.
+  INVISIBLE while closed: laid out, so it opens on the frame after the tap, but it neither draws nor
+  takes touches.
+
+    scrim   - dims the watch page while the sheet slides over it
+    sheet   - header (title + count, Top / Newest, close; back + "Replies" on a replies page),
+              a thin progress line for a sort switch, then the two pages: the comments list and
+              the replies page, which slide past each other on Material's shared X axis.
+-->
+<com.newtube.mobile.ui.playback.CommentsPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_comments_panel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="invisible"
+    tools:visibility="visible">
+
+    <View
+        android:id="@+id/comments_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@android:color/black" />
+
+    <LinearLayout
+        android:id="@+id/comments_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_page_sheet"
+        android:clickable="true"
+        android:focusable="false"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/comments_header"
+            android:layout_width="match_parent"
+            android:layout_height="52dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
+
+                <FrameLayout
+                    android:id="@+id/comments_titles"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:id="@+id/comments_title_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="true"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/comments_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:maxLines="1"
+                            android:text="@string/mobile_comments_title"
+                            android:textColor="@color/mobile_color_on_surface"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/comments_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:fontFeatureSettings="tnum"
+                            android:maxLines="1"
+                            android:textColor="@color/mobile_color_on_surface_secondary"
+                            android:textSize="14sp"
+                            tools:text="1.8K" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/comments_title_replies"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="@string/mobile_comments_replies_title"
+                        android:textColor="@color/mobile_color_on_surface"
+                        android:textSize="18sp"
+                        android:visibility="invisible" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/comments_sort"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_comment_action"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:id="@+id/comments_sort_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/mobile_comments_sort_top"
+                        android:textColor="@color/mobile_color_on_surface_secondary"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/comments_sort_chevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="2dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_watch_expand" />
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/comments_close"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/mobile_comments_close"
+                    android:src="@drawable/ic_sheet_close" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/comments_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="2dp"
+                android:alpha="0"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/mobile_comments_back"
+                android:src="@drawable/ic_mobile_back_arrow"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/comments_hairline"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:alpha="0"
+                android:background="@color/mobile_color_divider" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comments_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp"
+                android:scrollbars="none"
+                tools:listitem="@layout/item_mobile_comment" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comments_replies"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp"
+                android:scrollbars="none"
+                android:visibility="invisible" />
+
+            <include layout="@layout/mobile_page_load_state" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/comments_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="invisible"
+                app:indicatorColor="@color/mobile_color_on_surface"
+                app:trackColor="@android:color/transparent"
+                app:trackCornerRadius="0dp"
+                app:trackThickness="2dp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</com.newtube.mobile.ui.playback.CommentsPanelLayout>

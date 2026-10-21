@@ -1,0 +1,72 @@
+# Worked examples from README.md, plus experiments. Prefix x- = hand-written experiment.
+# Every entry `extends` a seed variant and changes one thing, so a cell difference is attributable.
+# SCOPE RULE (2026-09-28): no variant here may exist to remove or shorten YouTube's enforced pre-roll
+# wait (inline=1, adPlaybackContext, ad-context fields...). The wait is measured (ads.ad_wait_s next
+# to first_ok_after_s) and will be honoured by the app, as yt-dlp and FreeTube do.
+
+variants:
+  # README example 1: the WEB_EMBED identity recipe written out in full. nt-WEB_EMBED already is this;
+  # the copy exists to show every field a new embed-identity variant needs.
+  - id: x-WEB_EMBED-identity
+    extends: nt-WEB_EMBED
+    description: README example 1 - WEB_EMBEDDED_PLAYER with the embed page's visitor AND its encryptedHostFlags (both from one page fetch), sts, Safari UA, supportXhr=false
+    tags: {context: embed, identity: embed-page+flags}
+    identity:
+      session: x-embed          # its own identity: one fresh embed page per trial
+      pages: [embed]            # GET https://www.youtube.com/embed/<id>?html5=1 (Referer reddit)
+      visitor: embed            # -> context.client.visitorData + X-Goog-Visitor-Id
+      flags: embed              # -> playbackContext.contentPlaybackContext.encryptedHostFlags
+    sts: player                 # signatureTimestamp from the run's player JS
+    body:
+      context.thirdParty.embedUrl: https://www.reddit.com/
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  # README example 2: hypothetical "MWEB with supportXhr=false".
+  - id: x-MWEB-xhr-false
+    extends: nt-MWEB
+    description: README example 2 - NewTube's MWEB request with devicePlaybackCapabilities.supportXhr=false
+    tags: {capability: supportXhr=false}
+    body:
+      playbackContext.devicePlaybackCapabilities.supportXhr: false
+
+  # yt-dlp's embedded test "embedable only with clientScreen=EMBED": NewTube sends WATCH.
+  - id: x-WEB_EMBED-screen-EMBED
+    extends: nt-WEB_EMBED
+    description: nt-WEB_EMBED with clientScreen=EMBED
+    tags: {context: embed+clientScreen=EMBED}
+    client: {clientScreen: EMBED}
+
+  # inventory-external (b)0: the complete yt-dlp-shaped WEB_EMBED request, but with the embed page
+  # fetched PER VIDEO and its own visitor (no watch page), no devicePlaybackCapabilities,
+  # no isInlinePlaybackNoAd / lactMilliseconds - the baseline the other embed arms compare to.
+  - id: x-WEB_EMBED-ytdlp-shape-per-video
+    extends: ytdlp-web_embedded
+    description: yt-dlp-shaped web_embedded, embed page per video, visitor = the embed page's own
+    tags: {identity: embed-page-per-video}
+    identity:
+      session: x-embed-per-video
+      scope: video
+      pages: [embed]
+      visitor: embed
+      flags: embed
+      context: embed
+      visitor_in_body: true
+      cookies: false
+
+  # inventory-external (b)7: WEB_KIDS, "pending validation" in innertubex.
+  - id: x-WEB_KIDS
+    extends: nt-WEB
+    description: WEB_KIDS 2.20260205.00.00 (client id 76) on NewTube's WEB shape
+    tags: {client: web_kids, pot: none}
+    client_name_id: 76
+    client: {clientName: WEB_KIDS, clientVersion: 2.20260205.00.00}
+
+  # inventory-external (b)3: TVHTML5 5.x with the REAL five-digit sts and upstream's old Cobalt UA.
+  - id: x-TV_DOWNGRADED-realsts-oldcobalt
+    extends: nt-TV_DOWNGRADED
+    description: TV_DOWNGRADED with the real 5-digit sts and the DirectFB Cobalt 4 UA (SmartTube upstream 09-08)
+    tags: {client: tv_downgraded, sts: player}
+    sts: player
+    client:
+      userAgent: "Mozilla/5.0 (DirectFB; Linux x86_64) Cobalt/4.13031-qa (unlike Gecko) Starboard/1"
+      browserVersion: 4.13031-qa

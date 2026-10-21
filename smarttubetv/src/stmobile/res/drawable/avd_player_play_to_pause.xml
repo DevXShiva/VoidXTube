@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(motion): the center button's play glyph morphing into pause, YouTube-style. Both ends
+     are exactly ic_player_play / ic_player_pause, drawn as two quads each (the triangle split down
+     its middle) so the path can morph point for point. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="36dp"
+            android:height="36dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:name="glyph"
+                android:fillColor="#FFFFFFFF"
+                android:pathData="@string/path_player_play" />
+        </vector>
+    </aapt:attr>
+    <target android:name="glyph">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="@integer/mobile_player_glyph_morph_ms"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="pathData"
+                android:valueFrom="@string/path_player_play"
+                android:valueTo="@string/path_player_pause"
+                android:valueType="pathType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

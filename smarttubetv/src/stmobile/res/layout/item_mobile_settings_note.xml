@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A short explanation under the rows it is about. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_note_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/mobile_settings_row_inset"
+    android:paddingTop="8dp"
+    android:paddingEnd="@dimen/mobile_settings_row_inset"
+    android:paddingBottom="12dp"
+    android:lineSpacingMultiplier="1.1"
+    android:textColor="@color/mobile_color_on_surface_secondary"
+    android:textSize="13sp"
+    tools:text="These only change what NewTube shows you; nothing is removed from YouTube." />

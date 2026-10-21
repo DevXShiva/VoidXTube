@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(glass): the lit tab takes the accent, the rest sit at 68% (floating glass design).
+     The outline->filled icon swap (ic_nav_* state lists) still marks the active tab too. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/mobile_color_primary" android:state_checked="true" />
+    <item android:color="@color/voidx_nav_inactive" />
+</selector>

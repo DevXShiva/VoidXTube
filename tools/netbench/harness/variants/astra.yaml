@@ -1,0 +1,47 @@
+# Compatibility arms from the Codex astra review (../novel/astra.md, 2026-09-28). All derive from a
+# cookie-free, page-free control built on nt-VISIONOS; compare each arm with x-public-control, not with
+# nt-VISIONOS (different identity). Ordinary public content only; none touches ad or access fields.
+variants:
+  - id: _x-public-base
+    extends: nt-VISIONOS
+    description: Cookie-free ordinary-content compatibility control (no identity page, no visitor)
+    tags: {identity: none, cookies: "none", source: astra}
+    identity:
+      pages: []
+      visitor: null
+      flags: null
+      context: null
+      cookies: false
+      page_cookie_jar: false
+      page_cookies: null
+      pages_config: null
+    headers:
+      Cookie: null
+
+  - id: x-public-control
+    extends: _x-public-base
+    description: Unmodified request fields for comparison with the four arms
+
+  - id: x-browser-version
+    extends: _x-public-base
+    description: "Speculative: browserVersion matches the VISIONOS UA's Version/26.0 instead of the WebKit build"
+    tags: {context: browserVersion=26.0}
+    client_overrides: {browserVersion: "26.0"}
+
+  - id: x-offset-number
+    extends: _x-public-base
+    description: "Speculative: numeric utcOffsetMinutes (the app sends a string)"
+    tags: {context: utcOffsetMinutes-number}
+    client_overrides: {utcOffsetMinutes: 120}
+
+  - id: x-local-context
+    extends: _x-public-base
+    description: "Speculative: English UI in Spain, September 2026 (consistent locale fields)"
+    tags: {context: locale-en-ES}
+    client_overrides: {hl: en, gl: ES, acceptLanguage: en, acceptRegion: ES, timeZone: Europe/Madrid, utcOffsetMinutes: 120}
+
+  - id: x-player-identity-encoding
+    extends: _x-public-base
+    description: "Speculative: isolate player-response decompression (Accept-Encoding: identity on /player)"
+    tags: {transport: identity-encoding}
+    headers: {Accept-Encoding: identity}

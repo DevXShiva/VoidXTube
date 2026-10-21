@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(search filters): one Features toggle. -->
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.MaterialComponents.Chip.Filter"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="@color/mobile_color_on_surface"
+    app:checkedIconTint="@color/mobile_color_on_surface"
+    app:chipBackgroundColor="@color/mobile_search_filter_chip_bg" />

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick fade used when Browse is surfaced by ordinary navigation. Interactive player minimize
+     overrides the window transition because Browse is already visible beneath the dragged video. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:anim/decelerate_interpolator">
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"
+        android:duration="160" />
+</set>

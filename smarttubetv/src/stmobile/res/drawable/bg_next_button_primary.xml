@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(up-next): Play now - the white main-action pill. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33000000">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F5F5F7" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</ripple>

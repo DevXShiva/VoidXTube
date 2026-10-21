@@ -1,0 +1,2058 @@
+[
+  {
+    "id": "jNQXAC9IVRw",
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "category": "ordinary",
+    "subcategory": "vlog",
+    "title": "Me at the zoo",
+    "channel": "jawed",
+    "duration_s": 19,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=14 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=16 adaptive_usable=16 progressive_usable=0 url=16 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 24
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 24
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "First YouTube upload (2005); 240p max. Control for \"everything works\".; max 240p15 SDR; protocols {'m3u8_native': 8, 'https': 16}; channel subscribers ~6,630,000",
+    "verified_at": "2026-09-28T16:09:40Z"
+  },
+  {
+    "id": "5KLPxDtMqe8",
+    "url": "https://www.youtube.com/watch?v=5KLPxDtMqe8",
+    "category": "ordinary",
+    "subcategory": "tech-science",
+    "title": "Your Brain is Plastic",
+    "channel": "SciShow",
+    "duration_s": 248,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 42,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=30 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=28 adaptive_usable=28 progressive_usable=0 url=28 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 42
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 42
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "SciShow explainer; yt-dlp test fixture.; max 1080p24 SDR; protocols {'m3u8_native': 14, 'https': 28}; channel subscribers ~8,420,000",
+    "verified_at": "2026-09-28T16:11:01Z"
+  },
+  {
+    "id": "kJQP7kiw5Fk",
+    "url": "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+    "category": "ordinary",
+    "subcategory": "vevo-music-video",
+    "title": "Luis Fonsi - Despacito ft. Daddy Yankee",
+    "channel": "Luis Fonsi",
+    "duration_s": 282,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 40,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=24 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=25 adaptive_usable=25 progressive_usable=0 url=25 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 40
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 40
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Despacito, uploaded via LuisFonsiVEVO (channel now shows as \"Luis Fonsi\").; max 1080p24 SDR; protocols {'m3u8_native': 15, 'https': 25}; channel subscribers ~32,600,000",
+    "verified_at": "2026-09-28T16:10:24Z"
+  },
+  {
+    "id": "dQw4w9WgXcQ",
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "category": "ordinary",
+    "subcategory": "official-music-video",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "channel": "Rick Astley",
+    "duration_s": 213,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 45,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=27 adaptive_usable=27 progressive_usable=0 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 44
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 44,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Also the \"ordinary video\" check in issue5/findings.md (WEB_EMBED with encryptedHostFlags returned 26 formats).; max 2160p25 SDR; protocols {'m3u8_native': 17, 'https': 28}; channel subscribers ~4,550,000",
+    "verified_at": "2026-09-28T16:10:39Z"
+  },
+  {
+    "id": "0e3GPea1Tyg",
+    "url": "https://www.youtube.com/watch?v=0e3GPea1Tyg",
+    "category": "ordinary",
+    "subcategory": "dubbed-multi-audio",
+    "title": "$456,000 Squid Game In Real Life!",
+    "channel": "MrBeast",
+    "duration_s": 1541,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 200,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=122 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=138 adaptive_usable=138 progressive_usable=0 url=138 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 200
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 200
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "MrBeast; many dubbed audio tracks (see audio languages). CoComelon e_04ZrNroTo also carries dubs.; audio languages: ar, bn, de, en-US, es, fr, hi, id, it, ja, ko, ml, mr, pa, pl, pt, ru, ta, te, th, tr, vi, zh-Hans, zh-Hant; max 1080p24 SDR; protocols {'m3u8_native': 62, 'https': 138}; channel subscribers ~518,000,000",
+    "verified_at": "2026-09-28T16:11:17Z"
+  },
+  {
+    "id": "_WB5hh7WOb4",
+    "url": "https://youtu.be/_WB5hh7WOb4",
+    "category": "made_for_kids",
+    "subcategory": "RO / Cip-Cirip (issue #5)",
+    "title": "🐵 Cinci Maimuțele | Cântecel Vesel pentru Copii | Dansul Maimuțelor cu Banane 🌴🍌 | Cip-Cirip",
+    "channel": "Cip-Cirip - Cantece si desene animate pentru copii",
+    "duration_s": 132,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 33,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=1 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 33
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 33
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": "GitHub issue #5 \"Unknown source error\" (newtube-launch/issue5/findings.md): NewTube ring of 9 clients all fail signed out. yt-dlp plays it ONLY through web_embedded.",
+    "hls_formats_listed": true,
+    "notes": "max 2160p30 SDR; protocols {'https': 27, 'm3u8_native': 6}; channel subscribers ~51,000",
+    "verified_at": "2026-09-28T16:05:15Z"
+  },
+  {
+    "id": "e_04ZrNroTo",
+    "url": "https://www.youtube.com/watch?v=e_04ZrNroTo",
+    "category": "made_for_kids",
+    "subcategory": "US / CoComelon",
+    "title": "Wheels on the Bus | @CoComelon Nursery Rhymes & Kids Songs",
+    "channel": "Cocomelon - Nursery Rhymes",
+    "duration_s": 229,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 75,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=38 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=38 adaptive_usable=38 progressive_usable=1 url=0 cipher=39 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 75
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 75
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Also has dubbed audio (es-419, es-MX, ja, pt-BR). web_embedded formats are all signatureCipher (no plain url).; audio languages: en, es-419, es-MX, ja, pt-BR; max 1080p24 SDR; protocols {'https': 39, 'm3u8_native': 36}; channel subscribers ~203,000,000",
+    "verified_at": "2026-09-28T16:12:03Z"
+  },
+  {
+    "id": "9DqETNOlcDE",
+    "url": "https://www.youtube.com/watch?v=9DqETNOlcDE",
+    "category": "made_for_kids",
+    "subcategory": "UK / Peppa Pig Official",
+    "title": "A Trip to the Animal Zoo 🦁 | Peppa Pig Official Full Episodes",
+    "channel": "Peppa Pig - Official Channel",
+    "duration_s": 7272,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 33,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=30 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=1 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 33
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 33
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "2 h full-episode compilation.; max 1080p25 SDR; protocols {'https': 27, 'm3u8_native': 6}; channel subscribers ~44,700,000",
+    "verified_at": "2026-09-28T16:12:39Z"
+  },
+  {
+    "id": "pZw9veQ76fo",
+    "url": "https://www.youtube.com/watch?v=pZw9veQ76fo",
+    "category": "made_for_kids",
+    "subcategory": "CA / Super Simple Songs",
+    "title": "Five Little Ducks | Kids Songs | Super Simple Songs",
+    "channel": "Super Simple Songs - Kids Songs",
+    "duration_s": 174,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 35,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=22 progressive_usable=1 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 35
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 35
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Canadian kids channel.; max 1080p24 SDR; protocols {'https': 23, 'm3u8_native': 12}; channel subscribers ~47,000,000",
+    "verified_at": "2026-09-28T16:13:15Z"
+  },
+  {
+    "id": "717IVcyUrNE",
+    "url": "https://www.youtube.com/watch?v=717IVcyUrNE",
+    "category": "made_for_kids",
+    "subcategory": "ES / Cleo y Cuquin (Familia Telerin)",
+    "title": "Cinco patitos 🦆  Canciones infantiles con Cleo y Cuquín",
+    "channel": "Cleo y Cuquin - Canciones infantiles",
+    "duration_s": 137,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 23,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=22 progressive_usable=1 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 23
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Spanish kids channel.; max 1080p25 SDR; protocols {'https': 23}; channel subscribers ~17,900,000",
+    "verified_at": "2026-09-28T16:14:33Z"
+  },
+  {
+    "id": "XqZsoesa55w",
+    "url": "https://www.youtube.com/watch?v=XqZsoesa55w",
+    "category": "made_for_kids",
+    "subcategory": "KR / Pinkfong Baby Shark",
+    "title": "Baby Shark Dance | #babyshark Most Viewed Video | Animal Songs | PINKFONG Songs for Children",
+    "channel": "Baby Shark - Pinkfong Kids’ Songs & Stories",
+    "duration_s": 136,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 23,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=22 progressive_usable=1 url=0 cipher=23 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 23
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Most-viewed video on YouTube. web_embedded formats are all signatureCipher.; max 1080p30 SDR; protocols {'https': 23}; channel subscribers ~85,200,000",
+    "verified_at": "2026-09-28T16:14:33Z"
+  },
+  {
+    "id": "wGltuo1B1sM",
+    "url": "https://youtu.be/wGltuo1B1sM",
+    "category": "made_for_kids",
+    "subcategory": "RO / Siaris Kids (small, ~700 subscribers)",
+    "title": "🍂 Toamna a Venit! Cele Mai Frumoase Cântece de Toamnă pentru Copii | Colaj Siaris Kids",
+    "channel": "Siaris Kids",
+    "duration_s": 760,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 25,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=24 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=24 adaptive_usable=24 progressive_usable=1 url=25 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 25
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 25
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": "issue #5 check on the Pixel over LTE (issue5/pixel/b-kids2-lte.log): VISIONOS..IOS (9 clients) all unusable, the 10th, WEB_EMBED, played with 24 usable formats. Small/independent kids channel.",
+    "hls_formats_listed": false,
+    "notes": "max 2160p30 SDR; protocols {'https': 25}; channel subscribers ~699",
+    "verified_at": "2026-09-28T16:14:33Z"
+  },
+  {
+    "id": "Fc5aA77Nlf0",
+    "url": "https://www.youtube.com/watch?v=Fc5aA77Nlf0",
+    "category": "made_for_kids",
+    "subcategory": "RO / TraLaLa",
+    "title": "Cățelul Bingo - Cântece cu animale pentru copii | TraLaLa",
+    "channel": "TraLaLa - Cantece si desene animate pentru copii",
+    "duration_s": 1434,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 23,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=22 progressive_usable=1 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 23
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": "issue #5 emulator repro (issue5/emu_signedout.log, emu_webembed.log): failed like _WB5hh7WOb4.",
+    "hls_formats_listed": false,
+    "notes": "max 1080p24 SDR; protocols {'https': 23}; channel subscribers ~7,800,000",
+    "verified_at": "2026-09-28T16:14:33Z"
+  },
+  {
+    "id": "WaOKSUlf4TM",
+    "url": "https://www.youtube.com/watch?v=WaOKSUlf4TM",
+    "category": "age_restricted",
+    "subcategory": "embeddable 18+ (web_embedded bypass works)",
+    "title": "Assassin’s Creed Valhalla: Story Trailer | Ubisoft [NA]",
+    "channel": "Assassin's Creed",
+    "duration_s": 148,
+    "made_for_kids": null,
+    "age_limit": 18,
+    "live_status": "not_live",
+    "availability": "needs_auth",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 33,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=1 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 33
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 33
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "yt-dlp fixture labelled \"multiple audio streams\", but it is an 18+ trailer now; only web_embedded formats (en audio only). Expect most clients to fail.; max 2160p30 SDR; protocols {'https': 27, 'm3u8_native': 6}; channel subscribers ~459,000",
+    "verified_at": "2026-09-28T16:11:33Z"
+  },
+  {
+    "id": "HtVdAasjOgU",
+    "url": "https://www.youtube.com/watch?v=HtVdAasjOgU",
+    "category": "age_restricted",
+    "subcategory": "embeddable 18+ (web_embedded bypass works)",
+    "title": "The Witcher 3: Wild Hunt - The Sword Of Destiny Trailer",
+    "channel": "The Witcher",
+    "duration_s": 142,
+    "made_for_kids": null,
+    "age_limit": 18,
+    "live_status": "not_live",
+    "availability": "needs_auth",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 27,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=1 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 27
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 27
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "yt-dlp fixture \"Embed allowed age-gated video; works with web_embedded\". Only web_embedded formats.; max 1080p30 SDR; protocols {'https': 27}; channel subscribers ~611,000",
+    "verified_at": "2026-09-28T16:24:45Z"
+  },
+  {
+    "id": "qkO6iBwcoe4",
+    "url": "https://www.youtube.com/watch?v=qkO6iBwcoe4",
+    "category": "age_restricted",
+    "subcategory": "non-bypassable 18+",
+    "title": "Rammstein - ''Pussy'' - (OFFICIAL VIDEO) -  [FIXED AUDIO] - (English CC)",
+    "channel": "Eliass Kevrelis",
+    "duration_s": 242,
+    "made_for_kids": null,
+    "age_limit": 18,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm your age",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "UNPLAYABLE",
+        "reason": "Sorry, this content is age-restricted",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Sign in to confirm your age. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies",
+    "playable_in_embed": null,
+    "available_countries": "248 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": "HANDOFF.md section 6: \"Age-gated test video used across rounds\" (Rammstein, [FIXED AUDIO] re-upload). web_embedded answers \"Sorry, this content is age-restricted\".",
+    "hls_formats_listed": false,
+    "notes": "",
+    "verified_at": "2026-09-28T16:24:45Z"
+  },
+  {
+    "id": "MgNrAu2pzNs",
+    "url": "https://www.youtube.com/watch?v=MgNrAu2pzNs",
+    "category": "music",
+    "subcategory": "topic-art-track",
+    "title": "Voyeur Girl",
+    "channel": "Stephen",
+    "duration_s": 169,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 23,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=23 adaptive_usable=23 progressive_usable=0 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 23
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "123 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Auto-generated art track (\"Stephen - Topic\", \"Provided to YouTube by ...\", also at music.youtube.com/watch?v=MgNrAu2pzNs). yt-dlp reports channel \"Stephen\". Probed via the www watch URL.; max 1080p25 SDR; protocols {'https': 23}; channel subscribers ~226,000",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "XclachpHxis",
+    "url": "https://music.youtube.com/watch?v=XclachpHxis",
+    "category": "music",
+    "subcategory": "ytm-art-track (premium-style)",
+    "title": "Firefly",
+    "channel": "Jim Yosef - Topic",
+    "duration_s": 257,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "Video unavailable",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Video unavailable",
+    "playable_in_embed": null,
+    "available_countries": null,
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Jim Yosef - Topic \"Firefly\"; yt-dlp fixture \"Requires Premium: has format 141 when requested using YTM url\". Signed out now \"This video is not available\" (visionos) / \"Video unavailable\" (web). No availableCountries in microformat. Good test for WEB_REMIX / YTM clients.",
+    "verified_at": "2026-09-28T16:24:45Z"
+  },
+  {
+    "id": "5yx6BWlEVcY",
+    "url": "https://www.youtube.com/watch?v=5yx6BWlEVcY",
+    "category": "live",
+    "subcategory": "24/7 livestream (Chillhop Radio)",
+    "title": "Chillhop Radio - jazzy & lofi hip hop beats 🐾 2026-09-28 18:17",
+    "channel": "Chillhop Music",
+    "duration_s": 0,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "is_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 14,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=13 adaptive_usable=13 progressive_usable=0 url=13 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 6
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=8 adaptive_usable=8 progressive_usable=0 url=8 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 8
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 8,
+      "web": 6
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "HANDOFF.md \"live dash search\" note: one of two 24/7 streams where every web-family client answered dash=n and ANDROID_VR dash=y. Working 24/7 stream in this corpus (the Lofi Girl ids below are dead).",
+    "hls_formats_listed": true,
+    "notes": "max 1080p30 SDR; protocols {'m3u8_native': 14}; channel subscribers ~3,300,000",
+    "verified_at": "2026-09-28T16:17:13Z"
+  },
+  {
+    "id": "v03RjDNwG1o",
+    "url": "https://www.youtube.com/watch?v=v03RjDNwG1o",
+    "category": "live",
+    "subcategory": "recently ended stream with replay (NASA)",
+    "title": "Progress 96 Cargo Ship Docking",
+    "channel": "NASA",
+    "duration_s": 3140,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "was_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 178,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=110 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=122 adaptive_usable=122 progressive_usable=0 url=122 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 177
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 177,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Progress 96 Cargo Ship Docking; was_live, ~52 min replay with HLS + https formats and 20 audio languages (auto-dubbed replay). Picked from the NASA /streams tab on 2026-09-28.; audio languages: ar, bn, de-DE, en-US, es-US, fr-FR, hi, id, it, iw, ja, ko, ml, nl-NL, pl, pt-BR, ru, ta, te, uk; max 2160p30 SDR; protocols {'m3u8_native': 55, 'https': 123}; channel subscribers ~15,100,000",
+    "verified_at": "2026-09-28T16:17:13Z"
+  },
+  {
+    "id": "j9epFget1W8",
+    "url": "https://www.youtube.com/watch?v=j9epFget1W8",
+    "category": "live",
+    "subcategory": "upcoming scheduled stream (NASA)",
+    "title": "Space Station Operations Update (Sept. 28, 2026)",
+    "channel": "NASA",
+    "duration_s": 0,
+    "made_for_kids": false,
+    "age_limit": null,
+    "live_status": "is_upcoming",
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "LIVE_STREAM_OFFLINE",
+        "reason": "This live event will begin in 2 hours.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "LIVE_STREAM_OFFLINE",
+        "reason": "This live event will begin in 2 hours.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "This live event will begin in 2 hours.",
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "TIME-SENSITIVE: \"Space Station Operations Update (Sept. 28, 2026)\"; at 16:13Z it answered LIVE_STREAM_OFFLINE \"This live event will begin in 2 hours\". After ~18:15Z it becomes live and then was_live - re-check before using it as the upcoming control.",
+    "verified_at": "2026-09-28T16:17:13Z"
+  },
+  {
+    "id": "gDcYk-rDY5I",
+    "url": "https://www.youtube.com/watch?v=gDcYk-rDY5I",
+    "category": "live",
+    "subcategory": "ended 12 h kids stream (Peppa Pig \"Live 24/7\")",
+    "title": "🔴 Peppa Pig | Full Episodes | All Series | Live 24/7 🐷 @Peppa Pig - Official Channel Livestream",
+    "channel": "George Pig - Official Channel",
+    "duration_s": 42848,
+    "made_for_kids": true,
+    "age_limit": 0,
+    "live_status": "was_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 33,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=30 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "tv_downgraded",
+        "status": "UNPLAYABLE",
+        "reason": "The page needs to be reloaded.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "web_embedded",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=1 url=27 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 33
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "web_embedded": 33
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_PAUSED_ONLY",
+      "page_texts": [
+        "Miniplayer is off for videos made for kids",
+        "This action is turned off for content made for kids"
+      ]
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "Made for kids AND a finished 11.9 h livestream (was_live), posted by the \"George Pig - Official Channel\" (Peppa Pig family). Also covers \"10h+\". Only web_embedded formats.; max 1080p30 SDR; protocols {'https': 27, 'm3u8_native': 6}; channel subscribers ~9,930,000",
+    "verified_at": "2026-09-28T16:17:13Z"
+  },
+  {
+    "id": "X4VbdwhkE10",
+    "url": "https://www.youtube.com/watch?v=X4VbdwhkE10",
+    "category": "live",
+    "subcategory": "dead 24/7 stream (Lofi Girl, HANDOFF)",
+    "title": "lofi hip hop radio 📚 beats to relax/study to",
+    "channel": "Lofi Girl",
+    "duration_s": 6552955,
+    "made_for_kids": false,
+    "age_limit": null,
+    "live_status": "post_live_unavailable",
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "This live stream recording is not available.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This live stream recording is not available.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "This live stream recording is not available.",
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "HANDOFF.md section 6 calls it the \"Reliable 24/7 live stream\"; section on Live DVR PASS used it. Now \"This live stream recording is not available.\" (post-live manifestless). Update HANDOFF.",
+    "hls_formats_listed": true,
+    "notes": "",
+    "verified_at": "2026-09-28T16:17:13Z"
+  },
+  {
+    "id": "jfKfPfyJRdk",
+    "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+    "category": "live",
+    "subcategory": "dead 24/7 stream (Lofi Girl canonical)",
+    "title": "lofi hip hop radio 📚 beats to relax/study to",
+    "channel": "Lofi Girl",
+    "duration_s": 121601512,
+    "made_for_kids": false,
+    "age_limit": null,
+    "live_status": "post_live_unavailable",
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "This live stream recording is not available.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This live stream recording is not available.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "This live stream recording is not available.",
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": true,
+    "notes": "yt-dlp \"continuous livestream\" fixture; \"This live stream recording is not available.\" (Lofi Girl wiki says the main stream was taken down 2026-05-19).",
+    "verified_at": "2026-09-28T16:25:54Z"
+  },
+  {
+    "id": "BGQWPY4IigY",
+    "url": "https://www.youtube.com/shorts/BGQWPY4IigY",
+    "category": "shorts",
+    "subcategory": "short (creator)",
+    "title": "MET THE LOVE OF MY LIFE ON AN AIRPLANE *caught on camera*",
+    "channel": "Allie Schnacky",
+    "duration_s": 14,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 26,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=24 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=26 adaptive_usable=26 progressive_usable=0 url=26 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 26
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 26
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "247 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "yt-dlp shorts fixture; 14 s vertical.; max 1280p30 SDR; protocols {'https': 26}; channel subscribers ~1,680,000",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "MT8tg5b3b8E",
+    "url": "https://www.youtube.com/shorts/MT8tg5b3b8E",
+    "category": "shorts",
+    "subcategory": "short (NASA official)",
+    "title": "Artemis II Watches Earth Set Behind the Moon",
+    "channel": "NASA",
+    "duration_s": 53,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 26,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=27 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=25 adaptive_usable=25 progressive_usable=0 url=25 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 25
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 25,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Artemis II; picked from the NASA /shorts tab on 2026-09-28 (1M views).; max 960p30 SDR; protocols {'https': 26}; channel subscribers ~15,100,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "Vop-h-u9B4o",
+    "url": "https://www.youtube.com/watch?v=Vop-h-u9B4o",
+    "category": "long",
+    "subcategory": "10h+",
+    "title": "Nyan Cat 10 hours (original)",
+    "channel": "HermTrololol",
+    "duration_s": 36000,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 5,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=4 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=5 adaptive_usable=5 progressive_usable=0 url=5 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 5
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 5
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Nyan Cat 10 hours (original), 36000 s; only 240p.; max 240p25 SDR; protocols {'https': 5}; channel subscribers ~46,200",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "LXb3EKWsInQ",
+    "url": "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+    "category": "long",
+    "subcategory": "4K60 HDR",
+    "title": "COSTA RICA IN 4K 60fps HDR (ULTRA HD)",
+    "channel": "Jacob + Katie Schwarz",
+    "duration_s": 314,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 40,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=44 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=40 adaptive_usable=40 progressive_usable=0 url=40 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 40
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 40
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "2160p60 with HDR10 formats (VP9.2/AV1 HDR).; max 2160p60 HDR10/SDR; protocols {'https': 40}; channel subscribers ~817,000",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "wE-aQO9XD1g",
+    "url": "https://www.youtube.com/watch?v=wE-aQO9XD1g",
+    "category": "long",
+    "subcategory": "360 / VR",
+    "title": "NASA’S Perseverance Rover’s First 360 View of Mars (Official)",
+    "channel": "NASA Jet Propulsion Laboratory",
+    "duration_s": 60,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=24 adaptive_usable=24 progressive_usable=0 url=24 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 24
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 24
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Equirectangular 360 (player response projectionType MESH on 14 formats), up to 2160p.; max 2160p30 SDR; protocols {'https': 24}; channel subscribers ~1,240,000",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "MeJVWBSsPAY",
+    "url": "https://www.youtube.com/watch?v=MeJVWBSsPAY",
+    "category": "embed_disabled",
+    "subcategory": "embedding disabled (lyrics upload)",
+    "title": "OOMPH! - Such Mich Find Mich (Lyrics)",
+    "channel": "Herr Lurik",
+    "duration_s": 210,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 15,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=13 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=14 adaptive_usable=14 progressive_usable=0 url=14 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 14
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 14,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": false,
+    "available_countries": "248 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "yt-dlp fixture \"Non-age-gated non-embeddable video\"; playableInEmbed=false. WEB_EMBED clients should fail, others play.; max 360p30 SDR; protocols {'https': 15}; playableInEmbed=false; channel subscribers ~597",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "s5qx1X78ujE",
+    "url": "https://www.youtube.com/watch?v=s5qx1X78ujE",
+    "category": "embed_disabled",
+    "subcategory": "embedding disabled (Russian TV series ep.)",
+    "title": "МОЛЧАНИЕ - Серия 1 / Детектив / СМОТРИТЕ на EPIC+",
+    "channel": "EPIC MEDIA",
+    "duration_s": 2988,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 29,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=34 adaptive_usable=0 progressive_usable=1 url=1 cipher=0 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=28 adaptive_usable=28 progressive_usable=0 url=28 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 28
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 28,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": false,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "From anxdpanic/plugin.video.youtube#482; playableInEmbed=false; 50 min; ru original + en-US dub.; audio languages: en-US, ru; max 1080p25 SDR; protocols {'https': 29}; playableInEmbed=false; channel subscribers ~5,180,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "sJL6WA-aGkQ",
+    "url": "https://www.youtube.com/watch?v=sJL6WA-aGkQ",
+    "category": "region_blocked",
+    "subcategory": "JP-only (blocked in ES)",
+    "title": "西野カナ 『Dear Bride』MV(Short Ver.)",
+    "channel": "西野カナ Official YouTube Channel",
+    "duration_s": 128,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "Video unavailable",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "The uploader has not made this video available in your country",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Video unavailable",
+    "playable_in_embed": null,
+    "available_countries": [
+      "JP"
+    ],
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "availableCountries=[JP]; from Spain the player says \"The uploader has not made this video available in your country\". yt-dlp fixture \"geo restricted to JP\".",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "jwCz9KmGuYY",
+    "url": "https://www.youtube.com/watch?v=jwCz9KmGuYY",
+    "category": "region_blocked",
+    "subcategory": "JP-only (blocked in ES)",
+    "title": "【公式】その着せ替え人形はラジオをする（第16回）",
+    "channel": "アニプレックス チャンネル",
+    "duration_s": 3553,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "Video unavailable",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "The uploader has not made this video available in your country",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Video unavailable",
+    "playable_in_embed": null,
+    "available_countries": [
+      "JP"
+    ],
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "availableCountries=[JP]; official radio episode; from yt-dlp#3641.",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "yZIXLfi8CZQ",
+    "url": "https://www.youtube.com/watch?v=yZIXLfi8CZQ",
+    "category": "expected_fail",
+    "subcategory": "private",
+    "title": null,
+    "channel": null,
+    "duration_s": null,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Private video",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Please sign in",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Private video",
+    "playable_in_embed": null,
+    "available_countries": null,
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "LOGIN_REQUIRED \"Private video\" (yt-dlp fixture).",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "6SJNVb0GnPI",
+    "url": "https://www.youtube.com/watch?v=6SJNVb0GnPI",
+    "category": "expected_fail",
+    "subcategory": "removed (policy)",
+    "title": null,
+    "channel": null,
+    "duration_s": null,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "ERROR",
+        "reason": "This video has been removed for violating YouTube's policy on hate speech. Learn more about combating hate speech in your country.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "ERROR",
+        "reason": "This video has been removed for violating YouTube's policy on hate speech. Learn more about combating hate speech in your country.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "This video has been removed for violating YouTube's policy on hate speech. Learn more about combating hate speech in your country.",
+    "playable_in_embed": null,
+    "available_countries": null,
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "ERROR \"removed for violating YouTube's policy on hate speech\" (yt-dlp fixture).",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "EwVsbUg4u2I",
+    "url": "https://www.youtube.com/shorts/EwVsbUg4u2I",
+    "category": "expected_fail",
+    "subcategory": "removed (Shorts re-upload)",
+    "title": null,
+    "channel": null,
+    "duration_s": null,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "ERROR",
+        "reason": "Video unavailable",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "ERROR",
+        "reason": "This video is no longer available because the YouTube account associated with this video has been terminated.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Video unavailable",
+    "playable_in_embed": null,
+    "available_countries": null,
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "A MrBeast \"baguette\" re-upload found by search; ERROR \"This video is no longer available because the YouTube account associated with this video has been terminated.\" - a terminated-account video addressed by a /shorts/ URL.",
+    "verified_at": "2026-09-28T16:20:13Z"
+  },
+  {
+    "id": "w664JpkrDio",
+    "url": "https://www.youtube.com/watch?v=w664JpkrDio",
+    "category": "expected_fail",
+    "subcategory": "members-only",
+    "title": "Dimension 20: Dungeons and Drag Queens Trailer",
+    "channel": "Dropout",
+    "duration_s": 166,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "Join this channel to get access to members-only content like this video, and other exclusive perks.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "Join this channel from your computer or mobile app to get access to members-only content like this video.",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Join this channel to get access to members-only content like this video, and other exclusive perks.",
+    "playable_in_embed": true,
+    "available_countries": "249 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "Dimension 20 trailer; UNPLAYABLE \"Join this channel ... members-only content\" (yt-dlp#9368).",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "6ULI7RH_0U8",
+    "url": "https://www.youtube.com/watch?v=6ULI7RH_0U8",
+    "category": "expected_fail",
+    "subcategory": "paid movie (YouTube Movies)",
+    "title": "I Still Know What You Did Last Summer",
+    "channel": "YouTube Movies",
+    "duration_s": 6031,
+    "made_for_kids": null,
+    "age_limit": null,
+    "live_status": null,
+    "availability": null,
+    "expected_signed_out": "fail",
+    "yt_dlp_formats": 0,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "UNPLAYABLE",
+        "reason": "Video unavailable",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      },
+      {
+        "client": "visionos",
+        "status": "UNPLAYABLE",
+        "reason": "This video is not available",
+        "streaming": "adaptive=0 adaptive_usable=0 progressive_usable=0 url=0 cipher=0 hls=False dash=False sabr=False",
+        "yt_dlp_formats": 0
+      }
+    ],
+    "yt_dlp_formats_by_client": {},
+    "yt_dlp_error": "Video unavailable",
+    "playable_in_embed": null,
+    "available_countries": [
+      "MX"
+    ],
+    "mfk_signal": {
+      "miniplayer_playbackMode": null,
+      "page_texts": []
+    },
+    "trouble_history": null,
+    "hls_formats_listed": false,
+    "notes": "\"I Still Know What You Did Last Summer\"; hasYpcMetadata, availableCountries=[MX] only, so from Spain it reads \"Video unavailable\", not \"requires payment\". It exercises the paid path AND a geo block; a rental that is offered in ES was not found without a signed-in storefront.",
+    "verified_at": "2026-09-28T16:23:30Z"
+  },
+  {
+    "id": "Fo89b8zAIE4",
+    "url": "https://www.youtube.com/watch?v=Fo89b8zAIE4",
+    "category": "history",
+    "subcategory": "bot-check incident",
+    "title": "Rusowsky: Tiny Desk Concert",
+    "channel": "NPR Music",
+    "duration_s": 1169,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=23 adaptive_usable=23 progressive_usable=0 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 23,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "241 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "BOT-CHECK-2026-09-07.md: Pixel showed \"Inicia sesion para confirmar que no eres un bot\" (LOGIN_REQUIRED) on this video; the fixed video of PERFORMANCE/SABR docs; plays in official app.",
+    "hls_formats_listed": false,
+    "notes": "max 1080p24 SDR; protocols {'https': 24}; channel subscribers ~13,000,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "p7YpVl35pac",
+    "url": "https://www.youtube.com/watch?v=p7YpVl35pac",
+    "category": "history",
+    "subcategory": "audio 403 on resume",
+    "title": "Milo J: Tiny Desk Concert",
+    "channel": "NPR Music",
+    "duration_s": 988,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=23 adaptive_usable=23 progressive_usable=0 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 23,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "243 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "LIVE-PASS-2026-09-07.md: historical resume at 945.9 s got one audio HTTP 403, recovered by reload.",
+    "hls_formats_listed": false,
+    "notes": "max 1080p24 SDR; protocols {'https': 24}; channel subscribers ~13,000,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "u_vnA6nlDvs",
+    "url": "https://www.youtube.com/watch?v=u_vnA6nlDvs",
+    "category": "history",
+    "subcategory": "initial error + recovery",
+    "title": "Charlie Puth: Tiny Desk Concert",
+    "channel": "NPR Music",
+    "duration_s": 1389,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=23 adaptive_usable=23 progressive_usable=0 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 23,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "241 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "PIXEL-TTFF-GATE-2026-09-07.md: \"One initial error, ordinary recovery, then playback\" (overall TTFF 3585 ms).",
+    "hls_formats_listed": false,
+    "notes": "max 1080p24 SDR; protocols {'https': 24}; channel subscribers ~13,000,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  },
+  {
+    "id": "X1bx9_TL20A",
+    "url": "https://www.youtube.com/watch?v=X1bx9_TL20A",
+    "category": "history",
+    "subcategory": "preload media 403",
+    "title": "The Cast of Buena Vista Social Club: Tiny Desk Concert",
+    "channel": "NPR Music",
+    "duration_s": 1218,
+    "made_for_kids": false,
+    "age_limit": 0,
+    "live_status": "not_live",
+    "availability": "public",
+    "expected_signed_out": "play",
+    "yt_dlp_formats": 24,
+    "yt_dlp_clients_used": [
+      {
+        "client": "web (watch page)",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=22 adaptive_usable=0 progressive_usable=1 url=0 cipher=1 hls=False dash=False sabr=True",
+        "yt_dlp_formats": 1
+      },
+      {
+        "client": "visionos",
+        "status": "OK",
+        "reason": null,
+        "streaming": "adaptive=23 adaptive_usable=23 progressive_usable=0 url=23 cipher=0 hls=True dash=False sabr=True",
+        "yt_dlp_formats": 23
+      }
+    ],
+    "yt_dlp_formats_by_client": {
+      "visionos": 23,
+      "web": 1
+    },
+    "yt_dlp_error": null,
+    "playable_in_embed": true,
+    "available_countries": "243 countries incl. ES",
+    "mfk_signal": {
+      "miniplayer_playbackMode": "PLAYBACK_MODE_ALLOW",
+      "page_texts": []
+    },
+    "trouble_history": "PIXEL-STARTUP-ABR-2026-09-07.md: speculative next-video preload got media 403s (reason=error); the real open recovered once.",
+    "hls_formats_listed": false,
+    "notes": "max 1080p24 SDR; protocols {'https': 24}; channel subscribers ~13,000,000",
+    "verified_at": "2026-09-28T16:21:55Z"
+  }
+]

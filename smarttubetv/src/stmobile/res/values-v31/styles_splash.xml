@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VOIDXDEV(launch): the Android 12+ system splash shows the VoidTube mark. -->
+    <style name="Theme.VoidTube.Splash" parent="Theme.NewTube">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_voidx_mark_art</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+    <style name="Theme.VoidTube.Splash.Classic">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_voidx_mark_art</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+    <style name="Theme.VoidTube.Splash.Fantasy">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_voidx_mark_art</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+</resources>

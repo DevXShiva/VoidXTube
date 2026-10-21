@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Update sheet (MobileUpdateActivity): one sheet for the whole update - checking, up to date,
+  update available with its release notes, download progress, ready to install, the one-time
+  "allow installs" step, failures, and "What's new" after an update. MobileUpdateActivity fills it
+  from AppUpdates' state; styled after sheet_mobile_accounts / sheet_mobile_cast. Only the notes
+  scroll (capped in code), so the buttons stay on screen however many versions are listed.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_mobile_sheet"
+    android:orientation="vertical"
+    android:paddingBottom="12dp">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_mobile_sheet_handle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp">
+
+        <ImageView
+            android:id="@+id/mobile_update_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@null"
+            android:src="@mipmap/app_icon" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/update_sheet_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:textColor="@color/mobile_color_on_surface"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Update available" />
+
+            <TextView
+                android:id="@+id/update_sheet_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/mobile_color_on_surface_secondary"
+                android:textSize="14sp"
+                tools:text="NewTube 1.10.5 · 41 MB" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Checking (indeterminate) and downloading (determinate once the size is known). -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/update_sheet_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        app:indicatorColor="@color/mobile_color_progress"
+        app:trackColor="@color/mobile_color_track"
+        app:trackCornerRadius="2dp"
+        app:trackThickness="4dp"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/update_sheet_progress_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="20dp"
+        android:textColor="@color/mobile_color_on_surface_secondary"
+        android:textSize="13sp"
+        android:visibility="gone"
+        tools:text="12 MB of 41 MB"
+        tools:visibility="visible" />
+
+    <com.newtube.mobile.ui.update.MaxHeightScrollView
+        android:id="@+id/update_sheet_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/update_sheet_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:lineSpacingMultiplier="1.15"
+                android:paddingHorizontal="20dp"
+                android:textColor="@color/mobile_color_on_surface_secondary"
+                android:textSize="14sp"
+                android:visibility="gone"
+                tools:text="Check your connection and try again."
+                tools:visibility="visible" />
+
+            <!-- Release notes: a "What's new in <version>" block per version. -->
+            <LinearLayout
+                android:id="@+id/update_sheet_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp" />
+
+            <TextView
+                android:id="@+id/update_sheet_release_notes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:paddingHorizontal="12dp"
+                android:text="@string/mobile_update_release_notes"
+                android:textColor="@color/mobile_color_link"
+                android:textSize="14sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+    </com.newtube.mobile.ui.update.MaxHeightScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <!-- VOIDXDEV(update pop-up): only on a sheet that opened by itself. -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/update_sheet_dont_ask"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start|center_vertical"
+            android:text="@string/mobile_update_dont_ask"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:visibility="gone"
+            app:rippleColor="@color/mobile_color_pill" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/update_sheet_secondary"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/mobile_color_on_surface"
+            android:visibility="gone"
+            app:rippleColor="@color/mobile_color_pill"
+            tools:text="Later"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/update_sheet_primary"
+            style="@style/Widget.NewTube.Button.Pill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            tools:text="Update"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

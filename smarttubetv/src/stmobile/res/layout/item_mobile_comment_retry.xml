@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(comments-panel): the end of a list whose next page failed - the rows stay, this offers
+     the page again. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:minHeight="64dp"
+    android:orientation="horizontal"
+    android:paddingStart="52dp"
+    android:paddingEnd="12dp">
+
+    <TextView
+        android:id="@+id/comment_retry_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/mobile_load_more_error"
+        android:textColor="@color/mobile_color_on_surface_secondary"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/comment_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_comment_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:text="@string/mobile_signin_retry_button"
+        android:textColor="@color/mobile_color_on_surface"
+        android:textSize="14sp" />
+
+</LinearLayout>

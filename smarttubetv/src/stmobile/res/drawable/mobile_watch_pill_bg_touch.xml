@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NEWTUBE(touch): the watch-page pill drawn 36dp tall inside a 48dp touch target. The chips
+     were exactly as tall as they looked (34-36dp); the extra 6dp above and below is touchable
+     but invisible. NEWTUBE(motion): with a ripple inside the pill - Share, Download and Save had
+     no press feedback at all (the Like / Dislike halves have their own, and their container is
+     not clickable, so this one never shows there). -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetTop="6dp"
+    android:insetBottom="6dp">
+    <ripple android:color="?android:attr/colorControlHighlight">
+        <item android:drawable="@drawable/mobile_watch_pill_bg" />
+    </ripple>
+</inset>

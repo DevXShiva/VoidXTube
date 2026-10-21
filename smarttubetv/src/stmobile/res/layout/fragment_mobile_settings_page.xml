@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(glass): the page is a GlassSource and the "Search settings" pill floats over it as
+     frosted glass (Glass.blur), so the rows scroll under it. A GlassSource may not hold the glass
+     that samples it, hence the FrameLayout around both. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<com.newtube.mobile.ui.common.GlassSource
+    android:id="@+id/settings_blur_target"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mobile_color_background">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mobile_settings_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/settings_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_dialog_back"
+            android:padding="12dp"
+            android:src="@drawable/ic_mobile_back_arrow" />
+
+        <TextView
+            android:id="@+id/settings_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="@dimen/mobile_settings_title_inset"
+            android:paddingEnd="16dp"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="@dimen/mobile_settings_title_size"
+            android:fontFamily="sans-serif-medium"
+            tools:text="Settings" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/settings_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_mobile_settings_row" />
+
+</LinearLayout>
+
+</com.newtube.mobile.ui.common.GlassSource>
+
+    <!-- "Search settings" on the top level, pinned under the title: a tap opens the search page
+         (SettingsSearchFragment). Gone on every other page. -->
+    <com.newtube.mobile.ui.common.GlassView
+        android:id="@+id/settings_search_field"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="@dimen/mobile_settings_search_top"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:visibility="gone"
+        app:glassCornerRadius="26dp"
+        app:glassTint="@color/voidx_glass_tint"
+        tools:visibility="visible">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/mobile_settings_search_hint"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_mobile_search"
+            android:tint="@color/mobile_color_on_surface_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:paddingStart="16dp"
+            android:text="@string/mobile_settings_search_hint"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    </com.newtube.mobile.ui.common.GlassView>
+
+</FrameLayout>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  VOIDXDEV(lyrics): the song's lyrics, opened from the watch page's Music pill. A title, provider and
+  close header, then a loader until Lyrics answers: timed lines that follow the song (LyricsSheet), plain selectable
+  text, or "not available". The frame is the frosted sheet glass; its height is capped from code so
+  it stops under the video, like the Description panel.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_mobile_sheet"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_mobile_sheet_handle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/mobile_lyrics"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Whose lyrics these are, once found; a tap opens the other providers (LyricsSheet). The
+             comments panel's sort button. -->
+        <LinearLayout
+            android:id="@+id/lyrics_sheet_provider"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_comment_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="6dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lyrics_sheet_provider_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/mobile_color_on_surface_secondary"
+                android:textSize="14sp"
+                tools:text="LRCLIB" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="2dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_watch_expand" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/lyrics_sheet_close"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/mobile_sheet_close"
+            android:src="@drawable/ic_sheet_close" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/mobile_color_divider" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minHeight="160dp">
+
+        <ProgressBar
+            android:id="@+id/lyrics_sheet_loading"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/lyrics_sheet_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingHorizontal="32dp"
+            android:text="@string/mobile_lyrics_none"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/lyrics_sheet_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="24dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="16dp">
+
+                <TextView
+                    android:id="@+id/lyrics_sheet_song"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textSize="18sp"
+                    tools:text="Ooroda Oththa Don" />
+
+                <TextView
+                    android:id="@+id/lyrics_sheet_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/mobile_color_on_surface_secondary"
+                    android:textSize="14sp"
+                    tools:text="Sai Abhyankkar" />
+
+                <!-- One TextView per timed line, or a single selectable one for plain lyrics. -->
+                <LinearLayout
+                    android:id="@+id/lyrics_sheet_lines"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/lyrics_sheet_source"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:textColor="@color/mobile_color_on_surface_secondary"
+                    android:textSize="12sp"
+                    tools:text="Source: LRCLIB" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </FrameLayout>
+
+</LinearLayout>

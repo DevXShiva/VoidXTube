@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(quotes): what a tap on the brand pill shows (QuoteCard), as "quote|author", English
+     only. Add freely: every one is shown once before any comes back. -->
+<resources>
+    <string-array name="voidx_quotes" translatable="false">
+        <item>The unexamined life is not worth living.|Socrates</item>
+        <item>I think, therefore I am.|René Descartes</item>
+        <item>Know thyself.|Inscription at Delphi</item>
+        <item>The journey of a thousand miles begins with a single step.|Lao Tzu</item>
+        <item>Imagination is more important than knowledge.|Albert Einstein</item>
+        <item>Life is like riding a bicycle. To keep your balance you must keep moving.|Albert Einstein</item>
+        <item>The important thing is not to stop questioning.|Albert Einstein</item>
+        <item>We are what we repeatedly do. Excellence, then, is not an act, but a habit.|Will Durant</item>
+        <item>The best way out is always through.|Robert Frost</item>
+        <item>Two roads diverged in a wood, and I took the one less traveled by.|Robert Frost</item>
+        <item>The woods are lovely, dark and deep, but I have promises to keep.|Robert Frost</item>
+        <item>Hope is the thing with feathers that perches in the soul.|Emily Dickinson</item>
+        <item>Forever is composed of nows.|Emily Dickinson</item>
+        <item>Not all those who wander are lost.|J.R.R. Tolkien</item>
+        <item>All we have to decide is what to do with the time that is given us.|J.R.R. Tolkien</item>
+        <item>All that is gold does not glitter.|J.R.R. Tolkien</item>
+        <item>Even the smallest person can change the course of the future.|The Fellowship of the Ring</item>
+        <item>It is our choices that show what we truly are, far more than our abilities.|J.K. Rowling</item>
+        <item>It does not do to dwell on dreams and forget to live.|J.K. Rowling</item>
+        <item>Happiness can be found, even in the darkest of times, if one only remembers to turn on the light.|Albus Dumbledore</item>
+        <item>I solemnly swear that I am up to no good.|J.K. Rowling</item>
+        <item>Do or do not. There is no try.|Yoda</item>
+        <item>May the Force be with you.|Star Wars</item>
+        <item>To be, or not to be: that is the question.|William Shakespeare</item>
+        <item>This above all: to thine own self be true.|William Shakespeare</item>
+        <item>We know what we are, but know not what we may be.|William Shakespeare</item>
+        <item>The fault, dear Brutus, is not in our stars, but in ourselves.|William Shakespeare</item>
+        <item>There is nothing either good or bad, but thinking makes it so.|William Shakespeare</item>
+        <item>All the world\'s a stage, and all the men and women merely players.|William Shakespeare</item>
+        <item>The course of true love never did run smooth.|William Shakespeare</item>
+        <item>We are such stuff as dreams are made on.|William Shakespeare</item>
+        <item>Brevity is the soul of wit.|William Shakespeare</item>
+        <item>I am the master of my fate, I am the captain of my soul.|William Ernest Henley</item>
+        <item>Ask not what your country can do for you; ask what you can do for your country.|John F. Kennedy</item>
+        <item>The only thing we have to fear is fear itself.|Franklin D. Roosevelt</item>
+        <item>Darkness cannot drive out darkness; only light can do that.|Martin Luther King Jr.</item>
+        <item>The time is always right to do what is right.|Martin Luther King Jr.</item>
+        <item>That\'s one small step for man, one giant leap for mankind.|Neil Armstrong</item>
+        <item>Education is the most powerful weapon which you can use to change the world.|Nelson Mandela</item>
+        <item>Arise, awake, and stop not till the goal is reached.|Swami Vivekananda</item>
+        <item>You have to dream before your dreams can come true.|A. P. J. Abdul Kalam</item>
+        <item>Dream is not that which you see while sleeping, it is something that does not let you sleep.|A. P. J. Abdul Kalam</item>
+        <item>Excellence is a continuous process and not an accident.|A. P. J. Abdul Kalam</item>
+        <item>Where the mind is without fear and the head is held high.|Rabindranath Tagore</item>
+        <item>You can\'t cross the sea merely by standing and staring at the water.|Rabindranath Tagore</item>
+        <item>Faith is the bird that feels the light when the dawn is still dark.|Rabindranath Tagore</item>
+        <item>You have a right to your actions, but never to their fruits.|Bhagavad Gita</item>
+        <item>Satyameva Jayate. Truth alone triumphs.|Mundaka Upanishad</item>
+        <item>Vasudhaiva Kutumbakam. The world is one family.|Maha Upanishad</item>
+        <item>Jai Jawan, Jai Kisan.|Lal Bahadur Shastri</item>
+        <item>The weak can never forgive. Forgiveness is the attribute of the strong.|Mahatma Gandhi</item>
+        <item>Strength does not come from physical capacity. It comes from an indomitable will.|Mahatma Gandhi</item>
+        <item>Stay hungry. Stay foolish.|Whole Earth Catalog</item>
+        <item>Your time is limited, so don\'t waste it living someone else\'s life.|Steve Jobs</item>
+        <item>The only way to do great work is to love what you do.|Steve Jobs</item>
+        <item>Design is not just what it looks like and feels like. Design is how it works.|Steve Jobs</item>
+        <item>Real artists ship.|Steve Jobs</item>
+        <item>Talk is cheap. Show me the code.|Linus Torvalds</item>
+        <item>Premature optimization is the root of all evil.|Donald Knuth</item>
+        <item>Any sufficiently advanced technology is indistinguishable from magic.|Arthur C. Clarke</item>
+        <item>The best way to predict the future is to invent it.|Alan Kay</item>
+        <item>Simple things should be simple, complex things should be possible.|Alan Kay</item>
+        <item>Programs must be written for people to read, and only incidentally for machines to execute.|Harold Abelson</item>
+        <item>Make it work, make it right, make it fast.|Kent Beck</item>
+        <item>Simplicity is prerequisite for reliability.|Edsger W. Dijkstra</item>
+        <item>Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.|Antoine de Saint-Exupéry</item>
+        <item>What is essential is invisible to the eye.|Antoine de Saint-Exupéry</item>
+        <item>He who has a why to live can bear almost any how.|Friedrich Nietzsche</item>
+        <item>That which does not kill us makes us stronger.|Friedrich Nietzsche</item>
+        <item>Without music, life would be a mistake.|Friedrich Nietzsche</item>
+        <item>One must imagine Sisyphus happy.|Albert Camus</item>
+        <item>In the depth of winter, I finally learned that within me there lay an invincible summer.|Albert Camus</item>
+        <item>We suffer more often in imagination than in reality.|Seneca</item>
+        <item>You have power over your mind, not outside events. Realize this, and you will find strength.|Marcus Aurelius</item>
+        <item>Waste no more time arguing about what a good man should be. Be one.|Marcus Aurelius</item>
+        <item>The happiness of your life depends upon the quality of your thoughts.|Marcus Aurelius</item>
+        <item>No man ever steps in the same river twice.|Heraclitus</item>
+        <item>Well done is better than well said.|Benjamin Franklin</item>
+        <item>Lost time is never found again.|Benjamin Franklin</item>
+        <item>Nothing in life is to be feared, it is only to be understood.|Marie Curie</item>
+        <item>We are a way for the cosmos to know itself.|Carl Sagan</item>
+        <item>Look up at the stars and not down at your feet.|Stephen Hawking</item>
+        <item>If I have seen further it is by standing on the shoulders of giants.|Isaac Newton</item>
+        <item>What I cannot create, I do not understand.|Richard Feynman</item>
+        <item>The first principle is that you must not fool yourself, and you are the easiest person to fool.|Richard Feynman</item>
+        <item>There is no greater agony than bearing an untold story inside you.|Maya Angelou</item>
+        <item>Nothing will work unless you do.|Maya Angelou</item>
+        <item>The best time to plant a tree was 20 years ago. The second best time is now.|Chinese proverb</item>
+        <item>Fall seven times, stand up eight.|Japanese proverb</item>
+        <item>A smooth sea never made a skilled sailor.|English proverb</item>
+        <item>Little by little, one goes far.|Spanish proverb</item>
+        <item>Fortune favors the bold.|Latin proverb</item>
+        <item>Carpe diem. Seize the day.|Horace</item>
+        <item>This too shall pass.|Persian proverb</item>
+        <item>Rome wasn\'t built in a day.|Proverb</item>
+        <item>Knowledge is power.|Francis Bacon</item>
+        <item>Reading is to the mind what exercise is to the body.|Richard Steele</item>
+        <item>The pen is mightier than the sword.|Edward Bulwer-Lytton</item>
+        <item>Not everything that can be counted counts, and not everything that counts can be counted.|William Bruce Cameron</item>
+        <item>Time you enjoy wasting is not wasted time.|Marthe Troly-Curtin</item>
+        <item>Life is what happens to you while you\'re busy making other plans.|John Lennon</item>
+        <item>Imagine all the people living life in peace.|John Lennon</item>
+        <item>All you need is love.|The Beatles</item>
+        <item>Here comes the sun, and I say it\'s all right.|The Beatles</item>
+        <item>The answer, my friend, is blowin\' in the wind.|Bob Dylan</item>
+        <item>Don\'t worry about a thing, \'cause every little thing gonna be all right.|Bob Marley</item>
+        <item>Don\'t stop believin\'.|Journey</item>
+        <item>Every day is a new day.|Ernest Hemingway</item>
+        <item>The world breaks everyone, and afterward, some are strong at the broken places.|Ernest Hemingway</item>
+        <item>So it goes.|Kurt Vonnegut</item>
+        <item>We are what we pretend to be, so we must be careful about what we pretend to be.|Kurt Vonnegut</item>
+        <item>Don\'t panic.|Douglas Adams</item>
+        <item>Time is an illusion. Lunchtime doubly so.|Douglas Adams</item>
+        <item>I love deadlines. I like the whooshing sound they make as they fly by.|Douglas Adams</item>
+        <item>The answer to the ultimate question of life, the universe and everything is 42.|Douglas Adams</item>
+        <item>All animals are equal, but some animals are more equal than others.|George Orwell</item>
+        <item>I declare after all there is no enjoyment like reading!|Jane Austen</item>
+        <item>There is no charm equal to tenderness of heart.|Jane Austen</item>
+        <item>You never really understand a person until you consider things from his point of view.|Harper Lee</item>
+        <item>It was the best of times, it was the worst of times.|Charles Dickens</item>
+        <item>Not everything that is faced can be changed, but nothing can be changed until it is faced.|James Baldwin</item>
+        <item>Those who cannot remember the past are condemned to repeat it.|George Santayana</item>
+        <item>Nothing great was ever achieved without enthusiasm.|Ralph Waldo Emerson</item>
+        <item>Our life is frittered away by detail. Simplify, simplify.|Henry David Thoreau</item>
+        <item>I went to the woods because I wished to live deliberately.|Henry David Thoreau</item>
+        <item>I am large, I contain multitudes.|Walt Whitman</item>
+        <item>Where words fail, music speaks.|Hans Christian Andersen</item>
+        <item>A picture is worth a thousand words.|English adage</item>
+        <item>Have no fear of perfection; you\'ll never reach it.|Salvador Dalí</item>
+        <item>I dream my painting and I paint my dream.|Vincent van Gogh</item>
+        <item>Great things are done by a series of small things brought together.|Vincent van Gogh</item>
+        <item>Float like a butterfly, sting like a bee.|Muhammad Ali</item>
+        <item>Don\'t quit. Suffer now and live the rest of your life as a champion.|Muhammad Ali</item>
+        <item>You miss 100% of the shots you don\'t take.|Wayne Gretzky</item>
+        <item>I\'ve failed over and over and over again in my life. And that is why I succeed.|Michael Jordan</item>
+        <item>Hard work beats talent when talent doesn\'t work hard.|Tim Notke</item>
+        <item>Champions keep playing until they get it right.|Billie Jean King</item>
+        <item>Well-behaved women seldom make history.|Laurel Thatcher Ulrich</item>
+        <item>Speak softly and carry a big stick.|Theodore Roosevelt</item>
+        <item>The credit belongs to the man who is actually in the arena.|Theodore Roosevelt</item>
+        <item>Do what you can, with what you have, where you are.|Theodore Roosevelt</item>
+        <item>Travel is fatal to prejudice, bigotry, and narrow-mindedness.|Mark Twain</item>
+        <item>Courage is resistance to fear, mastery of fear, not absence of fear.|Mark Twain</item>
+        <item>Get your facts first, and then you can distort them as you please.|Mark Twain</item>
+        <item>I can resist everything except temptation.|Oscar Wilde</item>
+        <item>We are all in the gutter, but some of us are looking at the stars.|Oscar Wilde</item>
+        <item>To live is the rarest thing in the world. Most people exist, that is all.|Oscar Wilde</item>
+        <item>Experience is the name everyone gives to their mistakes.|Oscar Wilde</item>
+        <item>The truth is rarely pure and never simple.|Oscar Wilde</item>
+        <item>When you have eliminated the impossible, whatever remains, however improbable, must be the truth.|Arthur Conan Doyle</item>
+        <item>Only those who will risk going too far can possibly find out how far one can go.|T.S. Eliot</item>
+        <item>Tell me, what is it you plan to do with your one wild and precious life?|Mary Oliver</item>
+        <item>Do not go gentle into that good night.|Dylan Thomas</item>
+        <item>Second star to the right, and straight on till morning.|J.M. Barrie</item>
+        <item>All children, except one, grow up.|J.M. Barrie</item>
+        <item>Curiouser and curiouser!|Lewis Carroll</item>
+        <item>Why, sometimes I\'ve believed as many as six impossible things before breakfast.|Lewis Carroll</item>
+        <item>We\'re all mad here.|Lewis Carroll</item>
+        <item>It is not down on any map; true places never are.|Herman Melville</item>
+        <item>A reader lives a thousand lives before he dies.|George R.R. Martin</item>
+        <item>So many books, so little time.|Frank Zappa</item>
+        <item>The most wasted of all days is one without laughter.|Nicolas Chamfort</item>
+        <item>Life is a tragedy when seen in close-up, but a comedy in long-shot.|Charlie Chaplin</item>
+        <item>To infinity and beyond!|Buzz Lightyear</item>
+        <item>Just keep swimming.|Dory, Finding Nemo</item>
+        <item>Why so serious?|The Joker, The Dark Knight</item>
+        <item>With great power comes great responsibility.|Spider-Man</item>
+        <item>I\'ll be back.|The Terminator</item>
+        <item>Life is like a box of chocolates. You never know what you\'re gonna get.|Forrest Gump</item>
+        <item>After all, tomorrow is another day!|Gone with the Wind</item>
+        <item>Here\'s looking at you, kid.|Casablanca</item>
+        <item>Hakuna matata. It means no worries.|The Lion King</item>
+        <item>Ohana means family. Family means nobody gets left behind.|Lilo and Stitch</item>
+        <item>Seize the day, boys. Make your lives extraordinary.|Dead Poets Society</item>
+        <item>It\'s not who I am underneath, but what I do that defines me.|Batman Begins</item>
+        <item>Even miracles take a little time.|Cinderella</item>
+        <item>Some people are worth melting for.|Olaf, Frozen</item>
+        <item>The flower that blooms in adversity is the most rare and beautiful of all.|Mulan</item>
+        <item>Adventure is out there!|Up</item>
+        <item>Anyone can cook.|Ratatouille</item>
+        <item>Houston, we have a problem.|Apollo 13</item>
+        <item>There\'s no place like home.|The Wizard of Oz</item>
+        <item>Winter is coming.|Game of Thrones</item>
+        <item>I\'m not superstitious, but I am a little stitious.|Michael Scott, The Office</item>
+        <item>Treat yo self.|Parks and Recreation</item>
+        <item>Broadcast yourself.|YouTube\'s first slogan</item>
+        <item>All right, so here we are in front of the elephants.|Me at the zoo, the first YouTube video</item>
+    </string-array>
+</resources>

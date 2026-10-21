@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VOIDXDEV(feed-strip): the browse grid's header row (FeedStrip) and its view type. -->
+    <item name="mobile_feed_strip" type="id" />
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A group title inside a settings page: smaller, in the accent colour and spaced off the group
+     above, so it never reads as one more row (a toggle list's headers were taken for options). -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_header_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:accessibilityHeading="true"
+    android:fontFamily="sans-serif-medium"
+    android:paddingStart="@dimen/mobile_settings_row_inset"
+    android:letterSpacing="0.02"
+    android:paddingTop="24dp"
+    android:paddingEnd="@dimen/mobile_settings_row_inset"
+    android:paddingBottom="8dp"
+    android:textColor="@color/mobile_color_section_title"
+    android:textSize="@dimen/mobile_settings_header_size"
+    tools:text="Network" />

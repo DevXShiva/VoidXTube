@@ -1,0 +1,26 @@
+{
+  "note": "Seed corpus for runs without ../corpus.json. jfKfPfyJRdk (Lofi Girl) is dead as of 2026-09-28 per ../corpus.md; the live seed is Chillhop 5yx6BWlEVcY.",
+  "videos": [
+    {
+      "id": "_WB5hh7WOb4",
+      "category": "made_for_kids",
+      "subcategory": "RO / Cip-Cirip (issue #5)",
+      "made_for_kids": true,
+      "expected_signed_out": "play"
+    },
+    {
+      "id": "dQw4w9WgXcQ",
+      "category": "ordinary",
+      "subcategory": "official-music-video",
+      "made_for_kids": false,
+      "expected_signed_out": "play"
+    },
+    {
+      "id": "5yx6BWlEVcY",
+      "category": "live",
+      "subcategory": "24/7 livestream (Chillhop Radio)",
+      "made_for_kids": false,
+      "expected_signed_out": "play"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VOIDXDEV(up-next): the small card over an ended video (NextCountdown) - "Up next in N", the next
+     title, Cancel / Replay / Play now, and a bar that drains over the ten seconds. Clickable so a
+     tap on it never reaches the player's tap-to-toggle-controls. Fits the ~200dp portrait box. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_next_countdown"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginHorizontal="16dp"
+    android:background="@drawable/bg_next_countdown"
+    android:clickable="true"
+    android:focusable="false"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="14dp">
+
+        <TextView
+            android:id="@+id/mobile_next_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:textColor="#B3FFFFFF"
+            android:textSize="12sp"
+            tools:text="Up next in 8" />
+
+        <TextView
+            android:id="@+id/mobile_next_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxWidth="268dp"
+            android:maxLines="1"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:text="The next video's title goes here" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/mobile_next_cancel"
+                style="@style/VoidTubeNextButton"
+                android:background="@drawable/bg_next_button_glass"
+                android:text="@string/mobile_next_cancel" />
+
+            <TextView
+                android:id="@+id/mobile_next_repeat"
+                style="@style/VoidTubeNextButton"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_next_button_glass"
+                android:text="@string/mobile_player_replay" />
+
+            <TextView
+                android:id="@+id/mobile_next_play"
+                style="@style/VoidTubeNextButton"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_next_button_primary"
+                android:text="@string/mobile_next_play"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/mobile_next_bar"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom"
+        android:background="@color/mobile_color_primary" />
+
+</FrameLayout>

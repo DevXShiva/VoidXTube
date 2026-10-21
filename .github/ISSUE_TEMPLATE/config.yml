@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and answers
+    url: https://github.com/DevXShiva/VoidXTube#readme
+    about: Sign-in, updates, safety and how VoidTube compares with other apps.
+  - name: Using SmartTube on a TV?
+    url: https://github.com/yuliskov/SmartTube/issues
+    about: VoidTube is a separate app. Please report SmartTube bugs in SmartTube's tracker.
