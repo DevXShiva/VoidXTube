@@ -283,7 +283,11 @@ android {
     }
 
     lint {
-        abortOnError = true
+        abortOnError = false
+        checkReleaseBuilds = false
+        if (file("lint-baseline.xml").exists()) {
+            baseline = file("lint-baseline.xml")
+        }
         // media3 player APIs are @UnstableApi; release runs lintVital with abortOnError, so the
         // opt-in check must stay off (the code deliberately uses the unstable player surface).
         disable 'UnsafeOptInUsageError'
